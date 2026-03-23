@@ -1,5 +1,5 @@
-// ========== ОТЛАДКА ==========
-const DEBUG = false; // включите true для вывода логов в консоль
+// ========== ОТЛАДКА (можно включить при необходимости) ==========
+const DEBUG = false;
 
 // Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
 const romajiToKatakana = {
@@ -23,7 +23,7 @@ const romajiToKatakana = {
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-    // Носовой n
+    // Носовой n (для случаев, когда n не образует слог)
     "n": ["ン"],
     // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
@@ -43,6 +43,7 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
+    // Длинное n
     "nn": ["ン"]
 };
 
@@ -376,15 +377,16 @@ function isPrefixOfLongerKey(str) {
 function processBuffer(row, col, buffer) {
     // 1. Если буфер точно совпадает с ключом
     if (romajiToKatakana.hasOwnProperty(buffer)) {
-        // Если буфер является префиксом более длинного ключа, ждём
-        if (isPrefixOfLongerKey(buffer)) {
+        // Для одно- и двухбуквенных вставляем сразу, даже если они префикс
+        const isShort = buffer.length === 1 || buffer.length === 2;
+        if (!isPrefixOfLongerKey(buffer) || isShort) {
+            if (DEBUG) console.log(`[processBuffer] Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
+            insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+            return true;
+        } else {
             if (DEBUG) console.log(`[processBuffer] Ждём, "${buffer}" — префикс более длинного ключа`);
             return false;
         }
-        // Иначе вставляем
-        if (DEBUG) console.log(`[processBuffer] Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
-        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
-        return true;
     }
     
     // 2. Если не совпадает, но является префиксом – ждём
@@ -402,7 +404,6 @@ function processBuffer(row, col, buffer) {
             if (DEBUG) console.log(`[processBuffer] Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
             insertKatakanaArray(row, col, katakanaArray, 0);
             if (remaining.length > 0) {
-                // Переносим остаток в следующую ячейку
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
                     if (activeWord) {
@@ -439,7 +440,6 @@ function handleKeydown(e, row, col) {
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
             updateCellUI(row, col);
-            if (DEBUG) console.log(`[Backspace] буфер "${buffer}"`);
         } else {
             if (gridData[row][col] !== "") {
                 gridData[row][col] = "";
@@ -492,6 +492,13 @@ function handleKeydown(e, row, col) {
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
+        } else {
+            // Принудительная вставка, если буфер является ключом и не префикс более длинного
+            if (romajiToKatakana.hasOwnProperty(buffer) && !isPrefixOfLongerKey(buffer)) {
+                if (DEBUG) console.log(`[handleKeydown] Принудительная вставка "${buffer}"`);
+                insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+                romajiBuffers.set(key, "");
+            }
         }
     }
 }
