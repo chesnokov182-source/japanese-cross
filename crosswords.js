@@ -8,7 +8,7 @@ window.crosswordsData = {
                 width: 8,
                 height: 6,
                 words: [
-                    { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык" },
+                    { word: "ガンバル", row: 3, col: 0, dir: "across", clue: "Стараться" },
                     { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель" },
                     { word: "デンワバンゴウ", row: 1, col: 1, dir: "across", clue: "Номер телефона" },
                     { word: "ギンコウ", row: 0, col: 5, dir: "down", clue: "Банк" },
