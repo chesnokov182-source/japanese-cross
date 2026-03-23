@@ -8,7 +8,6 @@ const crosswords = {
             { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
             { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
             { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
-            { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },
             { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" },
             { word: "ヤマ",   row: 2, col: 5, dir: "down",   clue: "Гора" }
         ]
