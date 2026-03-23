@@ -20,7 +20,8 @@ const romajiToKatakana = {
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-
+    // Носовой n (будет обрабатываться специально)
+    "n": ["ン"],
     // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
     "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
@@ -197,15 +198,33 @@ function getWordNumberAt(row, col){
 }
 
 function onCellFocus(row, col){
-    // Если активное слово уже есть, не меняем его при фокусе на ячейку
+    // Получаем список слов, содержащих эту ячейку
+    let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
+    if (containingWords.length === 0) return;
+    
+    // Если есть активное слово и ячейка принадлежит ему, не меняем
     if (activeWordId !== null) {
-        return;
+        let activeWord = wordsList.find(w => w.id === activeWordId);
+        if (activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) {
+            // Ячейка принадлежит активному слову – оставляем
+            return;
+        }
     }
-    // Иначе определяем слово по ячейке
-    let acrossWord = wordsList.find(w => w.dir === "across" && w.cells.some(c => c.row === row && c.col === col));
-    let downWord = wordsList.find(w => w.dir === "down" && w.cells.some(c => c.row === row && c.col === col));
-    if(acrossWord) setActiveWord(acrossWord.id);
-    else if(downWord) setActiveWord(downWord.id);
+    
+    // Иначе выбираем слово: приоритет у того, которое соответствует направлению предыдущего активного слова (если есть), иначе горизонтальное
+    let newWord = null;
+    if (activeWordId !== null) {
+        let activeWord = wordsList.find(w => w.id === activeWordId);
+        if (activeWord) {
+            // Ищем в той же ориентации
+            newWord = containingWords.find(w => w.dir === activeWord.dir);
+        }
+    }
+    if (!newWord) {
+        // По умолчанию берём горизонтальное, если есть
+        newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
+    }
+    setActiveWord(newWord.id);
 }
 
 function onCellBlur(row, col) {
@@ -326,7 +345,6 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
 
 // Фокус на следующее слово по номеру
 function focusNextWord(currentNumber) {
-    // Собираем все слова с их номерами, отсортированные по возрастанию
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
     let currentIndex = allWords.findIndex(w => w.num === currentNumber);
@@ -342,30 +360,41 @@ function focusNextWord(currentNumber) {
                     return;
                 }
             }
-            // Если все ячейки заполнены, всё равно ставим фокус на первую
             cellElements[word.cells[0].row][word.cells[0].col]?.focus();
         }
     }
 }
 
-// Обработка буфера: поиск максимального совпадения
+// Новая функция: проверяет, является ли строка префиксом какого-либо ключа (кроме самого себя)
+function isPrefixOfLongerKey(str) {
+    let keys = Object.keys(romajiToKatakana);
+    for (let key of keys) {
+        if (key !== str && key.startsWith(str)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function processBuffer(row, col, buffer) {
-    // Проверяем точное совпадение
+    // 1. Проверяем точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
+        // Если буфер является префиксом более длинного ключа, ждём
+        if (isPrefixOfLongerKey(buffer)) {
+            return false; // ждём
+        }
+        // Иначе вставляем
         const katakanaArray = romajiToKatakana[buffer];
         insertKatakanaArray(row, col, katakanaArray, 0);
         return true;
     }
     
-    // Проверяем, есть ли префикс (буфер может быть началом более длинного ключа)
-    let hasPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
-    if (hasPrefix) {
-        // Ждём дальнейшего ввода
+    // 2. Если не совпадает, но является префиксом какого-либо ключа – ждём
+    if (isPrefixOfLongerKey(buffer)) {
         return false;
     }
     
-    // Префиксов нет — значит буфер не может образовать слог.
-    // Нужно найти самый длинный ключ, который является префиксом буфера.
+    // 3. Иначе ищем самый длинный ключ, который является началом буфера
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -391,7 +420,7 @@ function processBuffer(row, col, buffer) {
         }
     }
     
-    // Если ничего не нашли, сбрасываем буфер
+    // Ничего не нашли – сбрасываем буфер
     return false;
 }
 
@@ -462,10 +491,8 @@ function handleKeydown(e, row, col) {
         // Обрабатываем буфер
         const processed = processBuffer(row, col, buffer);
         if (processed) {
-            // Буфер обработан, очищаем его
             romajiBuffers.set(key, "");
         }
-        // Если не обработан, буфер остаётся для дальнейшего ввода
     }
 }
 
