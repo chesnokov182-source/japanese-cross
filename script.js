@@ -8,6 +8,7 @@ const crosswords = {
             { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
             { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
             { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
+            { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },
             { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" },
             { word: "ヤマ",   row: 2, col: 5, dir: "down",   clue: "Гора" }
         ]
@@ -67,13 +68,12 @@ const crosswords = {
 };
 
 // ========== ТАБЛИЦА СООТВЕТСТВИЯ РОМАДЗИ → КАТАКАНА ==========
-// Добавляйте сюда нужные сочетания. Ключи — строчные буквы.
 const romajiToKatakana = {
     // Гласные
     "a": "ア", "i": "イ", "u": "ウ", "e": "エ", "o": "オ",
     // К-ряд
     "ka": "カ", "ki": "キ", "ku": "ク", "ke": "ケ", "ko": "コ",
-    // С-ряд (си, су, сэ, со)
+    // С-ряд
     "sa": "サ", "shi": "シ", "su": "ス", "se": "セ", "so": "ソ",
     // Т-ряд
     "ta": "タ", "chi": "チ", "tsu": "ツ", "te": "テ", "to": "ト",
@@ -89,6 +89,8 @@ const romajiToKatakana = {
     "ra": "ラ", "ri": "リ", "ru": "ル", "re": "レ", "ro": "ロ",
     // В-ряд
     "wa": "ワ", "wo": "ヲ",
+    // Носовой n
+    "n": "ン",
     // Дакутэн
     "ga": "ガ", "gi": "ギ", "gu": "グ", "ge": "ゲ", "go": "ゴ",
     "za": "ザ", "ji": "ジ", "zu": "ズ", "ze": "ゼ", "zo": "ゾ",
@@ -107,7 +109,7 @@ const romajiToKatakana = {
     "ja": "ジャ", "ju": "ジュ", "jo": "ジョ",
     "bya": "ビャ", "byu": "ビュ", "byo": "ビョ",
     "pya": "ピャ", "pyu": "ピュ", "pyo": "ピョ",
-    // Длинное "n" (для nn)
+    // Длинное n (для nn)
     "nn": "ン"
 };
 
@@ -121,7 +123,7 @@ let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 
-// Буферы для ввода ромадзи
+// Буферы для ввода ромадзи (ключ: `${row},${col}`)
 let romajiBuffers = new Map();
 
 // ========== Вспомогательные функции ==========
@@ -215,13 +217,13 @@ function renderGrid() {
             }
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;
-            input.value = gridData[i][j] !== null ? gridData[i][j] : "";
+            input.maxLength = 1; // визуально только один символ, но мы будем показывать буфер текстом
+            input.value = getDisplayValue(i, j);
             input.disabled = isBlocked;
             if(!isBlocked){
                 input.addEventListener("keydown", (e) => handleKeydown(e, i, j));
                 input.addEventListener("focus", () => onCellFocus(i,j));
-                input.addEventListener("blur", () => clearRomajiBuffer(i,j));
+                input.addEventListener("blur", () => onCellBlur(i,j));
             }
             cellDiv.appendChild(input);
             container.appendChild(cellDiv);
@@ -229,6 +231,22 @@ function renderGrid() {
         }
     }
     applyHighlight();
+}
+
+// Получить отображаемое значение в ячейке: буфер ромадзи (если есть) или сохранённую катакану
+function getDisplayValue(row, col) {
+    const key = `${row},${col}`;
+    const buffer = romajiBuffers.get(key) || "";
+    if (buffer !== "") {
+        return buffer;
+    }
+    return gridData[row][col] !== null ? gridData[row][col] : "";
+}
+
+function updateCellUI(row, col) {
+    if (cellElements[row][col]) {
+        cellElements[row][col].value = getDisplayValue(row, col);
+    }
 }
 
 function getWordNumberAt(row, col){
@@ -242,16 +260,27 @@ function getWordNumberAt(row, col){
 }
 
 function onCellFocus(row, col){
+    // Определяем активное слово
     let acrossWord = wordsList.find(w => w.dir === "across" && w.cells.some(c => c.row === row && c.col === col));
     let downWord = wordsList.find(w => w.dir === "down" && w.cells.some(c => c.row === row && c.col === col));
     if(acrossWord) setActiveWord(acrossWord.id);
     else if(downWord) setActiveWord(downWord.id);
-    clearRomajiBuffer(row, col);
+    
+    // Если в ячейке уже есть катакана, мы не очищаем буфер, но при следующем вводе будем её стирать.
+    // Для этого запомним в буфере специальный флаг, что нужно стереть старую катакану.
+    // Проще: при первом вводе символа после фокуса мы проверим, есть ли в ячейке значение, и если да — сотрём его.
+    // Этот флаг будем хранить отдельно, но проще реализовать в handleKeydown.
+    // Оставляем буфер как есть (он может быть пуст), а в handleKeydown при наборе нового символа очистим gridData,
+    // если буфер был пуст и в ячейке что-то есть.
 }
 
-function clearRomajiBuffer(row, col) {
+function onCellBlur(row, col) {
+    // При потере фокуса очищаем буфер, чтобы ячейка снова показывала катакану
     const key = `${row},${col}`;
-    romajiBuffers.set(key, "");
+    if (romajiBuffers.has(key) && romajiBuffers.get(key) !== "") {
+        romajiBuffers.set(key, "");
+        updateCellUI(row, col);
+    }
 }
 
 function setActiveWord(wordId){
@@ -294,7 +323,7 @@ function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
 
     // Отменяем стандартное поведение для всех печатных символов
-    if (e.key.length === 1) {
+    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
         e.preventDefault();
     }
 
@@ -306,6 +335,7 @@ function handleKeydown(e, row, col) {
             // Удаляем последний символ из буфера
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
+            updateCellUI(row, col);
         } else {
             // Буфер пуст — очищаем ячейку или переходим назад
             if (gridData[row][col] !== "") {
@@ -345,19 +375,27 @@ function handleKeydown(e, row, col) {
     // Только латиница
     if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
-        let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
+        let buffer = romajiBuffers.get(key) || "";
+        
+        // Если в ячейке уже есть катакана и буфер пуст, то при первом вводе очищаем ячейку
+        if (buffer === "" && gridData[row][col] !== "") {
+            gridData[row][col] = "";
+            // Не обновляем UI сразу, чтобы не потерять буфер, который сейчас начнём набирать
+        }
+        
+        buffer += e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
-
+        updateCellUI(row, col);
+        
         // Проверяем, есть ли в таблице ключ, полностью совпадающий с буфером
         if (romajiToKatakana.hasOwnProperty(buffer)) {
-            // Найдено полное соответствие
             const katakanaChar = romajiToKatakana[buffer];
             gridData[row][col] = katakanaChar;
+            romajiBuffers.set(key, ""); // очищаем буфер
             updateCellUI(row, col);
             syncWordFromGrid();
             checkCompletion();
-            romajiBuffers.set(key, ""); // очищаем буфер
-
+            
             // Переход на следующую ячейку активного слова
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -375,15 +413,10 @@ function handleKeydown(e, row, col) {
             if (!isPrefix) {
                 // Невалидная комбинация — сбрасываем буфер
                 romajiBuffers.set(key, "");
+                updateCellUI(row, col);
             }
             // Если префикс, ждём дальнейшего ввода
         }
-    }
-}
-
-function updateCellUI(row, col) {
-    if (cellElements[row][col]) {
-        cellElements[row][col].value = gridData[row][col] || "";
     }
 }
 
@@ -412,7 +445,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Например: su → ス, nn → ン, a → ア.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, nn → ン, a → ア.";
         statusDiv.style.color = "#666";
     }
 }
