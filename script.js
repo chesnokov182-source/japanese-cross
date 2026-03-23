@@ -238,6 +238,17 @@ function onCellBlur(row, col) {
 function setActiveWord(wordId){
     activeWordId = wordId;
     applyHighlight();
+    // После смены активного слова фокусируем первую пустую ячейку этого слова
+    const word = wordsList.find(w => w.id === activeWordId);
+    if (word && word.cells.length) {
+        const firstEmpty = word.cells.find(cell => gridData[cell.row][cell.col] === "");
+        if (firstEmpty) {
+            cellElements[firstEmpty.row][firstEmpty.col]?.focus();
+        } else {
+            // Если все ячейки заполнены, фокусируем первую
+            cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+        }
+    }
 }
 
 function applyHighlight(){
@@ -270,6 +281,19 @@ function clearHighlight(){
     applyHighlight();
 }
 
+// Получить следующую пустую ячейку в слове после заданной позиции
+function getNextEmptyCellInWord(word, currentRow, currentCol) {
+    let currentIndex = word.cells.findIndex(cell => cell.row === currentRow && cell.col === currentCol);
+    if (currentIndex === -1) return null;
+    for (let i = currentIndex + 1; i < word.cells.length; i++) {
+        let cell = word.cells[i];
+        if (gridData[cell.row][cell.col] === "") {
+            return cell;
+        }
+    }
+    return null; // нет пустых дальше
+}
+
 // Вставка массива символов в последовательные ячейки текущего слова
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     if (startIndex >= katakanaArray.length) return;
@@ -286,22 +310,22 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
                     if (idx !== -1 && idx + 1 < activeWord.cells.length) {
                         let nextCell = activeWord.cells[idx + 1];
+                        // Вставляем остаток в следующую ячейку
                         insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
                         return;
                     }
                 }
             }
         } else {
-            // После вставки одного символа переходим к следующей ячейке
+            // После вставки одного символа переходим к следующей пустой ячейке
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        cellElements[nextCell.row][nextCell.col]?.focus();
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if (nextEmpty) {
+                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        // Если слово закончилось, переходим к следующему слову по порядку номеров
+                        // Слово полностью заполнено – переходим к следующему слову
                         focusNextWord(activeWord.number);
                     }
                 }
@@ -326,14 +350,13 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                 }
             }
         } else {
-            // Переход к следующей ячейке после вставки последнего символа
+            // После вставки последнего символа переходим к следующей пустой ячейке
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        cellElements[nextCell.row][nextCell.col]?.focus();
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if (nextEmpty) {
+                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
                         focusNextWord(activeWord.number);
                     }
@@ -351,21 +374,11 @@ function focusNextWord(currentNumber) {
     if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
         let nextWord = allWords[currentIndex + 1];
         setActiveWord(nextWord.wordId);
-        let word = wordsList.find(w => w.id === nextWord.wordId);
-        if (word && word.cells.length) {
-            // Ищем первую пустую ячейку в слове
-            for (let cell of word.cells) {
-                if (gridData[cell.row][cell.col] === "") {
-                    cellElements[cell.row][cell.col]?.focus();
-                    return;
-                }
-            }
-            cellElements[word.cells[0].row][word.cells[0].col]?.focus();
-        }
+        // фокус уже будет установлен в setActiveWord на первую пустую ячейку
     }
 }
 
-// Новая функция: проверяет, является ли строка префиксом какого-либо ключа (кроме самого себя)
+// Проверяет, является ли строка префиксом какого-либо ключа (кроме самого себя)
 function isPrefixOfLongerKey(str) {
     let keys = Object.keys(romajiToKatakana);
     for (let key of keys) {
