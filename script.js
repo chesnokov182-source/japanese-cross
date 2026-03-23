@@ -1,3 +1,6 @@
+// ========== ОТЛАДКА ==========
+const DEBUG = false; // включите true для вывода логов в консоль
+
 // Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
 const romajiToKatakana = {
     // Гласные
@@ -20,7 +23,8 @@ const romajiToKatakana = {
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-    
+    // Носовой n
+    "n": ["ン"],
     // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
     "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
@@ -39,7 +43,6 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    // Длинное n
     "nn": ["ン"]
 };
 
@@ -373,18 +376,15 @@ function isPrefixOfLongerKey(str) {
 function processBuffer(row, col, buffer) {
     // 1. Если буфер точно совпадает с ключом
     if (romajiToKatakana.hasOwnProperty(buffer)) {
-        // Если это ключ, который является префиксом более длинного ключа,
-        // но при этом имеет длину 2 или более, то вставляем сразу (для ускорения).
-        // Одиночные гласные и все двухбуквенные вставляем немедленно.
-        const isShort = buffer.length === 1 || buffer.length === 2;
-        if (!isPrefixOfLongerKey(buffer) || isShort) {
-            if (DEBUG) console.log(`[processBuffer] Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
-            insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
-            return true;
-        } else {
+        // Если буфер является префиксом более длинного ключа, ждём
+        if (isPrefixOfLongerKey(buffer)) {
             if (DEBUG) console.log(`[processBuffer] Ждём, "${buffer}" — префикс более длинного ключа`);
             return false;
         }
+        // Иначе вставляем
+        if (DEBUG) console.log(`[processBuffer] Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
+        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+        return true;
     }
     
     // 2. Если не совпадает, но является префиксом – ждём
@@ -402,6 +402,7 @@ function processBuffer(row, col, buffer) {
             if (DEBUG) console.log(`[processBuffer] Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
             insertKatakanaArray(row, col, katakanaArray, 0);
             if (remaining.length > 0) {
+                // Переносим остаток в следующую ячейку
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
                     if (activeWord) {
