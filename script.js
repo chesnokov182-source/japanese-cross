@@ -20,7 +20,7 @@ const romajiToKatakana = {
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-    // Носовой n (будет обрабатываться специально)
+    // Носовой n
     "n": ["ン"],
     // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
@@ -40,7 +40,6 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    // Длинное n
     "nn": ["ン"]
 };
 
@@ -206,7 +205,6 @@ function onCellFocus(row, col){
     if (activeWordId !== null) {
         let activeWord = wordsList.find(w => w.id === activeWordId);
         if (activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) {
-            // Ячейка принадлежит активному слову – оставляем
             return;
         }
     }
@@ -216,12 +214,10 @@ function onCellFocus(row, col){
     if (activeWordId !== null) {
         let activeWord = wordsList.find(w => w.id === activeWordId);
         if (activeWord) {
-            // Ищем в той же ориентации
             newWord = containingWords.find(w => w.dir === activeWord.dir);
         }
     }
     if (!newWord) {
-        // По умолчанию берём горизонтальное, если есть
         newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
     }
     setActiveWord(newWord.id);
@@ -238,7 +234,7 @@ function onCellBlur(row, col) {
 function setActiveWord(wordId){
     activeWordId = wordId;
     applyHighlight();
-    // После смены активного слова фокусируем первую пустую ячейку этого слова
+    // Устанавливаем фокус на первую пустую ячейку этого слова
     const word = wordsList.find(w => w.id === activeWordId);
     if (word && word.cells.length) {
         const firstEmpty = word.cells.find(cell => gridData[cell.row][cell.col] === "");
@@ -291,7 +287,7 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
             return cell;
         }
     }
-    return null; // нет пустых дальше
+    return null;
 }
 
 // Вставка массива символов в последовательные ячейки текущего слова
@@ -310,7 +306,6 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
                     if (idx !== -1 && idx + 1 < activeWord.cells.length) {
                         let nextCell = activeWord.cells[idx + 1];
-                        // Вставляем остаток в следующую ячейку
                         insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
                         return;
                     }
@@ -374,7 +369,6 @@ function focusNextWord(currentNumber) {
     if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
         let nextWord = allWords[currentIndex + 1];
         setActiveWord(nextWord.wordId);
-        // фокус уже будет установлен в setActiveWord на первую пустую ячейку
     }
 }
 
@@ -394,16 +388,19 @@ function processBuffer(row, col, buffer) {
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         // Если буфер является префиксом более длинного ключа, ждём
         if (isPrefixOfLongerKey(buffer)) {
-            return false; // ждём
+            // console.log(`Ждём, "${buffer}" — префикс более длинного ключа`);
+            return false;
         }
         // Иначе вставляем
         const katakanaArray = romajiToKatakana[buffer];
+        // console.log(`Вставляем "${buffer}" -> ${katakanaArray.join('')}`);
         insertKatakanaArray(row, col, katakanaArray, 0);
         return true;
     }
     
     // 2. Если не совпадает, но является префиксом какого-либо ключа – ждём
     if (isPrefixOfLongerKey(buffer)) {
+        // console.log(`Ждём, "${buffer}" — префикс`);
         return false;
     }
     
@@ -413,6 +410,7 @@ function processBuffer(row, col, buffer) {
         if (romajiToKatakana.hasOwnProperty(prefix)) {
             const katakanaArray = romajiToKatakana[prefix];
             const remaining = buffer.slice(i);
+            // console.log(`Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
             insertKatakanaArray(row, col, katakanaArray, 0);
             if (remaining.length > 0) {
                 // Переносим остаток в следующую ячейку
@@ -434,6 +432,7 @@ function processBuffer(row, col, buffer) {
     }
     
     // Ничего не нашли – сбрасываем буфер
+    // console.log(`Неверная комбинация "${buffer}", сброс`);
     return false;
 }
 
