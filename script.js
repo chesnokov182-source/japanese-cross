@@ -1,17 +1,15 @@
 // БИБЛИОТЕКА КРОССВОРДОВ ПО УРОВНЯМ JLPT
-// Здесь вы можете добавлять свои кроссворды, следуя формату
 const crosswords = {
     n5: {
         name: "JLPT N5",
         width: 7,
         height: 7,
         words: [
-            // Слова с пересечениями
             { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
-            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Суси" },
+            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
             { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
-            { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },          // пересекается с "サクラ" в (0,4)
-            { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" }, // пересекается с "スシ" в (2,3)? нет, но для примера
+            { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },
+            { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" },
             { word: "ヤマ",   row: 2, col: 5, dir: "down",   clue: "Гора" }
         ]
     },
@@ -113,36 +111,6 @@ function generateNumbering() {
     cluesDown.sort((a,b) => a.num - b.num);
 }
 
-function buildGridFromWords(words, width, height) {
-    let grid = Array(height).fill().map(() => Array(width).fill(null));
-    for(let w of words) {
-        let cells = [];
-        if(w.dir === "across") {
-            for(let i = 0; i < w.word.length; i++) {
-                let r = w.row;
-                let c = w.col + i;
-                if(c < width && r < height) cells.push({ row: r, col: c });
-            }
-        } else {
-            for(let i = 0; i < w.word.length; i++) {
-                let r = w.row + i;
-                let c = w.col;
-                if(r < height && c < width) cells.push({ row: r, col: c });
-            }
-        }
-        w.cells = cells;
-        for(let cell of cells) {
-            if(grid[cell.row][cell.col] === null) grid[cell.row][cell.col] = "";
-        }
-    }
-    for(let i=0;i<height;i++){
-        for(let j=0;j<width;j++){
-            if(grid[i][j] === null) grid[i][j] = null;
-        }
-    }
-    return grid;
-}
-
 function loadCrossword(levelId) {
     const data = crosswords[levelId];
     if(!data) return;
@@ -179,7 +147,7 @@ function loadCrossword(levelId) {
     clearHighlight();
     activeWordId = null;
     checkCompletion();
-    romajiBuffers.clear(); // сброс буферов при смене уровня
+    romajiBuffers.clear();
 }
 
 function renderGrid() {
@@ -203,7 +171,7 @@ function renderGrid() {
             }
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;        // визуально только один символ, но ввод обрабатываем сложнее
+            input.maxLength = 1;        // визуально только один символ
             input.value = gridData[i][j] !== null ? gridData[i][j] : "";
             input.disabled = isBlocked;
             if(!isBlocked){
@@ -230,12 +198,10 @@ function getWordNumberAt(row, col){
 }
 
 function onCellFocus(row, col){
-    // При фокусе определяем активное слово
     let acrossWord = wordsList.find(w => w.dir === "across" && w.cells.some(c => c.row === row && c.col === col));
     let downWord = wordsList.find(w => w.dir === "down" && w.cells.some(c => c.row === row && c.col === col));
     if(acrossWord) setActiveWord(acrossWord.id);
     else if(downWord) setActiveWord(downWord.id);
-    // Очищаем буфер для этой ячейки (начинаем ввод заново)
     clearRomajiBuffer(row, col);
 }
 
@@ -279,30 +245,28 @@ function clearHighlight(){
     applyHighlight();
 }
 
-// Обработка ввода с накоплением ромадзи
+// Новая логика ввода с накоплением ромадзи
 function handleKeydown(e, row, col){
     if(gridData[row][col] === null) return;
 
-    // Backspace: удалить символ в ячейке или стереть последнюю букву буфера
+    // Backspace
     if(e.key === "Backspace"){
         e.preventDefault();
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
         if(buffer.length > 0){
-            // Удаляем последний символ из буфера
+            // удаляем последний символ из буфера
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
-            // Показываем буфер в поле? Не нужно, поле показывает только катакану из gridData.
-            // Просто обновили буфер.
         } else {
-            // Если буфер пуст, очищаем ячейку
+            // буфер пуст: очищаем ячейку и переходим назад
             if(gridData[row][col] !== ""){
                 gridData[row][col] = "";
                 updateCellUI(row,col);
                 syncWordFromGrid();
                 checkCompletion();
             } else {
-                // Переход на предыдущую ячейку активного слова
+                // переход на предыдущую ячейку активного слова
                 if(activeWordId !== null){
                     const activeWord = wordsList.find(w => w.id === activeWordId);
                     if(activeWord){
@@ -332,26 +296,53 @@ function handleKeydown(e, row, col){
         return;
     }
 
-    // Обработка букв (только латиница)
+    // Только латиница
     if(e.key.length === 1 && /[a-zA-Z]/.test(e.key)){
         e.preventDefault();
         const key = `${row},${col}`;
-        let buffer = romajiBuffers.get(key) || "";
-        buffer += e.key.toLowerCase(); // wanakana работает с нижним регистром
+        let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
-        
-        // Пытаемся преобразовать накопленную ромадзи в катакану
+
+        // Преобразуем буфер в катакану
         let katakana = wanakana.toKatakana(buffer);
-        // Если получился ровно один символ катаканы и он не пустой
-        if(katakana.length === 1 && katakana !== ""){
-            // Вставляем символ в ячейку
-            gridData[row][col] = katakana;
-            updateCellUI(row,col);
-            syncWordFromGrid();
-            checkCompletion();
-            // Очищаем буфер для этой ячейки
-            romajiBuffers.set(key, "");
-            // Переход на следующую ячейку в активном слове
+        
+        if(katakana.length === 0){
+            // ещё не набрали полноценную мору, ждём
+            return;
+        }
+        
+        // Если получилось несколько символов, берём первый
+        let firstChar = katakana[0];
+        let remaining = katakana.slice(1);
+        
+        // Вставляем первый символ в текущую ячейку
+        gridData[row][col] = firstChar;
+        updateCellUI(row,col);
+        syncWordFromGrid();
+        checkCompletion();
+        
+        // Очищаем буфер текущей ячейки
+        romajiBuffers.set(key, "");
+        
+        // Если есть остаток, сохраняем его для следующей ячейки
+        if(remaining.length > 0){
+            // Переходим на следующую ячейку активного слова
+            if(activeWordId !== null){
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if(activeWord){
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if(idx !== -1 && idx+1 < activeWord.cells.length){
+                        let nextCell = activeWord.cells[idx+1];
+                        const nextKey = `${nextCell.row},${nextCell.col}`;
+                        romajiBuffers.set(nextKey, remaining);
+                        cellElements[nextCell.row][nextCell.col]?.focus();
+                        return;
+                    }
+                }
+            }
+            // Если не нашли следующую ячейку, просто забываем остаток
+        } else {
+            // Без остатка: просто переходим на следующую ячейку активного слова
             if(activeWordId !== null){
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if(activeWord){
@@ -362,40 +353,7 @@ function handleKeydown(e, row, col){
                     }
                 }
             }
-        } else if(katakana.length > 1){
-            // Случай, когда набралось больше одной моры – берём первый символ, остаток оставляем в буфере?
-            // Но обычно wanakana.toKatakana("sushi") даст "スシ" – сразу два символа.
-            // В таком случае вставляем первый символ, а остаток сохраняем для следующей ячейки? Это сложно.
-            // Упростим: если получилось несколько символов, значит пользователь ввёл слово целиком.
-            // Вставим первый символ, а остаток отправим в следующую ячейку?
-            // Реализуем это: берём первый символ, остаток кладём в буфер следующей ячейки.
-            if(katakana.length >= 1){
-                let firstChar = katakana[0];
-                let remaining = katakana.slice(1);
-                gridData[row][col] = firstChar;
-                updateCellUI(row,col);
-                syncWordFromGrid();
-                checkCompletion();
-                romajiBuffers.set(key, "");
-                // Переход на следующую ячейку с остатком
-                if(activeWordId !== null){
-                    const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if(activeWord){
-                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if(idx !== -1 && idx+1 < activeWord.cells.length){
-                            let nextCell = activeWord.cells[idx+1];
-                            // Сохраняем остаток в буфер следующей ячейки
-                            if(remaining){
-                                const nextKey = `${nextCell.row},${nextCell.col}`;
-                                romajiBuffers.set(nextKey, remaining);
-                            }
-                            cellElements[nextCell.row][nextCell.col]?.focus();
-                        }
-                    }
-                }
-            }
         }
-        // иначе ждём ещё букв (например, "s" -> "" пока не добавится "u")
     }
 }
 
@@ -430,7 +388,7 @@ function checkCompletion(){
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Для ввода используйте английские буквы (a-z).";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Например: su → ス, nn → ん, a → あ.";
         statusDiv.style.color = "#666";
     }
 }
