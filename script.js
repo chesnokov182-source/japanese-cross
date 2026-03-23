@@ -69,15 +69,15 @@ const crosswords = {
 
 // Глобальное состояние
 let currentLevel = "n5";
-let gridData = [];        // 2D массив символов (null для блоков)
-let wordsList = [];       // список слов с доп. инфой
+let gridData = [];
+let wordsList = [];
 let cluesAcross = [];
 let cluesDown = [];
 let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 
-// Буферы для ввода ромадзи (ключ: `${row},${col}`)
+// Буферы для ввода ромадзи
 let romajiBuffers = new Map();
 
 // ========== Вспомогательные функции ==========
@@ -171,7 +171,7 @@ function renderGrid() {
             }
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;        // визуально только один символ
+            input.maxLength = 1;
             input.value = gridData[i][j] !== null ? gridData[i][j] : "";
             input.disabled = isBlocked;
             if(!isBlocked){
@@ -245,34 +245,36 @@ function clearHighlight(){
     applyHighlight();
 }
 
-// Новая логика ввода с накоплением ромадзи
-function handleKeydown(e, row, col){
-    if(gridData[row][col] === null) return;
+// Обработка ввода с накоплением ромадзи (полностью предотвращает прямой ввод)
+function handleKeydown(e, row, col) {
+    if (gridData[row][col] === null) return;
+
+    // Предотвращаем ввод любых печатных символов
+    const isPrintable = e.key.length === 1;
+    if (isPrintable) {
+        e.preventDefault();
+    }
 
     // Backspace
-    if(e.key === "Backspace"){
-        e.preventDefault();
+    if (e.key === "Backspace") {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
-        if(buffer.length > 0){
-            // удаляем последний символ из буфера
+        if (buffer.length > 0) {
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
         } else {
-            // буфер пуст: очищаем ячейку и переходим назад
-            if(gridData[row][col] !== ""){
+            if (gridData[row][col] !== "") {
                 gridData[row][col] = "";
-                updateCellUI(row,col);
+                updateCellUI(row, col);
                 syncWordFromGrid();
                 checkCompletion();
             } else {
-                // переход на предыдущую ячейку активного слова
-                if(activeWordId !== null){
+                if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if(activeWord){
+                    if (activeWord) {
                         let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if(idx > 0){
-                            let prev = activeWord.cells[idx-1];
+                        if (idx > 0) {
+                            let prev = activeWord.cells[idx - 1];
                             cellElements[prev.row][prev.col]?.focus();
                         }
                     }
@@ -283,56 +285,52 @@ function handleKeydown(e, row, col){
     }
 
     // Стрелки навигации
-    if(e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown"){
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
         let newRow = row, newCol = col;
-        if(e.key === "ArrowLeft") newCol--;
-        if(e.key === "ArrowRight") newCol++;
-        if(e.key === "ArrowUp") newRow--;
-        if(e.key === "ArrowDown") newRow++;
-        if(newRow>=0 && newRow<gridHeight && newCol>=0 && newCol<gridWidth && gridData[newRow][newCol] !== null){
+        if (e.key === "ArrowLeft") newCol--;
+        if (e.key === "ArrowRight") newCol++;
+        if (e.key === "ArrowUp") newRow--;
+        if (e.key === "ArrowDown") newRow++;
+        if (newRow >= 0 && newRow < gridHeight && newCol >= 0 && newCol < gridWidth && gridData[newRow][newCol] !== null) {
             cellElements[newRow][newCol]?.focus();
         }
-        e.preventDefault();
         return;
     }
 
-    // Только латиница
-    if(e.key.length === 1 && /[a-zA-Z]/.test(e.key)){
-        e.preventDefault();
+    // Обработка букв (только латиница)
+    if (isPrintable && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
 
         // Преобразуем буфер в катакану
         let katakana = wanakana.toKatakana(buffer);
-        
-        if(katakana.length === 0){
-            // ещё не набрали полноценную мору, ждём
+        if (katakana.length === 0) {
+            // Недостаточно символов для моры — ждём
             return;
         }
-        
-        // Если получилось несколько символов, берём первый
+
+        // Берём первый символ, остаток переносим в следующую ячейку
         let firstChar = katakana[0];
         let remaining = katakana.slice(1);
-        
-        // Вставляем первый символ в текущую ячейку
+
+        // Вставляем символ в текущую ячейку
         gridData[row][col] = firstChar;
-        updateCellUI(row,col);
+        updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
-        
+
         // Очищаем буфер текущей ячейки
         romajiBuffers.set(key, "");
-        
-        // Если есть остаток, сохраняем его для следующей ячейки
-        if(remaining.length > 0){
-            // Переходим на следующую ячейку активного слова
-            if(activeWordId !== null){
+
+        // Обработка остатка и переход на следующую ячейку
+        if (remaining.length > 0) {
+            if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
-                if(activeWord){
+                if (activeWord) {
                     let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if(idx !== -1 && idx+1 < activeWord.cells.length){
-                        let nextCell = activeWord.cells[idx+1];
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
                         const nextKey = `${nextCell.row},${nextCell.col}`;
                         romajiBuffers.set(nextKey, remaining);
                         cellElements[nextCell.row][nextCell.col]?.focus();
@@ -340,15 +338,15 @@ function handleKeydown(e, row, col){
                     }
                 }
             }
-            // Если не нашли следующую ячейку, просто забываем остаток
+            // Если нет следующей ячейки, остаток просто теряется
         } else {
-            // Без остатка: просто переходим на следующую ячейку активного слова
-            if(activeWordId !== null){
+            // Переход на следующую ячейку активного слова
+            if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
-                if(activeWord){
+                if (activeWord) {
                     let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if(idx !== -1 && idx+1 < activeWord.cells.length){
-                        let nextCell = activeWord.cells[idx+1];
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
                         cellElements[nextCell.row][nextCell.col]?.focus();
                     }
                 }
@@ -357,15 +355,15 @@ function handleKeydown(e, row, col){
     }
 }
 
-function updateCellUI(row,col){
-    if(cellElements[row][col]){
+function updateCellUI(row, col) {
+    if (cellElements[row][col]) {
         cellElements[row][col].value = gridData[row][col] || "";
     }
 }
 
-function syncWordFromGrid(){
-    for(let w of wordsList){
-        for(let i=0;i<w.cells.length;i++){
+function syncWordFromGrid() {
+    for (let w of wordsList) {
+        for (let i = 0; i < w.cells.length; i++) {
             let cell = w.cells[i];
             let val = gridData[cell.row][cell.col] || "";
             w.current[i] = val;
@@ -373,18 +371,18 @@ function syncWordFromGrid(){
     }
 }
 
-function checkCompletion(){
+function checkCompletion() {
     let allFilled = true;
-    for(let w of wordsList){
-        for(let i=0;i<w.word.length;i++){
-            if(w.current[i] !== w.wordOrig[i]){
+    for (let w of wordsList) {
+        for (let i = 0; i < w.word.length; i++) {
+            if (w.current[i] !== w.wordOrig[i]) {
                 allFilled = false;
                 break;
             }
         }
     }
     const statusDiv = document.getElementById("statusMsg");
-    if(allFilled){
+    if (allFilled) {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
@@ -393,7 +391,7 @@ function checkCompletion(){
     }
 }
 
-function renderClues(){
+function renderClues() {
     const container = document.getElementById("cluesContainer");
     container.innerHTML = `
         <div class="clue-block">
