@@ -1,62 +1,15 @@
-// ========== ОТЛАДКА (можно включить при необходимости) ==========
-const DEBUG = false;
-
-// Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
-const romajiToKatakana = {
-    // Гласные
-    "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
-    // К-ряд
-    "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
-    // С-ряд
-    "sa": ["サ"], "shi": ["シ"], "su": ["ス"], "se": ["セ"], "so": ["ソ"],
-    // Т-ряд
-    "ta": ["タ"], "chi": ["チ"], "tsu": ["ツ"], "te": ["テ"], "to": ["ト"],
-    // Н-ряд
-    "na": ["ナ"], "ni": ["ニ"], "nu": ["ヌ"], "ne": ["ネ"], "no": ["ノ"],
-    // Х-ряд
-    "ha": ["ハ"], "hi": ["ヒ"], "fu": ["フ"], "he": ["ヘ"], "ho": ["ホ"],
-    // М-ряд
-    "ma": ["マ"], "mi": ["ミ"], "mu": ["ム"], "me": ["メ"], "mo": ["モ"],
-    // Я-ряд
-    "ya": ["ヤ"], "yu": ["ユ"], "yo": ["ヨ"],
-    // Р-ряд
-    "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
-    // В-ряд
-    "wa": ["ワ"], "wo": ["ヲ"],
-    // Носовой n (для случаев, когда n не образует слог)
-    "n": ["ン"],
-    // Дакутэн
-    "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
-    "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
-    "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
-    "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
-    "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
-    // Комбинированные (полноразмерные вторые символы)
-    "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
-    "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
-    "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
-    "nya": ["ニ", "ヤ"], "nyu": ["ニ", "ユ"], "nyo": ["ニ", "ヨ"],
-    "hya": ["ヒ", "ヤ"], "hyu": ["ヒ", "ユ"], "hyo": ["ヒ", "ヨ"],
-    "mya": ["ミ", "ヤ"], "myu": ["ミ", "ユ"], "myo": ["ミ", "ヨ"],
-    "rya": ["リ", "ヤ"], "ryu": ["リ", "ユ"], "ryo": ["リ", "ヨ"],
-    "gya": ["ギ", "ヤ"], "gyu": ["ギ", "ユ"], "gyo": ["ギ", "ヨ"],
-    "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
-    "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
-    "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    // Длинное n
-    "nn": ["ン"]
-};
-
 // Глобальное состояние
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
-let gridData = [];
-let wordsList = [];
+let gridData = [];        // 2D массив символов (null для блоков)
+let wordsList = [];       // список слов с доп. инфой
 let cluesAcross = [];
 let cluesDown = [];
 let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
+
+// Буферы для ввода ромадзи (ключ: `${row},${col}`)
 let romajiBuffers = new Map();
 
 // DOM элементы
@@ -276,6 +229,7 @@ function clearHighlight(){
     applyHighlight();
 }
 
+// Возвращает следующую пустую ячейку в слове после указанной (row,col)
 function getNextEmptyCellInWord(word, currentRow, currentCol) {
     let currentIndex = word.cells.findIndex(cell => cell.row === currentRow && cell.col === currentCol);
     if (currentIndex === -1) return null;
@@ -288,15 +242,19 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     return null;
 }
 
+// Вставляет массив символов, начиная с (row,col), последовательно по ячейкам слова
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     if (startIndex >= katakanaArray.length) return;
     const char = katakanaArray[startIndex];
     if (startIndex === 0) {
+        // Первый символ – вставляем в текущую ячейку
         gridData[row][col] = char;
         updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
+
         if (katakanaArray.length > 1) {
+            // Есть остаток – рекурсивно вставляем в следующую ячейку
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
@@ -308,7 +266,9 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     }
                 }
             }
+            // Если следующей ячейки нет, остаток просто теряется (но в корректном кроссворде такого не будет)
         } else {
+            // Вставлен один символ – переходим к следующей пустой ячейке этого слова
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
@@ -316,16 +276,19 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     if (nextEmpty) {
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
+                        // Слово полностью заполнено – переходим к следующему слову
                         focusNextWord(activeWord.number);
                     }
                 }
             }
         }
     } else {
+        // Вставка в последующие ячейки (при рекурсии)
         gridData[row][col] = char;
         updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
+
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -339,6 +302,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                 }
             }
         } else {
+            // После вставки последнего символа переходим к следующей пустой ячейке
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
@@ -354,6 +318,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
+// Фокус на следующее слово по номеру (первая пустая ячейка)
 function focusNextWord(currentNumber) {
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
@@ -361,71 +326,11 @@ function focusNextWord(currentNumber) {
     if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
         let nextWord = allWords[currentIndex + 1];
         setActiveWord(nextWord.wordId);
+        // setActiveWord уже поставит фокус на первую пустую ячейку
     }
 }
 
-function isPrefixOfLongerKey(str) {
-    let keys = Object.keys(romajiToKatakana);
-    for (let key of keys) {
-        if (key !== str && key.startsWith(str)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function processBuffer(row, col, buffer) {
-    // 1. Если буфер точно совпадает с ключом
-    if (romajiToKatakana.hasOwnProperty(buffer)) {
-        // Для одно- и двухбуквенных вставляем сразу, даже если они префикс
-        const isShort = buffer.length === 1 || buffer.length === 2;
-        if (!isPrefixOfLongerKey(buffer) || isShort) {
-            if (DEBUG) console.log(`[processBuffer] Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
-            insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
-            return true;
-        } else {
-            if (DEBUG) console.log(`[processBuffer] Ждём, "${buffer}" — префикс более длинного ключа`);
-            return false;
-        }
-    }
-    
-    // 2. Если не совпадает, но является префиксом – ждём
-    if (isPrefixOfLongerKey(buffer)) {
-        if (DEBUG) console.log(`[processBuffer] Ждём, "${buffer}" — префикс`);
-        return false;
-    }
-    
-    // 3. Ищем самый длинный ключ, который является началом буфера
-    for (let i = buffer.length - 1; i >= 1; i--) {
-        let prefix = buffer.slice(0, i);
-        if (romajiToKatakana.hasOwnProperty(prefix)) {
-            const katakanaArray = romajiToKatakana[prefix];
-            const remaining = buffer.slice(i);
-            if (DEBUG) console.log(`[processBuffer] Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
-            insertKatakanaArray(row, col, katakanaArray, 0);
-            if (remaining.length > 0) {
-                if (activeWordId !== null) {
-                    const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if (activeWord) {
-                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                            let nextCell = activeWord.cells[idx + 1];
-                            const nextKey = `${nextCell.row},${nextCell.col}`;
-                            romajiBuffers.set(nextKey, remaining);
-                            if (DEBUG) console.log(`[processBuffer] Перенос остатка "${remaining}" в ячейку (${nextCell.row},${nextCell.col})`);
-                            cellElements[nextCell.row][nextCell.col]?.focus();
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-    }
-    
-    if (DEBUG) console.log(`[processBuffer] Неверная комбинация "${buffer}", сброс`);
-    return false;
-}
-
+// Обработка ввода с помощью wanakana
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -437,16 +342,19 @@ function handleKeydown(e, row, col) {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
         if (buffer.length > 0) {
+            // Удаляем последний символ из буфера
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
             updateCellUI(row, col);
         } else {
+            // Буфер пуст – удаляем символ из ячейки, если есть
             if (gridData[row][col] !== "") {
                 gridData[row][col] = "";
                 updateCellUI(row, col);
                 syncWordFromGrid();
                 checkCompletion();
             } else {
+                // Переход на предыдущую ячейку в активном слове
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
                     if (activeWord) {
@@ -481,23 +389,66 @@ function handleKeydown(e, row, col) {
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
-        
+
+        // Если в ячейке уже была катакана, стираем её при начале ввода
         if (buffer.length === 1 && gridData[row][col] !== "") {
             gridData[row][col] = "";
             updateCellUI(row, col);
             syncWordFromGrid();
             checkCompletion();
         }
-        
-        const processed = processBuffer(row, col, buffer);
-        if (processed) {
-            romajiBuffers.set(key, "");
+
+        // Преобразуем весь буфер в катакану с помощью wanakana
+        let katakana = wanakana.toKatakana(buffer);
+        if (DEBUG) console.log(`Buffer: "${buffer}" -> Katakana: "${katakana}"`);
+
+        if (katakana.length === 0) {
+            // Ни одного символа – ждём дальнейшего ввода
+            return;
+        }
+
+        // Разбиваем katakana на символы (каждый символ – это одна мора)
+        let chars = [...katakana];
+        let firstChar = chars[0];
+        let remainingChars = chars.slice(1);
+
+        // Вставляем первый символ в текущую ячейку
+        gridData[row][col] = firstChar;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+
+        // Очищаем буфер текущей ячейки
+        romajiBuffers.set(key, "");
+
+        // Если есть остаток, переносим его в следующую ячейку (рекурсивно)
+        if (remainingChars.length > 0) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        // Вставляем остаток в следующую ячейку, передавая массив символов
+                        insertKatakanaArray(nextCell.row, nextCell.col, remainingChars, 0);
+                        return;
+                    }
+                }
+            }
+            // Если нет следующей ячейки, остаток просто теряется (в корректном кроссворде такого не должно быть)
         } else {
-            // Принудительная вставка, если буфер является ключом и не префикс более длинного
-            if (romajiToKatakana.hasOwnProperty(buffer) && !isPrefixOfLongerKey(buffer)) {
-                if (DEBUG) console.log(`[handleKeydown] Принудительная вставка "${buffer}"`);
-                insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
-                romajiBuffers.set(key, "");
+            // Переходим к следующей пустой ячейке этого слова
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if (nextEmpty) {
+                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                    } else {
+                        // Слово полностью заполнено – переходим к следующему слову
+                        focusNextWord(activeWord.number);
+                    }
+                }
             }
         }
     }
@@ -528,7 +479,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ュ, a → ア, n+s → ン+s.";
         statusDiv.style.color = "#666";
     }
 }
