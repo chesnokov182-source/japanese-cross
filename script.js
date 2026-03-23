@@ -1,73 +1,4 @@
-// БИБЛИОТЕКА КРОССВОРДОВ ПО УРОВНЯМ JLPT
-const crosswords = {
-    n5: {
-        name: "JLPT N5",
-        width: 7,
-        height: 7,
-        words: [
-            { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
-            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
-            { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
-            { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },
-            { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" },
-            { word: "ヤマ",   row: 2, col: 5, dir: "down",   clue: "Гора" }
-        ]
-    },
-    n4: {
-        name: "JLPT N4",
-        width: 8,
-        height: 8,
-        words: [
-            { word: "デンシャ", row: 0, col: 1, dir: "across", clue: "Электричка, поезд" },
-            { word: "ヨミカタ", row: 3, col: 0, dir: "across", clue: "Способ чтения (как читается)" },
-            { word: "ハナシ",   row: 5, col: 2, dir: "across", clue: "Разговор, история" },
-            { word: "テンプラ", row: 1, col: 4, dir: "down",   clue: "Блюдо во фритюре" },
-            { word: "マチ",     row: 2, col: 6, dir: "down",   clue: "Город" },
-            { word: "アメ",     row: 4, col: 1, dir: "down",   clue: "Дождь / конфета" }
-        ]
-    },
-    n3: {
-        name: "JLPT N3",
-        width: 9,
-        height: 9,
-        words: [
-            { word: "ケイザイ",   row: 0, col: 2, dir: "across", clue: "Экономика" },
-            { word: "セイジ",     row: 2, col: 1, dir: "across", clue: "Политика" },
-            { word: "ブンカ",     row: 4, col: 0, dir: "across", clue: "Культура" },
-            { word: "レキシ",     row: 6, col: 3, dir: "across", clue: "История" },
-            { word: "ガクシュウ", row: 1, col: 5, dir: "down",   clue: "Обучение" },
-            { word: "ケンキュウ", row: 3, col: 7, dir: "down",   clue: "Исследование" }
-        ]
-    },
-    n2: {
-        name: "JLPT N2",
-        width: 10,
-        height: 10,
-        words: [
-            { word: "チョウサ",     row: 0, col: 3, dir: "across", clue: "Расследование, исследование" },
-            { word: "ハッテン",     row: 2, col: 1, dir: "across", clue: "Развитие" },
-            { word: "カンリョウ",   row: 4, col: 2, dir: "across", clue: "Чиновник, бюрократ" },
-            { word: "コクサイ",     row: 6, col: 0, dir: "across", clue: "Международный" },
-            { word: "ジョウホウ",   row: 1, col: 5, dir: "down",   clue: "Информация" },
-            { word: "イノベーション", row: 3, col: 7, dir: "down", clue: "Инновация" }
-        ]
-    },
-    n1: {
-        name: "JLPT N1",
-        width: 12,
-        height: 12,
-        words: [
-            { word: "ジッソウ",   row: 0, col: 2, dir: "across", clue: "Внедрение, реализация" },
-            { word: "ソウゴウテキ", row: 2, col: 1, dir: "across", clue: "Комплексный, всесторонний" },
-            { word: "ケイショウ", row: 4, col: 4, dir: "across", clue: "Наследование" },
-            { word: "ホショウ",   row: 6, col: 0, dir: "across", clue: "Гарантия" },
-            { word: "チイキ",     row: 1, col: 8, dir: "down",   clue: "Регион, район" },
-            { word: "サクセイ",   row: 3, col: 5, dir: "down",   clue: "Составление (документа)" }
-        ]
-    }
-};
-
-// ========== ТАБЛИЦА СООТВЕТСТВИЯ РОМАДЗИ → КАТАКАНА ==========
+// Таблица соответствия ромадзи → катакана
 const romajiToKatakana = {
     // Гласные
     "a": "ア", "i": "イ", "u": "ウ", "e": "エ", "o": "オ",
@@ -97,7 +28,7 @@ const romajiToKatakana = {
     "da": "ダ", "di": "ヂ", "du": "ヅ", "de": "デ", "do": "ド",
     "ba": "バ", "bi": "ビ", "bu": "ブ", "be": "ベ", "bo": "ボ",
     "pa": "パ", "pi": "ピ", "pu": "プ", "pe": "ペ", "po": "ポ",
-    // Комбинированные (с маленькими)
+    // Комбинированные
     "kya": "キャ", "kyu": "キュ", "kyo": "キョ",
     "sha": "シャ", "shu": "シュ", "sho": "ショ",
     "cha": "チャ", "chu": "チュ", "cho": "チョ",
@@ -109,12 +40,12 @@ const romajiToKatakana = {
     "ja": "ジャ", "ju": "ジュ", "jo": "ジョ",
     "bya": "ビャ", "byu": "ビュ", "byo": "ビョ",
     "pya": "ピャ", "pyu": "ピュ", "pyo": "ピョ",
-    // Длинное n (для nn)
     "nn": "ン"
 };
 
 // Глобальное состояние
 let currentLevel = "n5";
+let currentPuzzleIndex = 0;
 let gridData = [];
 let wordsList = [];
 let cluesAcross = [];
@@ -122,9 +53,12 @@ let cluesDown = [];
 let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
-
-// Буферы для ввода ромадзи (ключ: `${row},${col}`)
 let romajiBuffers = new Map();
+
+// DOM элементы
+const levelSelect = document.getElementById("levelSelect");
+const puzzleSelect = document.getElementById("puzzleSelect");
+const resetBtn = document.getElementById("resetBtn");
 
 // ========== Вспомогательные функции ==========
 function generateNumbering() {
@@ -157,17 +91,23 @@ function generateNumbering() {
     cluesDown.sort((a,b) => a.num - b.num);
 }
 
-function loadCrossword(levelId) {
-    const data = crosswords[levelId];
-    if(!data) return;
-    gridWidth = data.width;
-    gridHeight = data.height;
-    wordsList = data.words.map((w, idx) => ({
+function loadCrossword(levelId, puzzleIdx) {
+    const levelData = window.crosswordsData[levelId];
+    if (!levelData) return;
+    const puzzles = levelData.puzzles;
+    if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
+    const puzzle = puzzles[puzzleIdx];
+    
+    gridWidth = puzzle.width;
+    gridHeight = puzzle.height;
+    wordsList = puzzle.words.map((w, idx) => ({
         ...w,
         id: idx,
         current: Array(w.word.length).fill(""),
         wordOrig: w.word
     }));
+    
+    // Построение сетки
     let emptyGrid = Array(gridHeight).fill().map(() => Array(gridWidth).fill(null));
     for(let w of wordsList) {
         let cells = [];
@@ -217,7 +157,7 @@ function renderGrid() {
             }
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1; // визуально только один символ, но мы будем показывать буфер текстом
+            input.maxLength = 1;
             input.value = getDisplayValue(i, j);
             input.disabled = isBlocked;
             if(!isBlocked){
@@ -233,13 +173,10 @@ function renderGrid() {
     applyHighlight();
 }
 
-// Получить отображаемое значение в ячейке: буфер ромадзи (если есть) или сохранённую катакану
 function getDisplayValue(row, col) {
     const key = `${row},${col}`;
     const buffer = romajiBuffers.get(key) || "";
-    if (buffer !== "") {
-        return buffer;
-    }
+    if (buffer !== "") return buffer;
     return gridData[row][col] !== null ? gridData[row][col] : "";
 }
 
@@ -260,22 +197,13 @@ function getWordNumberAt(row, col){
 }
 
 function onCellFocus(row, col){
-    // Определяем активное слово
     let acrossWord = wordsList.find(w => w.dir === "across" && w.cells.some(c => c.row === row && c.col === col));
     let downWord = wordsList.find(w => w.dir === "down" && w.cells.some(c => c.row === row && c.col === col));
     if(acrossWord) setActiveWord(acrossWord.id);
     else if(downWord) setActiveWord(downWord.id);
-    
-    // Если в ячейке уже есть катакана, мы не очищаем буфер, но при следующем вводе будем её стирать.
-    // Для этого запомним в буфере специальный флаг, что нужно стереть старую катакану.
-    // Проще: при первом вводе символа после фокуса мы проверим, есть ли в ячейке значение, и если да — сотрём его.
-    // Этот флаг будем хранить отдельно, но проще реализовать в handleKeydown.
-    // Оставляем буфер как есть (он может быть пуст), а в handleKeydown при наборе нового символа очистим gridData,
-    // если буфер был пуст и в ячейке что-то есть.
 }
 
 function onCellBlur(row, col) {
-    // При потере фокуса очищаем буфер, чтобы ячейка снова показывала катакану
     const key = `${row},${col}`;
     if (romajiBuffers.has(key) && romajiBuffers.get(key) !== "") {
         romajiBuffers.set(key, "");
@@ -318,11 +246,8 @@ function clearHighlight(){
     applyHighlight();
 }
 
-// ========== Обработка ввода с таблицей соответствия ==========
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
-
-    // Отменяем стандартное поведение для всех печатных символов
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
         e.preventDefault();
     }
@@ -332,12 +257,10 @@ function handleKeydown(e, row, col) {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
         if (buffer.length > 0) {
-            // Удаляем последний символ из буфера
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
             updateCellUI(row, col);
         } else {
-            // Буфер пуст — очищаем ячейку или переходим назад
             if (gridData[row][col] !== "") {
                 gridData[row][col] = "";
                 updateCellUI(row, col);
@@ -359,7 +282,7 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    // Стрелки навигации
+    // Стрелки
     if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
         let newRow = row, newCol = col;
         if (e.key === "ArrowLeft") newCol--;
@@ -372,31 +295,25 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    // Только латиница
+    // Латинские буквы
     if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
-        
-        // Если в ячейке уже есть катакана и буфер пуст, то при первом вводе очищаем ячейку
         if (buffer === "" && gridData[row][col] !== "") {
             gridData[row][col] = "";
-            // Не обновляем UI сразу, чтобы не потерять буфер, который сейчас начнём набирать
         }
-        
         buffer += e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
-        
-        // Проверяем, есть ли в таблице ключ, полностью совпадающий с буфером
+
         if (romajiToKatakana.hasOwnProperty(buffer)) {
             const katakanaChar = romajiToKatakana[buffer];
             gridData[row][col] = katakanaChar;
-            romajiBuffers.set(key, ""); // очищаем буфер
+            romajiBuffers.set(key, "");
             updateCellUI(row, col);
             syncWordFromGrid();
             checkCompletion();
-            
-            // Переход на следующую ячейку активного слова
+
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
@@ -408,14 +325,11 @@ function handleKeydown(e, row, col) {
                 }
             }
         } else {
-            // Проверяем, является ли буфер префиксом какого-либо ключа
             let isPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
             if (!isPrefix) {
-                // Невалидная комбинация — сбрасываем буфер
                 romajiBuffers.set(key, "");
                 updateCellUI(row, col);
             }
-            // Если префикс, ждём дальнейшего ввода
         }
     }
 }
@@ -494,16 +408,38 @@ function renderClues() {
 }
 
 function resetCrossword(){
-    loadCrossword(currentLevel);
+    loadCrossword(currentLevel, currentPuzzleIndex);
 }
 
-// Инициализация
-document.getElementById("levelSelect").addEventListener("change", (e) => {
+function updatePuzzleSelect() {
+    const puzzles = window.crosswordsData[currentLevel].puzzles;
+    puzzleSelect.innerHTML = "";
+    puzzles.forEach((puzzle, idx) => {
+        const option = document.createElement("option");
+        option.value = idx;
+        option.textContent = puzzle.name || `Кроссворд ${idx + 1}`;
+        puzzleSelect.appendChild(option);
+    });
+    puzzleSelect.value = currentPuzzleIndex;
+}
+
+// Обработчики событий
+levelSelect.addEventListener("change", (e) => {
     currentLevel = e.target.value;
-    loadCrossword(currentLevel);
+    currentPuzzleIndex = 0;
+    updatePuzzleSelect();
+    loadCrossword(currentLevel, currentPuzzleIndex);
 });
-document.getElementById("resetBtn").addEventListener("click", () => {
+
+puzzleSelect.addEventListener("change", (e) => {
+    currentPuzzleIndex = parseInt(e.target.value, 10);
+    loadCrossword(currentLevel, currentPuzzleIndex);
+});
+
+resetBtn.addEventListener("click", () => {
     resetCrossword();
 });
 
-loadCrossword("n5");
+// Инициализация
+updatePuzzleSelect();
+loadCrossword("n5", 0);
