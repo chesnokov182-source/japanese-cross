@@ -504,6 +504,11 @@ function handleKeydown(e, row, col) {
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
+        } else if (romajiToKatakana.hasOwnProperty(buffer) && !isPrefixOfLongerKey(buffer)) {
+            // Принудительная вставка, если processBuffer по какой-то причине не сработал
+            const katakanaArray = romajiToKatakana[buffer];
+            insertKatakanaArray(row, col, katakanaArray, 0);
+            romajiBuffers.set(key, "");
         }
     }
 }
