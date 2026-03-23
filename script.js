@@ -1,46 +1,45 @@
-// Таблица соответствия ромадзи → катакана
+// Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
 const romajiToKatakana = {
     // Гласные
-    "a": "ア", "i": "イ", "u": "ウ", "e": "エ", "o": "オ",
+    "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
     // К-ряд
-    "ka": "カ", "ki": "キ", "ku": "ク", "ke": "ケ", "ko": "コ",
+    "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
     // С-ряд
-    "sa": "サ", "shi": "シ", "su": "ス", "se": "セ", "so": "ソ",
+    "sa": ["サ"], "shi": ["シ"], "su": ["ス"], "se": ["セ"], "so": ["ソ"],
     // Т-ряд
-    "ta": "タ", "chi": "チ", "tsu": "ツ", "te": "テ", "to": "ト",
+    "ta": ["タ"], "chi": ["チ"], "tsu": ["ツ"], "te": ["テ"], "to": ["ト"],
     // Н-ряд
-    "na": "ナ", "ni": "ニ", "nu": "ヌ", "ne": "ネ", "no": "ノ",
+    "na": ["ナ"], "ni": ["ニ"], "nu": ["ヌ"], "ne": ["ネ"], "no": ["ノ"],
     // Х-ряд
-    "ha": "ハ", "hi": "ヒ", "fu": "フ", "he": "ヘ", "ho": "ホ",
+    "ha": ["ハ"], "hi": ["ヒ"], "fu": ["フ"], "he": ["ヘ"], "ho": ["ホ"],
     // М-ряд
-    "ma": "マ", "mi": "ミ", "mu": "ム", "me": "メ", "mo": "モ",
+    "ma": ["マ"], "mi": ["ミ"], "mu": ["ム"], "me": ["メ"], "mo": ["モ"],
     // Я-ряд
-    "ya": "ヤ", "yu": "ユ", "yo": "ヨ",
+    "ya": ["ヤ"], "yu": ["ユ"], "yo": ["ヨ"],
     // Р-ряд
-    "ra": "ラ", "ri": "リ", "ru": "ル", "re": "レ", "ro": "ロ",
+    "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
-    "wa": "ワ", "wo": "ヲ",
-    // Носовой n
-    "n": "ン",
+    "wa": ["ワ"], "wo": ["ヲ"],
     // Дакутэн
-    "ga": "ガ", "gi": "ギ", "gu": "グ", "ge": "ゲ", "go": "ゴ",
-    "za": "ザ", "ji": "ジ", "zu": "ズ", "ze": "ゼ", "zo": "ゾ",
-    "da": "ダ", "di": "ヂ", "du": "ヅ", "de": "デ", "do": "ド",
-    "ba": "バ", "bi": "ビ", "bu": "ブ", "be": "ベ", "bo": "ボ",
-    "pa": "パ", "pi": "ピ", "pu": "プ", "pe": "ペ", "po": "ポ",
-    // Комбинированные
-    "kya": "キャ", "kyu": "キュ", "kyo": "キョ",
-    "sha": "シャ", "shu": "シュ", "sho": "ショ",
-    "cha": "チャ", "chu": "チュ", "cho": "チョ",
-    "nya": "ニャ", "nyu": "ニュ", "nyo": "ニョ",
-    "hya": "ヒャ", "hyu": "ヒュ", "hyo": "ヒョ",
-    "mya": "ミャ", "myu": "ミュ", "myo": "ミョ",
-    "rya": "リャ", "ryu": "リュ", "ryo": "リョ",
-    "gya": "ギャ", "gyu": "ギュ", "gyo": "ギョ",
-    "ja": "ジャ", "ju": "ジュ", "jo": "ジョ",
-    "bya": "ビャ", "byu": "ビュ", "byo": "ビョ",
-    "pya": "ピャ", "pyu": "ピュ", "pyo": "ピョ",
-    "nn": "ン"
+    "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
+    "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
+    "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
+    "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
+    "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
+    // Комбинированные (первый символ + полноразмерный второй)
+    "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
+    "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
+    "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
+    "nya": ["ニ", "ヤ"], "nyu": ["ニ", "ユ"], "nyo": ["ニ", "ヨ"],
+    "hya": ["ヒ", "ヤ"], "hyu": ["ヒ", "ユ"], "hyo": ["ヒ", "ヨ"],
+    "mya": ["ミ", "ヤ"], "myu": ["ミ", "ユ"], "myo": ["ミ", "ヨ"],
+    "rya": ["リ", "ヤ"], "ryu": ["リ", "ユ"], "ryo": ["リ", "ヨ"],
+    "gya": ["ギ", "ヤ"], "gyu": ["ギ", "ユ"], "gyo": ["ギ", "ヨ"],
+    "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
+    "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
+    "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
+    // Длинное n
+    "nn": ["ン"]
 };
 
 // Глобальное состояние
@@ -246,6 +245,54 @@ function clearHighlight(){
     applyHighlight();
 }
 
+// Вспомогательная функция для рекурсивной вставки массива символов в последовательные ячейки
+function insertKatakanaArray(row, col, katakanaArray, startIndex) {
+    if (startIndex >= katakanaArray.length) return;
+    const char = katakanaArray[startIndex];
+    if (startIndex === 0) {
+        // Первый символ вставляем в текущую ячейку
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        // Если есть ещё символы, переходим к следующей ячейке
+        if (katakanaArray.length > 1) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        // Вставляем остаток в следующую ячейку, начиная с индекса 1
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
+                        return;
+                    }
+                }
+            }
+            // Если нет следующей ячейки, остаток просто теряется (некуда вставить)
+        }
+    } else {
+        // Вставка в последующие ячейки
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        if (startIndex + 1 < katakanaArray.length) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -306,25 +353,15 @@ function handleKeydown(e, row, col) {
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
 
+        // Ищем полное совпадение в таблице
         if (romajiToKatakana.hasOwnProperty(buffer)) {
-            const katakanaChar = romajiToKatakana[buffer];
-            gridData[row][col] = katakanaChar;
+            const katakanaArray = romajiToKatakana[buffer];
+            // Очищаем буфер
             romajiBuffers.set(key, "");
-            updateCellUI(row, col);
-            syncWordFromGrid();
-            checkCompletion();
-
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        cellElements[nextCell.row][nextCell.col]?.focus();
-                    }
-                }
-            }
+            // Вставляем массив символов, начиная с текущей ячейки
+            insertKatakanaArray(row, col, katakanaArray, 0);
         } else {
+            // Проверяем, является ли буфер префиксом какого-либо ключа
             let isPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
             if (!isPrefix) {
                 romajiBuffers.set(key, "");
@@ -359,7 +396,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, nn → ン, a → ア.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ュ, a → ア.";
         statusDiv.style.color = "#666";
     }
 }
