@@ -5,15 +5,13 @@ window.crosswordsData = {
         puzzles: [
             {
                 name: "Кроссворд 1",
-                width: 7,
-                height: 7,
+                width: 8,
+                height: 6,
                 words: [
-                    { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
-                    { word: "スシ", row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
-                    { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
-                    { word: "カワ", row: 0, col: 4, dir: "down", clue: "Река" },
-                    { word: "サケ", row: 1, col: 3, dir: "down", clue: "Лосось (рыба)" },
-                    { word: "ヤマ", row: 2, col: 5, dir: "down", clue: "Гора" }
+                    { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык" },
+                    { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель" },
+                    { word: "デンワバンゴウ", row: 1, col: 1, dir: "across", clue: "Номер телефона" },
+                    { word: "ギンコウ", row: 0, col: 5, dir: "down", clue: "Банк" },
                 ]
             },
             // Пример второго кроссворда для N5 (можно добавить позже)
