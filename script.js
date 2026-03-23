@@ -8,7 +8,7 @@ const crosswords = {
         words: [
             // Слова с пересечениями
             { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
-            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
+            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Суси" },
             { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
             { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },          // пересекается с "サクラ" в (0,4)
             { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" }, // пересекается с "スシ" в (2,3)? нет, но для примера
