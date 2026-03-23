@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Кроссворд по японскому языку (JLPT)</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/wanakana@5.0.2/wanakana.min.js"></script>
 </head>
 <body>
 <div class="crossword-container">
@@ -19,6 +18,8 @@
                 <option value="n2">N2 (выше среднего)</option>
                 <option value="n1">N1 (продвинутый)</option>
             </select>
+            <span>Кроссворд:</span>
+            <select id="puzzleSelect"></select>
             <button id="resetBtn">Сбросить кроссворд</button>
         </div>
         <div id="gridContainer" class="crossword-grid"></div>
@@ -28,6 +29,7 @@
         <div id="cluesContainer"></div>
     </div>
 </div>
+<script src="crosswords.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
