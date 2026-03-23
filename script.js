@@ -20,13 +20,15 @@ const romajiToKatakana = {
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
     // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
+    // Носовой n (одиночный – будет обработан специально)
+    "n": ["ン"],
     // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
     "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
     "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
     "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
     "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
-    // Комбинированные (первый символ + полноразмерный второй)
+    // Комбинированные (полноразмерные вторые символы)
     "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
     "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
     "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
@@ -196,6 +198,11 @@ function getWordNumberAt(row, col){
 }
 
 function onCellFocus(row, col){
+    // Если активное слово уже есть, не меняем его при фокусе на ячейку
+    if (activeWordId !== null) {
+        return;
+    }
+    // Иначе определяем слово по ячейке
     let acrossWord = wordsList.find(w => w.dir === "across" && w.cells.some(c => c.row === row && c.col === col));
     let downWord = wordsList.find(w => w.dir === "down" && w.cells.some(c => c.row === row && c.col === col));
     if(acrossWord) setActiveWord(acrossWord.id);
@@ -245,74 +252,148 @@ function clearHighlight(){
     applyHighlight();
 }
 
-function getNextWord(currentWordId) {
-    let allClues = [...cluesAcross, ...cluesDown];
-    allClues.sort((a,b) => a.num - b.num);
-    let currentIndex = allClues.findIndex(c => c.wordId === currentWordId);
-    if (currentIndex !== -1 && currentIndex + 1 < allClues.length) {
-        return allClues[currentIndex + 1];
-    }
-    return null;
-}
-
-function moveToNextWord() {
-    const nextClue = getNextWord(activeWordId);
-    if (nextClue) {
-        setActiveWord(nextClue.wordId);
-        const word = wordsList.find(w => w.id === nextClue.wordId);
-        if (word && word.cells.length) {
-            const firstCell = word.cells[0];
-            cellElements[firstCell.row][firstCell.col]?.focus();
-        }
-    }
-}
-
-function finalizeInsertion(row, col) {
-    if (activeWordId !== null) {
-        const activeWord = wordsList.find(w => w.id === activeWordId);
-        if (activeWord) {
-            let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-            if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                let nextCell = activeWord.cells[idx + 1];
-                cellElements[nextCell.row][nextCell.col]?.focus();
-            } else {
-                // слово закончено
-                moveToNextWord();
-            }
-        }
-    }
-}
-
+// Вставка массива символов в последовательные ячейки текущего слова
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
-    if (startIndex >= katakanaArray.length) {
-        finalizeInsertion(row, col);
-        return;
-    }
+    if (startIndex >= katakanaArray.length) return;
     const char = katakanaArray[startIndex];
-    gridData[row][col] = char;
-    updateCellUI(row, col);
-    syncWordFromGrid();
-    checkCompletion();
-
-    if (startIndex + 1 < katakanaArray.length) {
-        // есть ещё символы для вставки
-        if (activeWordId !== null) {
-            const activeWord = wordsList.find(w => w.id === activeWordId);
-            if (activeWord) {
-                let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                    let nextCell = activeWord.cells[idx + 1];
-                    insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
-                    return;
+    if (startIndex === 0) {
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        if (katakanaArray.length > 1) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
+                        return;
+                    }
+                }
+            }
+        } else {
+            // После вставки одного символа переходим к следующей ячейке
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        cellElements[nextCell.row][nextCell.col]?.focus();
+                    } else {
+                        // Если слово закончилось, переходим к следующему слову по порядку номеров
+                        focusNextWord(activeWord.number);
+                    }
                 }
             }
         }
-        // нет следующей ячейки, остаток теряется, завершаем
-        finalizeInsertion(row, col);
     } else {
-        // последний символ вставлен, завершаем
-        finalizeInsertion(row, col);
+        // Вставка в последующие ячейки
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        if (startIndex + 1 < katakanaArray.length) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
+                        return;
+                    }
+                }
+            }
+        } else {
+            // Переход к следующей ячейке после вставки последнего символа
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        cellElements[nextCell.row][nextCell.col]?.focus();
+                    } else {
+                        focusNextWord(activeWord.number);
+                    }
+                }
+            }
+        }
     }
+}
+
+// Фокус на следующее слово по номеру
+function focusNextWord(currentNumber) {
+    // Собираем все слова с их номерами, отсортированные по возрастанию
+    let allWords = [...cluesAcross, ...cluesDown];
+    allWords.sort((a,b) => a.num - b.num);
+    let currentIndex = allWords.findIndex(w => w.num === currentNumber);
+    if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
+        let nextWord = allWords[currentIndex + 1];
+        setActiveWord(nextWord.wordId);
+        let word = wordsList.find(w => w.id === nextWord.wordId);
+        if (word && word.cells.length) {
+            // Ищем первую пустую ячейку в слове
+            for (let cell of word.cells) {
+                if (gridData[cell.row][cell.col] === "") {
+                    cellElements[cell.row][cell.col]?.focus();
+                    return;
+                }
+            }
+            // Если все ячейки заполнены, всё равно ставим фокус на первую
+            cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+        }
+    }
+}
+
+// Обработка буфера: поиск максимального совпадения
+function processBuffer(row, col, buffer) {
+    // Проверяем точное совпадение
+    if (romajiToKatakana.hasOwnProperty(buffer)) {
+        const katakanaArray = romajiToKatakana[buffer];
+        insertKatakanaArray(row, col, katakanaArray, 0);
+        return true;
+    }
+    
+    // Проверяем, есть ли префикс (буфер может быть началом более длинного ключа)
+    let hasPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
+    if (hasPrefix) {
+        // Ждём дальнейшего ввода
+        return false;
+    }
+    
+    // Префиксов нет — значит буфер не может образовать слог.
+    // Нужно найти самый длинный ключ, который является префиксом буфера.
+    for (let i = buffer.length - 1; i >= 1; i--) {
+        let prefix = buffer.slice(0, i);
+        if (romajiToKatakana.hasOwnProperty(prefix)) {
+            const katakanaArray = romajiToKatakana[prefix];
+            const remaining = buffer.slice(i);
+            insertKatakanaArray(row, col, katakanaArray, 0);
+            if (remaining.length > 0) {
+                // Переносим остаток в следующую ячейку
+                if (activeWordId !== null) {
+                    const activeWord = wordsList.find(w => w.id === activeWordId);
+                    if (activeWord) {
+                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                        if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                            let nextCell = activeWord.cells[idx + 1];
+                            const nextKey = `${nextCell.row},${nextCell.col}`;
+                            romajiBuffers.set(nextKey, remaining);
+                            cellElements[nextCell.row][nextCell.col]?.focus();
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+    
+    // Если ничего не нашли, сбрасываем буфер
+    return false;
 }
 
 function handleKeydown(e, row, col) {
@@ -367,25 +448,25 @@ function handleKeydown(e, row, col) {
     // Латинские буквы
     if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
-        let buffer = romajiBuffers.get(key) || "";
-        if (buffer === "" && gridData[row][col] !== "") {
-            gridData[row][col] = "";
-        }
-        buffer += e.key.toLowerCase();
+        let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
-
-        if (romajiToKatakana.hasOwnProperty(buffer)) {
-            const katakanaArray = romajiToKatakana[buffer];
-            romajiBuffers.set(key, "");
-            insertKatakanaArray(row, col, katakanaArray, 0);
-        } else {
-            let isPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
-            if (!isPrefix) {
-                romajiBuffers.set(key, "");
-                updateCellUI(row, col);
-            }
+        
+        // Если в ячейке уже была катакана, стираем её при начале ввода
+        if (buffer.length === 1 && gridData[row][col] !== "") {
+            gridData[row][col] = "";
+            updateCellUI(row, col);
+            syncWordFromGrid();
+            checkCompletion();
         }
+        
+        // Обрабатываем буфер
+        const processed = processBuffer(row, col, buffer);
+        if (processed) {
+            // Буфер обработан, очищаем его
+            romajiBuffers.set(key, "");
+        }
+        // Если не обработан, буфер остаётся для дальнейшего ввода
     }
 }
 
@@ -414,7 +495,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s.";
         statusDiv.style.color = "#666";
     }
 }
