@@ -6,7 +6,7 @@ const crosswords = {
         height: 7,
         words: [
             { word: "サクラ", row: 0, col: 2, dir: "across", clue: "Весенний цветок, символ Японии" },
-            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Суси" },
+            { word: "スシ",   row: 2, col: 1, dir: "across", clue: "Блюдо из риса с рыбой" },
             { word: "ニホン", row: 4, col: 0, dir: "across", clue: "Страна восходящего солнца" },
             { word: "カワ",   row: 0, col: 4, dir: "down",   clue: "Река" },
             { word: "サケ",   row: 1, col: 3, dir: "down",   clue: "Лосось (рыба)" },
@@ -65,6 +65,53 @@ const crosswords = {
             { word: "サクセイ",   row: 3, col: 5, dir: "down",   clue: "Составление (документа)" }
         ]
     }
+};
+
+// ========== ТАБЛИЦА СООТВЕТСТВИЯ РОМАДЗИ → КАТАКАНА ==========
+// Добавляйте сюда нужные сочетания. Ключи — строчные буквы.
+const romajiToKatakana = {
+    // Гласные
+    "a": "ア", "i": "イ", "u": "ウ", "e": "エ", "o": "オ",
+    // К-ряд
+    "ka": "カ", "ki": "キ", "ku": "ク", "ke": "ケ", "ko": "コ",
+    // С-ряд (си, су, сэ, со)
+    "sa": "サ", "shi": "シ", "su": "ス", "se": "セ", "so": "ソ",
+    // Т-ряд
+    "ta": "タ", "chi": "チ", "tsu": "ツ", "te": "テ", "to": "ト",
+    // Н-ряд
+    "na": "ナ", "ni": "ニ", "nu": "ヌ", "ne": "ネ", "no": "ノ",
+    // Х-ряд
+    "ha": "ハ", "hi": "ヒ", "fu": "フ", "he": "ヘ", "ho": "ホ",
+    // М-ряд
+    "ma": "マ", "mi": "ミ", "mu": "ム", "me": "メ", "mo": "モ",
+    // Я-ряд
+    "ya": "ヤ", "yu": "ユ", "yo": "ヨ",
+    // Р-ряд
+    "ra": "ラ", "ri": "リ", "ru": "ル", "re": "レ", "ro": "ロ",
+    // В-ряд
+    "wa": "ワ", "wo": "ヲ",
+    // Носовой n
+    "n": "ン",
+    // Дакутэн
+    "ga": "ガ", "gi": "ギ", "gu": "グ", "ge": "ゲ", "go": "ゴ",
+    "za": "ザ", "ji": "ジ", "zu": "ズ", "ze": "ゼ", "zo": "ゾ",
+    "da": "ダ", "di": "ヂ", "du": "ヅ", "de": "デ", "do": "ド",
+    "ba": "バ", "bi": "ビ", "bu": "ブ", "be": "ベ", "bo": "ボ",
+    "pa": "パ", "pi": "ピ", "pu": "プ", "pe": "ペ", "po": "ポ",
+    // Комбинированные (с маленькими)
+    "kya": "キャ", "kyu": "キュ", "kyo": "キョ",
+    "sha": "シャ", "shu": "シュ", "sho": "ショ",
+    "cha": "チャ", "chu": "チュ", "cho": "チョ",
+    "nya": "ニャ", "nyu": "ニュ", "nyo": "ニョ",
+    "hya": "ヒャ", "hyu": "ヒュ", "hyo": "ヒョ",
+    "mya": "ミャ", "myu": "ミュ", "myo": "ミョ",
+    "rya": "リャ", "ryu": "リュ", "ryo": "リョ",
+    "gya": "ギャ", "gyu": "ギュ", "gyo": "ギョ",
+    "ja": "ジャ", "ju": "ジュ", "jo": "ジョ",
+    "bya": "ビャ", "byu": "ビュ", "byo": "ビョ",
+    "pya": "ピャ", "pyu": "ピュ", "pyo": "ピョ",
+    // Длинное "n" (для nn)
+    "nn": "ン"
 };
 
 // Глобальное состояние
@@ -245,13 +292,12 @@ function clearHighlight(){
     applyHighlight();
 }
 
-// Обработка ввода с накоплением ромадзи (полностью предотвращает прямой ввод)
+// ========== Обработка ввода с таблицей соответствия ==========
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
 
-    // Предотвращаем ввод любых печатных символов
-    const isPrintable = e.key.length === 1;
-    if (isPrintable) {
+    // Отменяем стандартное поведение для всех печатных символов
+    if (e.key.length === 1) {
         e.preventDefault();
     }
 
@@ -260,9 +306,11 @@ function handleKeydown(e, row, col) {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
         if (buffer.length > 0) {
+            // Удаляем последний символ из буфера
             buffer = buffer.slice(0, -1);
             romajiBuffers.set(key, buffer);
         } else {
+            // Буфер пуст — очищаем ячейку или переходим назад
             if (gridData[row][col] !== "") {
                 gridData[row][col] = "";
                 updateCellUI(row, col);
@@ -297,49 +345,22 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    // Обработка букв (только латиница)
-    if (isPrintable && /[a-zA-Z]/.test(e.key)) {
+    // Только латиница
+    if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
 
-        // Преобразуем буфер в катакану
-        let katakana = wanakana.toKatakana(buffer);
-        if (katakana.length === 0) {
-            // Недостаточно символов для моры — ждём
-            return;
-        }
+        // Проверяем, есть ли в таблице ключ, полностью совпадающий с буфером
+        if (romajiToKatakana.hasOwnProperty(buffer)) {
+            // Найдено полное соответствие
+            const katakanaChar = romajiToKatakana[buffer];
+            gridData[row][col] = katakanaChar;
+            updateCellUI(row, col);
+            syncWordFromGrid();
+            checkCompletion();
+            romajiBuffers.set(key, ""); // очищаем буфер
 
-        // Берём первый символ, остаток переносим в следующую ячейку
-        let firstChar = katakana[0];
-        let remaining = katakana.slice(1);
-
-        // Вставляем символ в текущую ячейку
-        gridData[row][col] = firstChar;
-        updateCellUI(row, col);
-        syncWordFromGrid();
-        checkCompletion();
-
-        // Очищаем буфер текущей ячейки
-        romajiBuffers.set(key, "");
-
-        // Обработка остатка и переход на следующую ячейку
-        if (remaining.length > 0) {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        const nextKey = `${nextCell.row},${nextCell.col}`;
-                        romajiBuffers.set(nextKey, remaining);
-                        cellElements[nextCell.row][nextCell.col]?.focus();
-                        return;
-                    }
-                }
-            }
-            // Если нет следующей ячейки, остаток просто теряется
-        } else {
             // Переход на следующую ячейку активного слова
             if (activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -351,6 +372,14 @@ function handleKeydown(e, row, col) {
                     }
                 }
             }
+        } else {
+            // Проверяем, является ли буфер префиксом какого-либо ключа
+            let isPrefix = Object.keys(romajiToKatakana).some(key => key.startsWith(buffer));
+            if (!isPrefix) {
+                // Невалидная комбинация — сбрасываем буфер
+                romajiBuffers.set(key, "");
+            }
+            // Если префикс, ждём дальнейшего ввода
         }
     }
 }
@@ -386,7 +415,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Например: su → ス, nn → ん, a → あ.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Например: su → ス, nn → ン, a → ア.";
         statusDiv.style.color = "#666";
     }
 }
