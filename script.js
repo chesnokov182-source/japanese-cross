@@ -350,7 +350,6 @@ function focusNextWord(currentNumber) {
 }
 
 function processBuffer(row, col, buffer) {
-    console.log(`processBuffer called with buffer = "${buffer}" at (${row},${col})`);
     // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
@@ -394,6 +393,7 @@ function processBuffer(row, col, buffer) {
 
     // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
+        console.log(`Exact match: "${buffer}" -> ${romajiToKatakana[buffer][0]}`);
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
