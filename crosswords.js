@@ -23,6 +23,7 @@ window.crosswordsData = {
                     { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать" },
                     { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро" },
                     { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка" },
+                    { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да" },
                 ]
             },
             ]
