@@ -1,33 +1,20 @@
 // Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
 const romajiToKatakana = {
-    // Гласные
     "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
-    // К-ряд
     "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
-    // С-ряд
     "sa": ["サ"], "shi": ["シ"], "su": ["ス"], "se": ["セ"], "so": ["ソ"],
-    // Т-ряд
     "ta": ["タ"], "chi": ["チ"], "tsu": ["ツ"], "te": ["テ"], "to": ["ト"],
-    // Н-ряд
     "na": ["ナ"], "ni": ["ニ"], "nu": ["ヌ"], "ne": ["ネ"], "no": ["ノ"],
-    // Х-ряд
     "ha": ["ハ"], "hi": ["ヒ"], "fu": ["フ"], "he": ["ヘ"], "ho": ["ホ"],
-    // М-ряд
     "ma": ["マ"], "mi": ["ミ"], "mu": ["ム"], "me": ["メ"], "mo": ["モ"],
-    // Я-ряд
     "ya": ["ヤ"], "yu": ["ユ"], "yo": ["ヨ"],
-    // Р-ряд
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
-    // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-
-    // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
     "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
     "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
     "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
     "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
-    // Комбинированные (полноразмерные вторые символы)
     "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
     "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
     "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
@@ -39,11 +26,9 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    // Длинное n
     "nn": ["ン"]
 };
 
-// Глобальное состояние
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
 let gridData = [];
@@ -53,7 +38,6 @@ let cluesDown = [];
 let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
-
 let romajiBuffers = new Map();
 
 const levelSelect = document.getElementById("levelSelect");
@@ -527,6 +511,9 @@ function handleKeydown(e, row, col) {
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
+            if (gridData[row][col] === "") {
+                updateCellUI(row, col);
+            }
         }
     }
 }
