@@ -45,29 +45,39 @@ const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
 function generateNumbering() {
-    let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
-    let numberMap = new Map();
+    let cellNumbers = new Map();
     let counter = 1;
-    let sorted = [...allWords].sort((a,b) => {
-        if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
-        if(a.row === b.row) return a.col - b.col;
+    
+    let starters = [];
+    for (let w of wordsList) {
+        if (w.cells.length > 0) {
+            let firstCell = w.cells[0];
+            starters.push({
+                row: firstCell.row,
+                col: firstCell.col,
+                word: w
+            });
+        }
+    }
+    
+    starters.sort((a, b) => {
+        if (a.row === b.row) return a.col - b.col;
         return a.row - b.row;
     });
-    for(let w of sorted) {
-        let key = `${w.row},${w.col}`;
-        if(!numberMap.has(key)) {
-            numberMap.set(key, counter++);
+    
+    for (let s of starters) {
+        let key = `${s.row},${s.col}`;
+        if (!cellNumbers.has(key)) {
+            cellNumbers.set(key, counter++);
         }
-        w.number = numberMap.get(key);
+        s.word.number = cellNumbers.get(key);
     }
-    allWords.forEach(w => {
-        wordsList[w.id].number = w.number;
-    });
+    
     cluesAcross = [];
     cluesDown = [];
-    for(let w of wordsList) {
+    for (let w of wordsList) {
         let clueItem = { num: w.number, wordId: w.id, clue: w.clue, cells: w.cells };
-        if(w.dir === "across") cluesAcross.push(clueItem);
+        if (w.dir === "across") cluesAcross.push(clueItem);
         else cluesDown.push(clueItem);
     }
     cluesAcross.sort((a,b) => a.num - b.num);
@@ -350,7 +360,6 @@ function focusNextWord(currentNumber) {
 }
 
 function processBuffer(row, col, buffer) {
-    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -391,13 +400,11 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
-    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
-    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -511,7 +518,7 @@ function handleKeydown(e, row, col) {
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
-            updateCellUI(row, col); // обязательно обновляем UI после очистки буфера
+            updateCellUI(row, col);
         }
     }
 }
