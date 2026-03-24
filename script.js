@@ -230,7 +230,7 @@ function onCellBlur(row, col) {
     const buffer = romajiBuffers.get(key);
     if (buffer === "n") {
         // Одинокое n → ン
-        insertKatakanaArray(row, col, romajiToKatakana["n"], 0);
+        insertKatakanaArray(row, col, ["ン"], 0);
         romajiBuffers.delete(key);
         updateCellUI(row, col);
     } else if (buffer) {
@@ -373,12 +373,11 @@ function focusNextWord(currentNumber) {
     }
 }
 
-// Новая логика обработки буфера
+// Новая упрощённая логика обработки буфера
 function processBuffer(row, col, buffer) {
     // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         if (DEBUG) console.log(`Спец.случай: n + согласная -> ン + перенос "${buffer[1]}"`);
-        // Вставляем ン в текущую ячейку
         insertKatakanaArray(row, col, ["ン"], 0);
         // Переносим оставшийся символ в следующую ячейку
         if (activeWordId !== null) {
@@ -400,9 +399,7 @@ function processBuffer(row, col, buffer) {
                         updateCellUI(nextEmpty.row, nextEmpty.col);
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        // Если слово закончилось, переходим к следующему слову
                         focusNextWord(activeWord.number);
-                        // Ищем первую пустую ячейку в новом слове и устанавливаем туда буфер
                         setTimeout(() => {
                             if (activeWordId !== null) {
                                 const newWord = wordsList.find(w => w.id === activeWordId);
@@ -422,82 +419,63 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
+    // Проверяем точное совпадение
+    if (romajiToKatakana.hasOwnProperty(buffer)) {
+        if (DEBUG) console.log(`Точное совпадение: "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
+        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+        return true;
+    }
+
     // Ищем самый длинный ключ, который является началом буфера
-    for (let i = buffer.length; i >= 1; i--) {
+    for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
-            // Если это префикс более длинного ключа, но буфер уже кончился — ждём
-            // Но если буфер точно равен ключу и не является префиксом, вставляем
-            const isFullMatch = (i === buffer.length);
-            const isPrefixOfLonger = isPrefixOfLongerKey(prefix);
-            if (isFullMatch && !isPrefixOfLonger) {
-                if (DEBUG) console.log(`Вставляем "${prefix}" -> ${romajiToKatakana[prefix].join('')}`);
-                insertKatakanaArray(row, col, romajiToKatakana[prefix], 0);
-                return true;
-            } else if (isFullMatch && isPrefixOfLonger) {
-                if (DEBUG) console.log(`Ждём, "${prefix}" — префикс`);
-                return false;
-            } else if (!isFullMatch) {
-                // Нашли префикс, но буфер длиннее — вставляем префикс, остаток переносим
-                if (DEBUG) console.log(`Частичная вставка "${prefix}" -> ${romajiToKatakana[prefix].join('')}, остаток "${buffer.slice(i)}"`);
-                insertKatakanaArray(row, col, romajiToKatakana[prefix], 0);
-                const remaining = buffer.slice(i);
-                if (remaining.length > 0) {
-                    if (activeWordId !== null) {
-                        const activeWord = wordsList.find(w => w.id === activeWordId);
-                        if (activeWord) {
-                            let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                            if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                                let nextCell = activeWord.cells[idx + 1];
-                                const nextKey = `${nextCell.row},${nextCell.col}`;
+            const katakanaArray = romajiToKatakana[prefix];
+            const remaining = buffer.slice(i);
+            if (DEBUG) console.log(`Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
+            insertKatakanaArray(row, col, katakanaArray, 0);
+            if (remaining.length > 0) {
+                if (activeWordId !== null) {
+                    const activeWord = wordsList.find(w => w.id === activeWordId);
+                    if (activeWord) {
+                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                        if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                            let nextCell = activeWord.cells[idx + 1];
+                            const nextKey = `${nextCell.row},${nextCell.col}`;
+                            romajiBuffers.set(nextKey, remaining);
+                            updateCellUI(nextCell.row, nextCell.col);
+                            cellElements[nextCell.row][nextCell.col]?.focus();
+                        } else {
+                            let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                            if (nextEmpty) {
+                                const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
                                 romajiBuffers.set(nextKey, remaining);
-                                updateCellUI(nextCell.row, nextCell.col);
-                                cellElements[nextCell.row][nextCell.col]?.focus();
+                                updateCellUI(nextEmpty.row, nextEmpty.col);
+                                cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                             } else {
-                                // Если это последняя ячейка, переносим на следующее слово
-                                let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                                if (nextEmpty) {
-                                    const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
-                                    romajiBuffers.set(nextKey, remaining);
-                                    updateCellUI(nextEmpty.row, nextEmpty.col);
-                                    cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                                } else {
-                                    // Переход на следующее слово
-                                    focusNextWord(activeWord.number);
-                                    setTimeout(() => {
-                                        if (activeWordId !== null) {
-                                            const newWord = wordsList.find(w => w.id === activeWordId);
-                                            if (newWord && newWord.cells.length) {
-                                                let firstCell = newWord.cells[0];
-                                                const firstKey = `${firstCell.row},${firstCell.col}`;
-                                                romajiBuffers.set(firstKey, remaining);
-                                                updateCellUI(firstCell.row, firstCell.col);
-                                                cellElements[firstCell.row][firstCell.col]?.focus();
-                                            }
+                                focusNextWord(activeWord.number);
+                                setTimeout(() => {
+                                    if (activeWordId !== null) {
+                                        const newWord = wordsList.find(w => w.id === activeWordId);
+                                        if (newWord && newWord.cells.length) {
+                                            let firstCell = newWord.cells[0];
+                                            const firstKey = `${firstCell.row},${firstCell.col}`;
+                                            romajiBuffers.set(firstKey, remaining);
+                                            updateCellUI(firstCell.row, firstCell.col);
+                                            cellElements[firstCell.row][firstCell.col]?.focus();
                                         }
-                                    }, 10);
-                                }
+                                    }
+                                }, 10);
                             }
                         }
                     }
                 }
-                return true;
             }
-        }
-    }
-
-    // Если ничего не подошло — сбрасываем буфер
-    if (DEBUG) console.log(`Неверная комбинация "${buffer}", сброс`);
-    return false;
-}
-
-function isPrefixOfLongerKey(str) {
-    let keys = Object.keys(romajiToKatakana);
-    for (let key of keys) {
-        if (key !== str && key.startsWith(str)) {
             return true;
         }
     }
+
+    if (DEBUG) console.log(`Неверная комбинация "${buffer}", сброс`);
     return false;
 }
 
