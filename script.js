@@ -393,7 +393,6 @@ function processBuffer(row, col, buffer) {
 
     // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
-        console.log(`Exact match: "${buffer}" -> ${romajiToKatakana[buffer][0]}`);
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
@@ -512,9 +511,7 @@ function handleKeydown(e, row, col) {
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
-            if (gridData[row][col] === "") {
-                updateCellUI(row, col);
-            }
+            updateCellUI(row, col); // обязательно обновляем UI после очистки буфера
         }
     }
 }
