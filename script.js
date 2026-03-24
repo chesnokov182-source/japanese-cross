@@ -227,8 +227,19 @@ function onCellFocus(row, col){
 
 function onCellBlur(row, col) {
     const key = `${row},${col}`;
-    if (romajiBuffers.has(key) && romajiBuffers.get(key) !== "") {
-        romajiBuffers.set(key, "");
+    const buffer = romajiBuffers.get(key);
+    // Если в буфере остался одинокий "n", преобразуем его в ン
+    if (buffer === "n") {
+        if (romajiToKatakana.hasOwnProperty("n")) {
+            insertKatakanaArray(row, col, romajiToKatakana["n"], 0);
+            romajiBuffers.delete(key);
+        } else {
+            romajiBuffers.delete(key);
+        }
+        updateCellUI(row, col);
+    } else if (buffer && buffer !== "") {
+        // Очищаем любой другой буфер при потере фокуса
+        romajiBuffers.delete(key);
         updateCellUI(row, col);
     }
 }
@@ -380,10 +391,8 @@ function isPrefixOfLongerKey(str) {
 function processBuffer(row, col, buffer) {
     // 1. Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
-        // Если это префикс более длинного ключа и длина > 2, ждём
-        // Но для двухбуквенных и одиночных вставляем сразу
-        const isShort = buffer.length <= 2;
-        if (!isPrefixOfLongerKey(buffer) || isShort) {
+        // Вставляем только если это не префикс более длинного ключа
+        if (!isPrefixOfLongerKey(buffer)) {
             if (DEBUG) console.log(`Вставляем "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
             insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
             return true;
@@ -491,6 +500,11 @@ function handleKeydown(e, row, col) {
             updateCellUI(row, col);
             syncWordFromGrid();
             checkCompletion();
+        }
+
+        // Специальная обработка для "n": не обрабатываем, пока не получим следующий символ
+        if (buffer === "n") {
+            return;
         }
 
         const processed = processBuffer(row, col, buffer);
