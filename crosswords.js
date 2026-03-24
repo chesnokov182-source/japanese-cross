@@ -25,6 +25,7 @@ window.crosswordsData = {
                     { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка" },
                 ]
             },
+            ]
     },
     n4: {
         name: "JLPT N4",
