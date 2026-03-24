@@ -1,6 +1,3 @@
-// ========== ОТЛАДКА (можно включить для проверки) ==========
-const DEBUG = false;
-
 // Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
 const romajiToKatakana = {
     // Гласные
@@ -49,23 +46,20 @@ const romajiToKatakana = {
 // Глобальное состояние
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
-let gridData = [];        // 2D массив символов (null для блоков)
-let wordsList = [];       // список слов с доп. инфой
+let gridData = [];
+let wordsList = [];
 let cluesAcross = [];
 let cluesDown = [];
 let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 
-// Буферы для ввода ромадзи (ключ: `${row},${col}`)
 let romajiBuffers = new Map();
 
-// DOM элементы
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
-// ========== Вспомогательные функции ==========
 function generateNumbering() {
     let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
     let numberMap = new Map();
@@ -112,7 +106,6 @@ function loadCrossword(levelId, puzzleIdx) {
         wordOrig: w.word
     }));
     
-    // Построение сетки
     let emptyGrid = Array(gridHeight).fill().map(() => Array(gridWidth).fill(null));
     for(let w of wordsList) {
         let cells = [];
@@ -229,7 +222,6 @@ function onCellBlur(row, col) {
     const key = `${row},${col}`;
     const buffer = romajiBuffers.get(key);
     if (buffer === "n") {
-        // Одинокое n → ン
         insertKatakanaArray(row, col, ["ン"], 0);
         romajiBuffers.delete(key);
         updateCellUI(row, col);
@@ -373,13 +365,10 @@ function focusNextWord(currentNumber) {
     }
 }
 
-// Новая упрощённая логика обработки буфера
 function processBuffer(row, col, buffer) {
     // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
-        if (DEBUG) console.log(`Спец.случай: n + согласная -> ン + перенос "${buffer[1]}"`);
         insertKatakanaArray(row, col, ["ン"], 0);
-        // Переносим оставшийся символ в следующую ячейку
         if (activeWordId !== null) {
             const activeWord = wordsList.find(w => w.id === activeWordId);
             if (activeWord) {
@@ -391,7 +380,6 @@ function processBuffer(row, col, buffer) {
                     updateCellUI(nextCell.row, nextCell.col);
                     cellElements[nextCell.row][nextCell.col]?.focus();
                 } else {
-                    // Если это последняя ячейка, переносим на следующее слово
                     let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
                     if (nextEmpty) {
                         const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
@@ -419,20 +407,18 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
-    // Проверяем точное совпадение
+    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
-        if (DEBUG) console.log(`Точное совпадение: "${buffer}" -> ${romajiToKatakana[buffer].join('')}`);
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
-    // Ищем самый длинный ключ, который является началом буфера
+    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
             const katakanaArray = romajiToKatakana[prefix];
             const remaining = buffer.slice(i);
-            if (DEBUG) console.log(`Частичная вставка "${prefix}" -> ${katakanaArray.join('')}, остаток "${remaining}"`);
             insertKatakanaArray(row, col, katakanaArray, 0);
             if (remaining.length > 0) {
                 if (activeWordId !== null) {
@@ -475,7 +461,6 @@ function processBuffer(row, col, buffer) {
         }
     }
 
-    if (DEBUG) console.log(`Неверная комбинация "${buffer}", сброс`);
     return false;
 }
 
@@ -485,7 +470,6 @@ function handleKeydown(e, row, col) {
         e.preventDefault();
     }
 
-    // Backspace
     if (e.key === "Backspace") {
         const key = `${row},${col}`;
         let buffer = romajiBuffers.get(key) || "";
@@ -515,7 +499,6 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    // Стрелки
     if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
         let newRow = row, newCol = col;
         if (e.key === "ArrowLeft") newCol--;
@@ -528,14 +511,12 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    // Латинские буквы
     if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
 
-        // Если ячейка уже содержала катакану, стираем её при начале ввода
         if (buffer.length === 1 && gridData[row][col] !== "") {
             gridData[row][col] = "";
             updateCellUI(row, col);
