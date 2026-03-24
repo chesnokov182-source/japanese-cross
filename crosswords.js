@@ -14,14 +14,17 @@ window.crosswordsData = {
                     { word: "ギンコウ", row: 0, col: 5, dir: "down", clue: "Банк" },
                 ]
             },
-            // Пример второго кроссворда для N5 (можно добавить позже)
-            // {
-            //     name: "Кроссворд 2",
-            //     width: 6,
-            //     height: 6,
-            //     words: [...]
-            // }
-        ]
+            {
+                name: "Кроссворд 2",
+                width: 7,
+                height: 4,
+                words: [
+                    { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой" },
+                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать" },
+                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро" },
+                    { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка" },
+                ]
+            },
     },
     n4: {
         name: "JLPT N4",
