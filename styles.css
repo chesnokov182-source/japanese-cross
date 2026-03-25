@@ -186,3 +186,9 @@ button:hover {
     .cell input { font-size: 18px; }
     .cell-number { font-size: 8px; }
 }
+
+.clue-list li.completed {
+    text-decoration: line-through;
+    opacity: 0.7;
+    background-color: #e0ffe0;
+}
