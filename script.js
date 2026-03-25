@@ -44,19 +44,24 @@ const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
-// Генерация нумерации с учётом ручных номеров
 function generateNumbering() {
-    // Сначала скопируем ручные номера из исходных данных, если они есть
-    let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
+    // Проверяем, есть ли у слов ручные номера
+    let hasManualNumbers = wordsList.some(w => w.number !== undefined && w.number !== null);
     
-    // Определим, какие слова уже имеют номер
-    let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
-    
-    if (!hasManualNumbers) {
-        // Если ручных номеров нет, генерируем автоматически
+    if (hasManualNumbers) {
+        // Используем ручные номера как есть
+        // Ничего не меняем, только убеждаемся, что они числа
+        for (let w of wordsList) {
+            if (typeof w.number !== 'number') {
+                console.warn(`Word ${w.word} has invalid number, setting to 0`);
+                w.number = 0;
+            }
+        }
+    } else {
+        // Автоматическая нумерация
         let numberMap = new Map();
         let counter = 1;
-        let sorted = [...allWords].sort((a,b) => {
+        let sorted = [...wordsList].sort((a,b) => {
             if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
             if(a.row === b.row) return a.col - b.col;
             return a.row - b.row;
@@ -68,21 +73,9 @@ function generateNumbering() {
             }
             w.number = numberMap.get(key);
         }
-        allWords.forEach(w => {
-            wordsList[w.id].number = w.number;
-        });
-    } else {
-        // Если ручные номера есть, просто убедимся, что они числа
-        allWords.forEach(w => {
-            if (typeof w.number !== 'number') {
-                console.warn(`Word ${w.word} has invalid number, setting to 0`);
-                w.number = 0;
-            }
-            wordsList[w.id].number = w.number;
-        });
     }
     
-    // Формируем списки подсказок, сортируя по номеру
+    // Формируем списки подсказок
     cluesAcross = [];
     cluesDown = [];
     for(let w of wordsList) {
@@ -320,7 +313,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     if (nextEmpty) {
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.number);
+                        focusNextWord(activeWord.id);
                     }
                 }
             }
@@ -351,7 +344,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     if (nextEmpty) {
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.number);
+                        focusNextWord(activeWord.id);
                     }
                 }
             }
@@ -359,11 +352,16 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
-function focusNextWord(currentNumber) {
-    // Собираем все слова с их номерами и сортируем по номеру
+function focusNextWord(currentWordId) {
     let allWords = [...cluesAcross, ...cluesDown];
-    allWords.sort((a,b) => a.num - b.num);
-    let currentIndex = allWords.findIndex(w => w.num === currentNumber);
+    allWords.sort((a,b) => {
+        if (a.num === b.num) {
+            // При одинаковых номерах сохраняем исходный порядок (стабильная сортировка)
+            return 0;
+        }
+        return a.num - b.num;
+    });
+    let currentIndex = allWords.findIndex(w => w.wordId === currentWordId);
     if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
         let nextWord = allWords[currentIndex + 1];
         setActiveWord(nextWord.wordId);
@@ -392,7 +390,7 @@ function processBuffer(row, col, buffer) {
                         updateCellUI(nextEmpty.row, nextEmpty.col);
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.number);
+                        focusNextWord(activeWord.id);
                         setTimeout(() => {
                             if (activeWordId !== null) {
                                 const newWord = wordsList.find(w => w.id === activeWordId);
@@ -444,7 +442,7 @@ function processBuffer(row, col, buffer) {
                                 updateCellUI(nextEmpty.row, nextEmpty.col);
                                 cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                             } else {
-                                focusNextWord(activeWord.number);
+                                focusNextWord(activeWord.id);
                                 setTimeout(() => {
                                     if (activeWordId !== null) {
                                         const newWord = wordsList.find(w => w.id === activeWordId);
