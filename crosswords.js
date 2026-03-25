@@ -8,10 +8,10 @@ window.crosswordsData = {
                 width: 8,
                 height: 6,
                 words: [
-                    { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык" },
-                    { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель" },
-                    { word: "デンワバンゴウ", row: 1, col: 1, dir: "across", clue: "Номер телефона" },
-                    { word: "ギンコウ", row: 0, col: 5, dir: "down", clue: "Банк" },
+                    { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык", number: 1 },
+                    { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель", number: 2},
+                    { word: "デンワバンゴウ", row: 1, col: 1, dir: "across", clue: "Номер телефона", number: 3},
+                    { word: "ギンコウ", row: 0, col: 5, dir: "down", clue: "Банк", number: 4},
                 ]
             },
             {
@@ -19,11 +19,11 @@ window.crosswordsData = {
                 width: 7,
                 height: 4,
                 words: [
-                    { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой" },
-                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать" },
-                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро" },
-                    { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка" },
-                    { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да" },
+                    { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой", number: 1},
+                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2},
+                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро", number: 2},
+                    { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка", number: 3},
+                    { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да", number: 4},
                 ]
             },
             ]
