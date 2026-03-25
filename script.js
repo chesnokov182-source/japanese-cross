@@ -1,34 +1,20 @@
-// Таблица соответствия: ромадзи → массив катаканы + хирагана → катакана
+// Таблица соответствия ромадзи → массив катаканы
 const romajiToKatakana = {
-    // Гласные
     "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
-    // К-ряд
     "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
-    // С-ряд
     "sa": ["サ"], "shi": ["シ"], "su": ["ス"], "se": ["セ"], "so": ["ソ"],
-    // Т-ряд
     "ta": ["タ"], "chi": ["チ"], "tsu": ["ツ"], "te": ["テ"], "to": ["ト"],
-    // Н-ряд
     "na": ["ナ"], "ni": ["ニ"], "nu": ["ヌ"], "ne": ["ネ"], "no": ["ノ"],
-    // Х-ряд
     "ha": ["ハ"], "hi": ["ヒ"], "fu": ["フ"], "he": ["ヘ"], "ho": ["ホ"],
-    // М-ряд
     "ma": ["マ"], "mi": ["ミ"], "mu": ["ム"], "me": ["メ"], "mo": ["モ"],
-    // Я-ряд
     "ya": ["ヤ"], "yu": ["ユ"], "yo": ["ヨ"],
-    // Р-ряд
     "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
-    // В-ряд
     "wa": ["ワ"], "wo": ["ヲ"],
-
-    // Дакутэн
     "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
     "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
     "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
     "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
     "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
-
-    // Комбинированные (полноразмерные вторые символы)
     "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
     "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
     "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
@@ -40,26 +26,8 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    // Длинное n
     "nn": ["ン"],
-    "-": ["ー"],
-    
-    // Дополнительно: хирагана → катакана (одиночные символы)
-    "あ": ["ア"], "い": ["イ"], "う": ["ウ"], "え": ["エ"], "お": ["オ"],
-    "か": ["カ"], "き": ["キ"], "く": ["ク"], "け": ["ケ"], "こ": ["コ"],
-    "さ": ["サ"], "し": ["シ"], "す": ["ス"], "せ": ["セ"], "そ": ["ソ"],
-    "た": ["タ"], "ち": ["チ"], "つ": ["ツ"], "て": ["テ"], "と": ["ト"],
-    "な": ["ナ"], "に": ["ニ"], "ぬ": ["ヌ"], "ね": ["ネ"], "の": ["ノ"],
-    "は": ["ハ"], "ひ": ["ヒ"], "ふ": ["フ"], "へ": ["ヘ"], "ほ": ["ホ"],
-    "ま": ["マ"], "み": ["ミ"], "む": ["ム"], "め": ["メ"], "も": ["モ"],
-    "や": ["ヤ"], "ゆ": ["ユ"], "よ": ["ヨ"],
-    "ら": ["ラ"], "り": ["リ"], "る": ["ル"], "れ": ["レ"], "ろ": ["ロ"],
-    "わ": ["ワ"], "を": ["ヲ"], "ん": ["ン"],
-    "が": ["ガ"], "ぎ": ["ギ"], "ぐ": ["グ"], "げ": ["ゲ"], "ご": ["ゴ"],
-    "ざ": ["ザ"], "じ": ["ジ"], "ず": ["ズ"], "ぜ": ["ゼ"], "ぞ": ["ゾ"],
-    "だ": ["ダ"], "ぢ": ["ヂ"], "づ": ["ヅ"], "で": ["デ"], "ど": ["ド"],
-    "ば": ["バ"], "び": ["ビ"], "ぶ": ["ブ"], "べ": ["ベ"], "ぼ": ["ボ"],
-    "ぱ": ["パ"], "ぴ": ["ピ"], "ぷ": ["プ"], "ぺ": ["ペ"], "ぽ": ["ポ"]
+    "-": ["ー"]
 };
 
 let currentLevel = "n5";
@@ -178,7 +146,7 @@ function renderGrid() {
             if(wordNumber && !isBlocked){
                 const spanNum = document.createElement("span");
                 spanNum.className = "cell-number";
-                spanNum.innerText = Math.floor(wordNumber);
+                spanNum.innerText = Math.floor(wordNumber); // только целая часть
                 cellDiv.appendChild(spanNum);
             }
             const input = document.createElement("input");
@@ -363,9 +331,13 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
+// Новая логика перехода: ищем следующее незаполненное слово с большим номером, иначе первое незаполненное
 function focusNextWord(currentNumber) {
+    // Получаем все слова, отсортированные по полному номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
+    
+    // Сначала ищем слово с номером > currentNumber, которое не заполнено
     for (let w of allWords) {
         if (w.num > currentNumber) {
             const wordObj = wordsList.find(word => word.id === w.wordId);
@@ -383,6 +355,8 @@ function focusNextWord(currentNumber) {
             }
         }
     }
+    
+    // Если нет незаполненных с большим номером, ищем первое незаполненное (с наименьшим номером)
     for (let w of allWords) {
         const wordObj = wordsList.find(word => word.id === w.wordId);
         if (!wordObj) continue;
@@ -398,6 +372,7 @@ function focusNextWord(currentNumber) {
             return;
         }
     }
+    // Все слова заполнены — ничего не делаем
 }
 
 function processBuffer(row, col, buffer) {
@@ -497,7 +472,7 @@ function processBuffer(row, col, buffer) {
 
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
-    const allowedChars = /^[a-zA-Z-あ-んー]$/; // разрешаем латиницу, дефис, хирагану (кроме ん)
+    const allowedChars = /^[a-zA-Z-]$/;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
         e.preventDefault();
         return;
@@ -548,7 +523,7 @@ function handleKeydown(e, row, col) {
 
     if (e.key.length === 1 && allowedChars.test(e.key)) {
         const key = `${row},${col}`;
-        let buffer = (romajiBuffers.get(key) || "") + e.key;
+        let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
 
@@ -593,7 +568,7 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z) или хираганой. Буквы отображаются в процессе набора. Например: su → ス, し → シ, a → ア, n+s → ン+s, - → ー.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
         statusDiv.style.color = "#666";
     }
 }
@@ -633,6 +608,7 @@ function renderClues() {
     for(let clue of cluesAcross){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
+        // Отображаем целую часть номера
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
