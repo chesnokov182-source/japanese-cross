@@ -35,7 +35,7 @@ window.crosswordsData = {
                     { word: "パン", row: 4, col: 0, dir: "across", clue: "Выпекаемое мучное изделие", number: 2},
                     { word: "トリニク", row: 3, col: 4, dir: "across", clue: "Мясо птицы", number: 3},
                     { word: "アサゴハン", row: 0, col: 1, dir: "down", clue: "Рис на завтрак", number: 1.1},
-                    { word: "リョウリ", row: 0, col: 5, dir: "down", clue: "Готовить еду", number: 4},
+                    { word: "リヨウリ", row: 0, col: 5, dir: "down", clue: "Готовить еду", number: 4},
                 ]
             },
             {
