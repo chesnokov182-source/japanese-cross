@@ -26,7 +26,8 @@ const romajiToKatakana = {
     "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    "nn": ["ン"]
+    "nn": ["ン"],
+    "-": ["ー"]   // дефис → длинная черта
 };
 
 let currentLevel = "n5";
@@ -130,6 +131,7 @@ function loadCrossword(levelId, puzzleIdx) {
     clearHighlight();
     activeWordId = null;
     checkCompletion();
+    updateClueCompletion();
     romajiBuffers.clear();
 }
 
@@ -184,17 +186,13 @@ function updateCellUI(row, col) {
 }
 
 function getWordNumberAt(row, col){
-    let numbers = new Set();
     for(let w of wordsList){
         if(w.cells.some(cell => cell.row === row && cell.col === col)){
-            if(w.cells[0].row === row && w.cells[0].col === col) {
-                numbers.add(w.number);
-            }
+            if(w.cells[0].row === row && w.cells[0].col === col) return w.number;
+            break;
         }
     }
-    if (numbers.size === 0) return null;
-    // Если несколько номеров в одной ячейке, показываем первый (обычно это происходит только если слова начинаются в одной клетке)
-    return Array.from(numbers)[0];
+    return null;
 }
 
 function onCellFocus(row, col){
@@ -298,6 +296,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
+        updateClueCompletion();
 
         if (katakanaArray.length > 1) {
             if (activeWordId !== null) {
@@ -329,6 +328,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
+        updateClueCompletion();
 
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
@@ -359,16 +359,24 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
 }
 
 function focusNextWord(currentNumber) {
+    // Находим все слова (всех направлений) и сортируем по номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
-    let currentIndex = allWords.findIndex(w => w.num === currentNumber);
-    if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
-        let nextWord = allWords[currentIndex + 1];
+    // Ищем следующее слово с номером > currentNumber
+    let nextWord = null;
+    for (let w of allWords) {
+        if (w.num > currentNumber) {
+            nextWord = w;
+            break;
+        }
+    }
+    if (nextWord) {
         setActiveWord(nextWord.wordId);
     }
 }
 
 function processBuffer(row, col, buffer) {
+    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -409,11 +417,13 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
+    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
+    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -467,13 +477,13 @@ function processBuffer(row, col, buffer) {
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
     
-    // Разрешаем только английские буквы, дефис и управляющие клавиши
-    const allowedKeys = /^[a-zA-Z\-]$/;
+    // Разрешаем ввод только английских букв, дефиса и управляющих клавиш
+    const allowedChars = /^[a-zA-Z-]$/;
+    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
+        e.preventDefault();
+        return;
+    }
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        if (!allowedKeys.test(e.key)) {
-            e.preventDefault();
-            return;
-        }
         e.preventDefault();
     }
 
@@ -490,6 +500,7 @@ function handleKeydown(e, row, col) {
                 updateCellUI(row, col);
                 syncWordFromGrid();
                 checkCompletion();
+                updateClueCompletion();
             } else {
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -518,7 +529,7 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    if (e.key.length === 1 && /[a-zA-Z\-]/.test(e.key)) {
+    if (e.key.length === 1 && allowedChars.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
@@ -529,6 +540,7 @@ function handleKeydown(e, row, col) {
             updateCellUI(row, col);
             syncWordFromGrid();
             checkCompletion();
+            updateClueCompletion();
         }
 
         const processed = processBuffer(row, col, buffer);
@@ -564,8 +576,30 @@ function checkCompletion() {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s.";
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
         statusDiv.style.color = "#666";
+    }
+}
+
+function updateClueCompletion() {
+    // Для каждого слова проверяем, полностью ли оно заполнено правильно
+    for (let w of wordsList) {
+        let isComplete = true;
+        for (let i = 0; i < w.word.length; i++) {
+            if (w.current[i] !== w.wordOrig[i]) {
+                isComplete = false;
+                break;
+            }
+        }
+        // Находим элемент списка подсказок по data-word-id
+        const clueLi = document.querySelector(`.clue-list li[data-word-id='${w.id}']`);
+        if (clueLi) {
+            if (isComplete) {
+                clueLi.classList.add("completed");
+            } else {
+                clueLi.classList.remove("completed");
+            }
+        }
     }
 }
 
@@ -610,6 +644,8 @@ function renderClues() {
         });
         downUl.appendChild(li);
     }
+    // Применить выделение завершённых слов после рендеринга
+    updateClueCompletion();
 }
 
 function resetCrossword(){
