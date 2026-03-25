@@ -1,4 +1,4 @@
-// Таблица соответствия ромадзи → массив катаканы (все символы полноразмерные)
+// Таблица соответствия ромадзи → массив катаканы
 const romajiToKatakana = {
     "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
     "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
@@ -44,40 +44,50 @@ const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
+// Генерация нумерации с учётом ручных номеров
 function generateNumbering() {
-    let cellNumbers = new Map();
-    let counter = 1;
+    // Сначала скопируем ручные номера из исходных данных, если они есть
+    let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
     
-    let starters = [];
-    for (let w of wordsList) {
-        if (w.cells.length > 0) {
-            let firstCell = w.cells[0];
-            starters.push({
-                row: firstCell.row,
-                col: firstCell.col,
-                word: w
-            });
+    // Определим, какие слова уже имеют номер
+    let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
+    
+    if (!hasManualNumbers) {
+        // Если ручных номеров нет, генерируем автоматически
+        let numberMap = new Map();
+        let counter = 1;
+        let sorted = [...allWords].sort((a,b) => {
+            if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
+            if(a.row === b.row) return a.col - b.col;
+            return a.row - b.row;
+        });
+        for(let w of sorted) {
+            let key = `${w.row},${w.col}`;
+            if(!numberMap.has(key)) {
+                numberMap.set(key, counter++);
+            }
+            w.number = numberMap.get(key);
         }
+        allWords.forEach(w => {
+            wordsList[w.id].number = w.number;
+        });
+    } else {
+        // Если ручные номера есть, просто убедимся, что они числа
+        allWords.forEach(w => {
+            if (typeof w.number !== 'number') {
+                console.warn(`Word ${w.word} has invalid number, setting to 0`);
+                w.number = 0;
+            }
+            wordsList[w.id].number = w.number;
+        });
     }
     
-    starters.sort((a, b) => {
-        if (a.row === b.row) return a.col - b.col;
-        return a.row - b.row;
-    });
-    
-    for (let s of starters) {
-        let key = `${s.row},${s.col}`;
-        if (!cellNumbers.has(key)) {
-            cellNumbers.set(key, counter++);
-        }
-        s.word.number = cellNumbers.get(key);
-    }
-    
+    // Формируем списки подсказок, сортируя по номеру
     cluesAcross = [];
     cluesDown = [];
-    for (let w of wordsList) {
+    for(let w of wordsList) {
         let clueItem = { num: w.number, wordId: w.id, clue: w.clue, cells: w.cells };
-        if (w.dir === "across") cluesAcross.push(clueItem);
+        if(w.dir === "across") cluesAcross.push(clueItem);
         else cluesDown.push(clueItem);
     }
     cluesAcross.sort((a,b) => a.num - b.num);
@@ -350,6 +360,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
 }
 
 function focusNextWord(currentNumber) {
+    // Собираем все слова с их номерами и сортируем по номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
     let currentIndex = allWords.findIndex(w => w.num === currentNumber);
@@ -360,6 +371,7 @@ function focusNextWord(currentNumber) {
 }
 
 function processBuffer(row, col, buffer) {
+    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -400,11 +412,13 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
+    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
+    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
