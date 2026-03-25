@@ -20,8 +20,8 @@ window.crosswordsData = {
                 height: 4,
                 words: [
                     { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой", number: 1},
-                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2.1},
-                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро", number: 2},
+                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2},
+                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро", number: 2.1},
                     { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка", number: 3},
                     { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да", number: 4},
                 ]
