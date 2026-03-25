@@ -26,6 +26,42 @@ window.crosswordsData = {
                     { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да", number: 4},
                 ]
             },
+            {
+                name: "Кроссворд Еда 1",
+                width: 8,
+                height: 5,
+                words: [
+                    { word: "アイスクリーム", row: 0, col: 1, dir: "across", clue: "Холодная еда из смеси молока и яиц", number: 1},
+                    { word: "パン", row: 4, col: 0, dir: "across", clue: "Выпекаемое мучное изделие", number: 2},
+                    { word: "トリニク", row: 3, col: 4, dir: "across", clue: "Мясо птицы", number: 3},
+                    { word: "アサゴハン", row: 0, col: 1, dir: "down", clue: "Рис на завтрак", number: 4},
+                    { word: "リョウリ", row: 0, col: 5, dir: "down", clue: "Готовить еду", number: 5},
+                ]
+            },
+            {
+                name: "Кроссворд Еда 2",
+                width: 6,
+                height: 8,
+                words: [
+                    { word: "ヒルゴハン", row: 2, col: 0, dir: "across", clue: "Рис на обед", number: 1},
+                    { word: "バナナ", row: 4, col: 3, dir: "across", clue: "Длинный продолговатый фрукт", number: 2},
+                    { word: "ラーメン", row: 7, col: 2, dir: "across", clue: "Китайская лапша. Очень популярна в Японии", number: 3},
+                    { word: "ハンバーガー", row: 2, col: 3, dir: "down", clue: "Блюдо из котлеты между булками", number: 4},
+                    { word: "ウドン", row: 0, col: 4, dir: "down", clue: "Длинная продолговатая белая лапша изготовляемая из пшеничной муки", number: 5},
+                ]
+            },
+            {
+                name: "Кроссворд Еда 3",
+                width: 7,
+                height: 4,
+                words: [
+                    { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой", number: 1},
+                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2},
+                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро", number: 2.1},
+                    { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка", number: 3},
+                    { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да", number: 4},
+                ]
+            },
             ]
     },
     n4: {
