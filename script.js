@@ -185,11 +185,11 @@ function updateCellUI(row, col) {
     }
 }
 
-function getWordNumberAt(row, col){
-    for(let w of wordsList){
-        if(w.cells.some(cell => cell.row === row && cell.col === col)){
-            if(w.cells[0].row === row && w.cells[0].col === col) return w.number;
-            break;
+// Исправленная функция: возвращает номер, только если ячейка является начальной для слова
+function getWordNumberAt(row, col) {
+    for (let w of wordsList) {
+        if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
+            return w.number;
         }
     }
     return null;
@@ -358,20 +358,17 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
+// Переход к следующему слову с большим номером
 function focusNextWord(currentNumber) {
-    // Находим все слова (всех направлений) и сортируем по номеру
+    // Собираем все слова (горизонтальные и вертикальные) и сортируем по номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
-    // Ищем следующее слово с номером > currentNumber
-    let nextWord = null;
+    // Ищем первое слово с номером > currentNumber
     for (let w of allWords) {
         if (w.num > currentNumber) {
-            nextWord = w;
-            break;
+            setActiveWord(w.wordId);
+            return;
         }
-    }
-    if (nextWord) {
-        setActiveWord(nextWord.wordId);
     }
 }
 
@@ -582,7 +579,6 @@ function checkCompletion() {
 }
 
 function updateClueCompletion() {
-    // Для каждого слова проверяем, полностью ли оно заполнено правильно
     for (let w of wordsList) {
         let isComplete = true;
         for (let i = 0; i < w.word.length; i++) {
@@ -591,7 +587,6 @@ function updateClueCompletion() {
                 break;
             }
         }
-        // Находим элемент списка подсказок по data-word-id
         const clueLi = document.querySelector(`.clue-list li[data-word-id='${w.id}']`);
         if (clueLi) {
             if (isComplete) {
@@ -644,7 +639,6 @@ function renderClues() {
         });
         downUl.appendChild(li);
     }
-    // Применить выделение завершённых слов после рендеринга
     updateClueCompletion();
 }
 
