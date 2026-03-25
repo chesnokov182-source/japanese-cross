@@ -27,7 +27,7 @@ const romajiToKatakana = {
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
     "nn": ["ン"],
-    "-": ["ー"]   // дефис → длинная черта
+    "-": ["ー"]
 };
 
 let currentLevel = "n5";
@@ -78,11 +78,25 @@ function generateNumbering() {
             wordsList[w.id].number = w.number;
         });
     }
+
+    // Для каждого слова создаём displayNumber (целую часть номера)
+    for (let w of wordsList) {
+        let num = w.number;
+        // Извлекаем целую часть (до точки)
+        let intPart = Math.floor(num);
+        w.displayNumber = intPart;
+    }
     
     cluesAcross = [];
     cluesDown = [];
     for(let w of wordsList) {
-        let clueItem = { num: w.number, wordId: w.id, clue: w.clue, cells: w.cells };
+        let clueItem = { 
+            num: w.number, 
+            displayNum: w.displayNumber,
+            wordId: w.id, 
+            clue: w.clue, 
+            cells: w.cells 
+        };
         if(w.dir === "across") cluesAcross.push(clueItem);
         else cluesDown.push(clueItem);
     }
@@ -185,11 +199,11 @@ function updateCellUI(row, col) {
     }
 }
 
-// Исправленная функция: возвращает номер, только если ячейка является начальной для слова
+// Возвращает displayNumber (целую часть), если ячейка является начальной для слова
 function getWordNumberAt(row, col) {
     for (let w of wordsList) {
         if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
-            return w.number;
+            return w.displayNumber;
         }
     }
     return null;
@@ -358,12 +372,9 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
-// Переход к следующему слову с большим номером
 function focusNextWord(currentNumber) {
-    // Собираем все слова (горизонтальные и вертикальные) и сортируем по номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
-    // Ищем первое слово с номером > currentNumber
     for (let w of allWords) {
         if (w.num > currentNumber) {
             setActiveWord(w.wordId);
@@ -373,7 +384,6 @@ function focusNextWord(currentNumber) {
 }
 
 function processBuffer(row, col, buffer) {
-    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -414,13 +424,11 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
-    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
-    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -474,7 +482,6 @@ function processBuffer(row, col, buffer) {
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
     
-    // Разрешаем ввод только английских букв, дефиса и управляющих клавиш
     const allowedChars = /^[a-zA-Z-]$/;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
         e.preventDefault();
@@ -616,7 +623,7 @@ function renderClues() {
     for(let clue of cluesAcross){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
-        li.innerHTML = `<span class="clue-num">${clue.num}.</span><span class="clue-text">${clue.clue}</span>`;
+        li.innerHTML = `<span class="clue-num">${clue.displayNum}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
             const word = wordsList.find(w => w.id === clue.wordId);
@@ -629,7 +636,7 @@ function renderClues() {
     for(let clue of cluesDown){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
-        li.innerHTML = `<span class="clue-num">${clue.num}.</span><span class="clue-text">${clue.clue}</span>`;
+        li.innerHTML = `<span class="clue-num">${clue.displayNum}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
             const word = wordsList.find(w => w.id === clue.wordId);
