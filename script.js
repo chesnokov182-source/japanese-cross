@@ -44,24 +44,16 @@ const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
+// Генерация нумерации с учётом ручных номеров
 function generateNumbering() {
-    // Проверяем, есть ли у слов ручные номера
-    let hasManualNumbers = wordsList.some(w => w.number !== undefined && w.number !== null);
+    let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
     
-    if (hasManualNumbers) {
-        // Используем ручные номера как есть
-        // Ничего не меняем, только убеждаемся, что они числа
-        for (let w of wordsList) {
-            if (typeof w.number !== 'number') {
-                console.warn(`Word ${w.word} has invalid number, setting to 0`);
-                w.number = 0;
-            }
-        }
-    } else {
-        // Автоматическая нумерация
+    let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
+    
+    if (!hasManualNumbers) {
         let numberMap = new Map();
         let counter = 1;
-        let sorted = [...wordsList].sort((a,b) => {
+        let sorted = [...allWords].sort((a,b) => {
             if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
             if(a.row === b.row) return a.col - b.col;
             return a.row - b.row;
@@ -73,9 +65,19 @@ function generateNumbering() {
             }
             w.number = numberMap.get(key);
         }
+        allWords.forEach(w => {
+            wordsList[w.id].number = w.number;
+        });
+    } else {
+        allWords.forEach(w => {
+            if (typeof w.number !== 'number') {
+                console.warn(`Word ${w.word} has invalid number, setting to 0`);
+                w.number = 0;
+            }
+            wordsList[w.id].number = w.number;
+        });
     }
     
-    // Формируем списки подсказок
     cluesAcross = [];
     cluesDown = [];
     for(let w of wordsList) {
@@ -182,13 +184,17 @@ function updateCellUI(row, col) {
 }
 
 function getWordNumberAt(row, col){
+    let numbers = new Set();
     for(let w of wordsList){
         if(w.cells.some(cell => cell.row === row && cell.col === col)){
-            if(w.cells[0].row === row && w.cells[0].col === col) return w.number;
-            break;
+            if(w.cells[0].row === row && w.cells[0].col === col) {
+                numbers.add(w.number);
+            }
         }
     }
-    return null;
+    if (numbers.size === 0) return null;
+    // Если несколько номеров в одной ячейке, показываем первый (обычно это происходит только если слова начинаются в одной клетке)
+    return Array.from(numbers)[0];
 }
 
 function onCellFocus(row, col){
@@ -313,7 +319,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     if (nextEmpty) {
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.id);
+                        focusNextWord(activeWord.number);
                     }
                 }
             }
@@ -344,7 +350,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                     if (nextEmpty) {
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.id);
+                        focusNextWord(activeWord.number);
                     }
                 }
             }
@@ -352,16 +358,10 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
-function focusNextWord(currentWordId) {
+function focusNextWord(currentNumber) {
     let allWords = [...cluesAcross, ...cluesDown];
-    allWords.sort((a,b) => {
-        if (a.num === b.num) {
-            // При одинаковых номерах сохраняем исходный порядок (стабильная сортировка)
-            return 0;
-        }
-        return a.num - b.num;
-    });
-    let currentIndex = allWords.findIndex(w => w.wordId === currentWordId);
+    allWords.sort((a,b) => a.num - b.num);
+    let currentIndex = allWords.findIndex(w => w.num === currentNumber);
     if (currentIndex !== -1 && currentIndex + 1 < allWords.length) {
         let nextWord = allWords[currentIndex + 1];
         setActiveWord(nextWord.wordId);
@@ -369,7 +369,6 @@ function focusNextWord(currentWordId) {
 }
 
 function processBuffer(row, col, buffer) {
-    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -390,7 +389,7 @@ function processBuffer(row, col, buffer) {
                         updateCellUI(nextEmpty.row, nextEmpty.col);
                         cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
-                        focusNextWord(activeWord.id);
+                        focusNextWord(activeWord.number);
                         setTimeout(() => {
                             if (activeWordId !== null) {
                                 const newWord = wordsList.find(w => w.id === activeWordId);
@@ -410,13 +409,11 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
-    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
-    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -442,7 +439,7 @@ function processBuffer(row, col, buffer) {
                                 updateCellUI(nextEmpty.row, nextEmpty.col);
                                 cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                             } else {
-                                focusNextWord(activeWord.id);
+                                focusNextWord(activeWord.number);
                                 setTimeout(() => {
                                     if (activeWordId !== null) {
                                         const newWord = wordsList.find(w => w.id === activeWordId);
@@ -469,7 +466,14 @@ function processBuffer(row, col, buffer) {
 
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
+    
+    // Разрешаем только английские буквы, дефис и управляющие клавиши
+    const allowedKeys = /^[a-zA-Z\-]$/;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        if (!allowedKeys.test(e.key)) {
+            e.preventDefault();
+            return;
+        }
         e.preventDefault();
     }
 
@@ -514,7 +518,7 @@ function handleKeydown(e, row, col) {
         return;
     }
 
-    if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+    if (e.key.length === 1 && /[a-zA-Z\-]/.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
