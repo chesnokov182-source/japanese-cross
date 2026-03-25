@@ -27,7 +27,7 @@ const romajiToKatakana = {
     "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
     "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
     "nn": ["ン"],
-    "-": ["ー"]   // дефис → длинная черта
+    "-": ["ー"]
 };
 
 let currentLevel = "n5";
@@ -45,10 +45,8 @@ const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 
-// Генерация нумерации с учётом ручных номеров (в том числе дробных)
 function generateNumbering() {
     let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
-    
     let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
     
     if (!hasManualNumbers) {
@@ -71,10 +69,7 @@ function generateNumbering() {
         });
     } else {
         allWords.forEach(w => {
-            if (typeof w.number !== 'number') {
-                console.warn(`Word ${w.word} has invalid number, setting to 0`);
-                w.number = 0;
-            }
+            if (typeof w.number !== 'number') w.number = 0;
             wordsList[w.id].number = w.number;
         });
     }
@@ -151,7 +146,7 @@ function renderGrid() {
             if(wordNumber && !isBlocked){
                 const spanNum = document.createElement("span");
                 spanNum.className = "cell-number";
-                spanNum.innerText = wordNumber;
+                spanNum.innerText = Math.floor(wordNumber); // только целая часть
                 cellDiv.appendChild(spanNum);
             }
             const input = document.createElement("input");
@@ -185,7 +180,6 @@ function updateCellUI(row, col) {
     }
 }
 
-// Возвращает номер, только если ячейка является начальной для слова
 function getWordNumberAt(row, col) {
     for (let w of wordsList) {
         if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
@@ -198,24 +192,16 @@ function getWordNumberAt(row, col) {
 function onCellFocus(row, col){
     let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
     if (containingWords.length === 0) return;
-    
     if (activeWordId !== null) {
         let activeWord = wordsList.find(w => w.id === activeWordId);
-        if (activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) {
-            return;
-        }
+        if (activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) return;
     }
-    
     let newWord = null;
     if (activeWordId !== null) {
         let activeWord = wordsList.find(w => w.id === activeWordId);
-        if (activeWord) {
-            newWord = containingWords.find(w => w.dir === activeWord.dir);
-        }
+        if (activeWord) newWord = containingWords.find(w => w.dir === activeWord.dir);
     }
-    if (!newWord) {
-        newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
-    }
+    if (!newWord) newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
     setActiveWord(newWord.id);
 }
 
@@ -238,11 +224,8 @@ function setActiveWord(wordId){
     const word = wordsList.find(w => w.id === activeWordId);
     if (word && word.cells.length) {
         const firstEmpty = word.cells.find(cell => gridData[cell.row][cell.col] === "");
-        if (firstEmpty) {
-            cellElements[firstEmpty.row][firstEmpty.col]?.focus();
-        } else {
-            cellElements[word.cells[0].row][word.cells[0].col]?.focus();
-        }
+        if (firstEmpty) cellElements[firstEmpty.row][firstEmpty.col]?.focus();
+        else cellElements[word.cells[0].row][word.cells[0].col]?.focus();
     }
 }
 
@@ -250,9 +233,7 @@ function applyHighlight(){
     for(let i=0;i<gridHeight;i++){
         for(let j=0;j<gridWidth;j++){
             const cellDiv = cellElements[i][j]?.parentElement;
-            if(cellDiv){
-                cellDiv.classList.remove("highlight", "active-word");
-            }
+            if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
         }
     }
     if(activeWordId !== null){
@@ -281,9 +262,7 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     if (currentIndex === -1) return null;
     for (let i = currentIndex + 1; i < word.cells.length; i++) {
         let cell = word.cells[i];
-        if (gridData[cell.row][cell.col] === "") {
-            return cell;
-        }
+        if (gridData[cell.row][cell.col] === "") return cell;
     }
     return null;
 }
@@ -315,11 +294,8 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
                     let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) {
-                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    } else {
-                        focusNextWord(activeWord.number);
-                    }
+                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
                 }
             }
         }
@@ -347,29 +323,43 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if (activeWord) {
                     let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) {
-                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    } else {
-                        focusNextWord(activeWord.number);
-                    }
+                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
                 }
             }
         }
     }
 }
 
-// Новая логика перехода к ближайшему незаполненному слову
+// Новая логика перехода: ищем следующее незаполненное слово с большим номером, иначе первое незаполненное
 function focusNextWord(currentNumber) {
-    // Получаем все слова с их текущим состоянием заполненности
+    // Получаем все слова, отсортированные по полному номеру
     let allWords = [...cluesAcross, ...cluesDown];
-    // Сортируем по номеру (целые и дробные)
     allWords.sort((a,b) => a.num - b.num);
     
-    // Ищем первое слово (начиная с самого маленького номера), которое не полностью заполнено правильно
+    // Сначала ищем слово с номером > currentNumber, которое не заполнено
+    for (let w of allWords) {
+        if (w.num > currentNumber) {
+            const wordObj = wordsList.find(word => word.id === w.wordId);
+            if (!wordObj) continue;
+            let isComplete = true;
+            for (let i = 0; i < wordObj.word.length; i++) {
+                if (wordObj.current[i] !== wordObj.wordOrig[i]) {
+                    isComplete = false;
+                    break;
+                }
+            }
+            if (!isComplete) {
+                setActiveWord(wordObj.id);
+                return;
+            }
+        }
+    }
+    
+    // Если нет незаполненных с большим номером, ищем первое незаполненное (с наименьшим номером)
     for (let w of allWords) {
         const wordObj = wordsList.find(word => word.id === w.wordId);
         if (!wordObj) continue;
-        // Проверяем, все ли ячейки заполнены правильно
         let isComplete = true;
         for (let i = 0; i < wordObj.word.length; i++) {
             if (wordObj.current[i] !== wordObj.wordOrig[i]) {
@@ -382,11 +372,10 @@ function focusNextWord(currentNumber) {
             return;
         }
     }
-    // Если все слова заполнены, ничего не делаем
+    // Все слова заполнены — ничего не делаем
 }
 
 function processBuffer(row, col, buffer) {
-    // Специальный случай: n + согласная (не гласная и не n)
     if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
         insertKatakanaArray(row, col, ["ン"], 0);
         if (activeWordId !== null) {
@@ -427,13 +416,11 @@ function processBuffer(row, col, buffer) {
         return true;
     }
 
-    // Точное совпадение
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
 
-    // Частичное совпадение (префикс)
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
@@ -480,22 +467,17 @@ function processBuffer(row, col, buffer) {
             return true;
         }
     }
-
     return false;
 }
 
 function handleKeydown(e, row, col) {
     if (gridData[row][col] === null) return;
-    
-    // Разрешаем ввод только английских букв, дефиса и управляющих клавиш
     const allowedChars = /^[a-zA-Z-]$/;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
         e.preventDefault();
         return;
     }
-    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        e.preventDefault();
-    }
+    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) e.preventDefault();
 
     if (e.key === "Backspace") {
         const key = `${row},${col}`;
@@ -602,11 +584,8 @@ function updateClueCompletion() {
         }
         const clueLi = document.querySelector(`.clue-list li[data-word-id='${w.id}']`);
         if (clueLi) {
-            if (isComplete) {
-                clueLi.classList.add("completed");
-            } else {
-                clueLi.classList.remove("completed");
-            }
+            if (isComplete) clueLi.classList.add("completed");
+            else clueLi.classList.remove("completed");
         }
     }
 }
@@ -629,7 +608,8 @@ function renderClues() {
     for(let clue of cluesAcross){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
-        li.innerHTML = `<span class="clue-num">${clue.num}.</span><span class="clue-text">${clue.clue}</span>`;
+        // Отображаем целую часть номера
+        li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
             const word = wordsList.find(w => w.id === clue.wordId);
@@ -642,7 +622,7 @@ function renderClues() {
     for(let clue of cluesDown){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
-        li.innerHTML = `<span class="clue-num">${clue.num}.</span><span class="clue-text">${clue.clue}</span>`;
+        li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
             const word = wordsList.find(w => w.id === clue.wordId);
