@@ -27,6 +27,17 @@ window.crosswordsData = {
                 ]
             },
             {
+                name: "Кроссворд 3",
+                width: 6,
+                height: 6,
+                words: [
+                    { word: "マイシユウ", row: 2, col: 1, dir: "across", clue: "Каждую неделю", number: 1},
+                    { word: "キノウ", row: 4, col: 0, dir: "across", clue: "День перед сегодня", number: 2},
+                    { word: "スイヨウビ", row: 1, col: 2, dir: "down", clue: "3-й день начиная с понедельника", number: 3},
+                    { word: "コトシ", row: 0, col: 3, dir: "down", clue: "Текущий год", number: 4},
+                ]
+            },
+            {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
@@ -48,18 +59,6 @@ window.crosswordsData = {
                     { word: "ラーメン", row: 7, col: 2, dir: "across", clue: "Китайская лапша. Очень популярна в Японии", number: 3},
                     { word: "ハンバーガー", row: 2, col: 3, dir: "down", clue: "Блюдо из котлеты между булками", number: 4},
                     { word: "ウドン", row: 0, col: 4, dir: "down", clue: "Длинная продолговатая белая лапша изготовляемая из пшеничной муки", number: 5},
-                ]
-            },
-            {
-                name: "Кроссворд Еда 3",
-                width: 7,
-                height: 4,
-                words: [
-                    { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой", number: 1},
-                    { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2},
-                    { word: "オハヨウ", row: 0, col: 3, dir: "across", clue: "Доброе утро", number: 2.1},
-                    { word: "メイシ", row: 0, col: 0, dir: "down", clue: "Визитка", number: 3},
-                    { word: "ハイ", row: 0, col: 4, dir: "down", clue: "Да", number: 4},
                 ]
             },
             ]
