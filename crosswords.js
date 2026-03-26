@@ -58,7 +58,7 @@ window.crosswordsData = {
                     { word: "ハナシマス", row: 1, col: 1, dir: "down", clue: "Говорить, рассказывать", number: 1.1},
                     { word: "オシエマス", row: 3, col: 0, dir: "across", clue: "Обучать, объяснять", number: 2},
                     { word: "イキマス", row: 0, col: 4, dir: "down", clue: "Идти, ходить", number: 3},
-                    { word: "スワリマス", row: 1, col: 7, dir: "down", clue: "Сидеть", number: 4},
+                    { word: "スワリマス", row: 1, col: 6, dir: "down", clue: "Сидеть", number: 4},
                 ]
             },
             {
