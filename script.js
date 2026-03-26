@@ -30,6 +30,25 @@ const romajiToKatakana = {
     "-": ["ー"]
 };
 
+// Генерация удвоенных согласных (например, tte → ツ + テ, kka → ツ + カ, etc.)
+(function generateDoubledConsonants() {
+    const consonants = ['k','s','t','p','c','j','d','b','g','z','r','m','h','f','w'];
+    const newEntries = {};
+    for (let key in romajiToKatakana) {
+        const firstChar = key[0];
+        if (!consonants.includes(firstChar)) continue;
+        // Пропускаем ключи, уже начинающиеся с двух одинаковых согласных (например, "kka")
+        if (key.length > 1 && key[0] === key[1]) continue;
+        // Исключаем особую обработку для 'n'
+        if (firstChar === 'n') continue;
+        const newKey = firstChar + key;
+        if (romajiToKatakana[newKey]) continue; // не перезаписываем
+        const originalValue = romajiToKatakana[key];
+        newEntries[newKey] = ['ツ'].concat(originalValue);
+    }
+    Object.assign(romajiToKatakana, newEntries);
+})();
+
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
 let gridData = [];
