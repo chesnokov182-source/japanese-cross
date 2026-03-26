@@ -86,6 +86,18 @@ window.crosswordsData = {
                 ]
             },
             {
+                name: "Кроссворд 8",
+                width: 6,
+                height: 6,
+                words: [
+                    { word: "ツカイマス", row: 0, col: 1, dir: "across", clue: "Использовать", number: 1},
+                    { word: "オコリマス", row: 2, col: 0, dir: "across", clue: "Злиться", number: 2.1},
+                    { word: "オキマス", row: 2, col: 0, dir: "down", clue: "Просыпаться", number: 2},
+                    { word: "カエリマス", row: 0, col: 2, dir: "down", clue: "Возвращаться", number: 3},
+                    { word: "スミマス", row: 2, col: 4, dir: "down", clue: "Жить, проживать", number: 4},
+                ]
+            },
+            {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
