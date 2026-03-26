@@ -37,7 +37,7 @@ window.crosswordsData = {
                     { word: "コトシ", row: 0, col: 3, dir: "down", clue: "Текущий год", number: 4},
                 ]
             },
-              {
+            {
                 name: "Кроссворд 4",
                 width: 8,
                 height: 6,
@@ -47,6 +47,18 @@ window.crosswordsData = {
                     { word: "コンバン", row: 2, col: 3, dir: "down", clue: "Сегодняшний вечер", number: 1.2},
                     { word: "アシタ", row: 1, col: 5, dir: "down", clue: "Завтрашний день", number: 3},
                     { word: "ドヨウビ", row: 0, col: 7, dir: "down", clue: "6-й день начиная с понедельника", number: 4},
+                ]
+            },
+            {
+                name: "Кроссворд 5",
+                width: 7,
+                height: 6,
+                words: [
+                    { word: "ハタラキマス", row: 1, col: 1, dir: "across", clue: "Работать", number: 1},
+                    { word: "ハナシマス", row: 1, col: 1, dir: "down", clue: "Говорить, рассказывать", number: 1.1},
+                    { word: "オシエマス", row: 3, col: 0, dir: "across", clue: "Обучать, объяснять", number: 2},
+                    { word: "イキマス", row: 0, col: 4, dir: "down", clue: "Идти, ходить", number: 3},
+                    { word: "スワリマス", row: 1, col: 7, dir: "down", clue: "Сидеть", number: 4},
                 ]
             },
             {
