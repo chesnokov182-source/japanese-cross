@@ -74,6 +74,18 @@ window.crosswordsData = {
                 ]
             },
             {
+                name: "Кроссворд 7",
+                width: 8,
+                height: 7,
+                words: [
+                    { word: "ケシマス", row: 0, col: 1, dir: "across", clue: "Тушить, гасить; Выключать", number: 1},
+                    { word: "ケツコンシマス", row: 0, col: 1, dir: "down", clue: "Жениться, Выходить замуж", number: 1.1},
+                    { word: "レンシユウシマス", row: 3, col: 0, dir: "across", clue: "Тренироваться, обучаться", number: 2},
+                    { word: "キマス", row: 5, col: 3, dir: "across", clue: "Приходить, приезжать", number: 3},
+                    { word: "カシマス", row: 2, col: 5, dir: "down", clue: "Давать в долг", number: 4},
+                ]
+            },
+            {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
