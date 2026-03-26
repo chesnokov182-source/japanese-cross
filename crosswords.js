@@ -44,8 +44,8 @@ window.crosswordsData = {
                 words: [
                     { word: "コンシユウ", row: 2, col: 3, dir: "across", clue: "Текущая неделя", number: 1},
                     { word: "キヨネン", row: 7, col: 0, dir: "across", clue: "Прошлый год", number: 2},
-                    { word: "コンバン", row: 2, col: 3, dir: "down", clue: "Сегодняшний вечер", number: 3},
-                    { word: "アシタ", row: 1, col: 5, dir: "down", clue: "Завтрашний день", number: 4},
+                    { word: "コンバン", row: 2, col: 3, dir: "down", clue: "Сегодняшний вечер", number: 1.2},
+                    { word: "アシタ", row: 1, col: 5, dir: "down", clue: "Завтрашний день", number: 3},
                     { word: "ドヨウビ", row: 0, col: 7, dir: "down", clue: "6-й день начиная с понедельника", number: 4},
                 ]
             },
