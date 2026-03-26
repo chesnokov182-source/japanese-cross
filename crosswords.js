@@ -98,6 +98,18 @@ window.crosswordsData = {
                 ]
             },
             {
+                name: "Кроссворд 9",
+                width: 7,
+                height: 4,
+                words: [
+                    { word: "エンピツ", row 2, col: , dir: "across", clue: "Используется для письма. Написанное можно стереть", number: 1},
+                    { word: "ガクセイ", row: 2, col: 0, dir: "across", clue: "Учиться в школе", number: 2},
+                    { word: "コウエン", row: 2, col: 0, dir: "down", clue: "Кто угодно может в нем играть. Находиться на улице", number: }3},
+                    { word: "ゴガツ", row: 0, col: 2, dir: "down", clue: "5-й месяц", number: 4},
+                    { word: "イチゴ", row: 2, col: 4, dir: "down", clue: "Маленькая красная ягода. Часто используется в тортах", number: 5},
+                ]
+            },
+            {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
