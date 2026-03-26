@@ -102,7 +102,7 @@ window.crosswordsData = {
                 width: 7,
                 height: 4,
                 words: [
-                    { word: "エンピツ", row 2, col: 0, dir: "across", clue: "Используется для письма. Написанное можно стереть", number: 1},
+                    { word: "エンピツ", row: 2, col: 0, dir: "across", clue: "Используется для письма. Написанное можно стереть", number: 1},
                     { word: "ガクセイ", row: 1, col: 3, dir: "across", clue: "Учиться в школе", number: 2},
                     { word: "コウエン", row: 0, col: 0, dir: "down", clue: "Кто угодно может в нем играть. Находиться на улице", number: }3},
                     { word: "ゴガツ", row: 0, col: 3, dir: "down", clue: "5-й месяц", number: 4},
