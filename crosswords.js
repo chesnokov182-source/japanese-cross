@@ -62,6 +62,18 @@ window.crosswordsData = {
                 ]
             },
             {
+                name: "Кроссворд 6",
+                width: 8,
+                height: 6,
+                words: [
+                    { word: "ベンキヨウシマス", row: 1, col: 0, dir: "across", clue: "Учиться", number: 1},
+                    { word: "ナキマス", row: 5, col: 1, dir: "across", clue: "Плакать", number: 2},
+                    { word: "カキマス", row: 0, col: 2, dir: "down", clue: "Писать", number: 3},
+                    { word: "ウタイマス", row: 1, col: 4, dir: "down", clue: "Петь", number: 4},
+                    { word: "ミマス", row: 0, col: 6, dir: "down", clue: "Смотреть", number: 5},
+                ]
+            },
+            {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
