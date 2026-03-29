@@ -66,6 +66,18 @@ const hintBtn = document.getElementById("hintBtn");
 const themeToggle = document.getElementById("themeToggle");
 const resetProgressBtn = document.getElementById("resetProgressBtn");
 
+// ========== КАСТОМНОЕ УВЕДОМЛЕНИЕ ==========
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
 // ========== РАБОТА С ХРАНИЛИЩЕМ ==========
 const STORAGE_PROGRESS_KEY = "crosswordProgress";
 const STORAGE_COMPLETED_KEY = "completedCrosswords";
@@ -824,10 +836,10 @@ resetBtn.addEventListener("click", () => {
 
 resetProgressBtn.addEventListener("click", resetAllProgress);
 
-// ========== ПОДСКАЗКА ==========
+// ========== ПОДСКАЗКА С КАСТОМНЫМ УВЕДОМЛЕНИЕМ ==========
 function giveHint() {
     if (hintUsed) {
-        alert("Подсказка уже использована для этого кроссворда.");
+        showToast("Подсказка уже использована для этого кроссворда.", "error");
         return;
     }
     
@@ -860,7 +872,7 @@ function giveHint() {
     }
     
     if (emptyCells.length === 0) {
-        alert("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)");
+        showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
         return;
     }
     
@@ -876,7 +888,7 @@ function giveHint() {
         }
     }
     if (!correctChar) {
-        alert("Ошибка: не удалось определить правильную букву.");
+        showToast("Ошибка: не удалось определить правильную букву.", "error");
         return;
     }
     
@@ -890,7 +902,7 @@ function giveHint() {
     hintUsed = true;
     hintBtn.disabled = true;
     hintBtn.textContent = "Подсказка использована";
-    saveCurrentProgress(); // сохраняем и флаг подсказки
+    saveCurrentProgress();
 }
 
 hintBtn.addEventListener("click", giveHint);
