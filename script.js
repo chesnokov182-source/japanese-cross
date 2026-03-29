@@ -78,6 +78,32 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+// ========== КАСТОМНОЕ ПОДТВЕРЖДЕНИЕ ==========
+let confirmResolve = null;
+const confirmModal = document.getElementById('confirmModal');
+const confirmMessage = document.getElementById('confirmMessage');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
+
+function showConfirmDialog(message) {
+    return new Promise((resolve) => {
+        confirmResolve = resolve;
+        confirmMessage.textContent = message;
+        confirmModal.style.display = 'flex';
+    });
+}
+
+function closeConfirmDialog(result) {
+    if (confirmResolve) {
+        confirmResolve(result);
+        confirmResolve = null;
+    }
+    confirmModal.style.display = 'none';
+}
+
+confirmYes.addEventListener('click', () => closeConfirmDialog(true));
+confirmNo.addEventListener('click', () => closeConfirmDialog(false));
+
 // ========== РАБОТА С ХРАНИЛИЩЕМ ==========
 const STORAGE_PROGRESS_KEY = "crosswordProgress";
 const STORAGE_COMPLETED_KEY = "completedCrosswords";
@@ -123,8 +149,9 @@ function isCrosswordCompleted(level, puzzleIdx) {
 }
 
 // Полностью сбросить прогресс
-function resetAllProgress() {
-    if (confirm("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.")) {
+async function resetAllProgress() {
+    const confirmed = await showConfirmDialog("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.");
+    if (confirmed) {
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
         // Перезагрузить текущий кроссворд (сбросить до исходного состояния)
