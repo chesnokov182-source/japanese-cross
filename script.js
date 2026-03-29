@@ -30,7 +30,7 @@ const romajiToKatakana = {
     "-": ["ー"]
 };
 
-// Генерация удвоенных согласных (например, tte → ツ + テ, kka → ツ + カ, etc.)
+// Генерация удвоенных согласных
 (function generateDoubledConsonants() {
     const consonants = ['k','s','t','p','c','j','d','b','g','z','r','m','h','f','w'];
     const newEntries = {};
@@ -57,12 +57,11 @@ let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
-let hintUsed = false; // флаг использованной подсказки
+let hintUsed = false;
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
-const checkWordBtn = document.getElementById("checkWordBtn");
 const hintBtn = document.getElementById("hintBtn");
 const themeToggle = document.getElementById("themeToggle");
 
@@ -183,7 +182,7 @@ function loadCrossword(levelId, puzzleIdx) {
 function renderGrid() {
     const container = document.getElementById("gridContainer");
     container.innerHTML = "";
-    container.style.gridTemplateColumns = `repeat(${gridWidth}, minmax(60px, 1fr))`;
+    container.style.gridTemplateColumns = `repeat(${gridWidth}, minmax(70px, 1fr))`;
     cellElements = [];
     for(let i=0;i<gridHeight;i++){
         cellElements[i]=[];
@@ -328,7 +327,6 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
-        autoCheckActiveWordIfComplete(); // автоматическая проверка при заполнении
 
         if (katakanaArray.length > 1) {
             if (activeWordId !== null) {
@@ -358,7 +356,6 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
-        autoCheckActiveWordIfComplete();
 
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
@@ -542,7 +539,6 @@ function handleKeydown(e, row, col) {
                 syncWordFromGrid();
                 checkCompletion();
                 updateClueCompletion();
-                autoCheckActiveWordIfComplete();
             } else {
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -583,7 +579,6 @@ function handleKeydown(e, row, col) {
             syncWordFromGrid();
             checkCompletion();
             updateClueCompletion();
-            autoCheckActiveWordIfComplete();
         }
 
         const processed = processBuffer(row, col, buffer);
@@ -595,8 +590,6 @@ function handleKeydown(e, row, col) {
 }
 
 function onCellInput(row, col) {
-    // Если пользователь вводит что-то напрямую (например, вставка), но у нас уже есть обработка keydown,
-    // но на всякий случай очистим буфер при ручном вводе.
     const key = `${row},${col}`;
     if (romajiBuffers.has(key)) {
         romajiBuffers.delete(key);
@@ -727,106 +720,21 @@ resetBtn.addEventListener("click", () => {
     resetCrossword();
 });
 
-// ========== НОВЫЕ ФУНКЦИИ ==========
-
-// Проверка активного слова
-function checkActiveWord() {
-    if (activeWordId === null) return;
-    const word = wordsList.find(w => w.id === activeWordId);
-    if (!word) return;
-    
-    // Убираем предыдущие пометки
-    clearWordWrongHighlight(word);
-    
-    // Проверяем, все ли ячейки заполнены
-    let allFilled = true;
-    for (let i = 0; i < word.word.length; i++) {
-        if (word.current[i] === "") {
-            allFilled = false;
-            break;
-        }
-    }
-    
-    if (!allFilled) {
-        alert("Слово не заполнено полностью. Заполните все буквы.");
-        return;
-    }
-    
-    // Проверяем каждую букву
-    let hasError = false;
-    for (let i = 0; i < word.word.length; i++) {
-        if (word.current[i] !== word.wordOrig[i]) {
-            const cell = word.cells[i];
-            const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
-            if (cellDiv) {
-                cellDiv.classList.add("wrong");
-                hasError = true;
-            }
-        }
-    }
-    if (!hasError) {
-        alert("Слово верное!");
-    }
-}
-
-function clearWordWrongHighlight(word) {
-    for (let cell of word.cells) {
-        const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
-        if (cellDiv) cellDiv.classList.remove("wrong");
-    }
-}
-
-// Автоматическая проверка, если слово заполнено
-function autoCheckActiveWordIfComplete() {
-    if (activeWordId === null) return;
-    const word = wordsList.find(w => w.id === activeWordId);
-    if (!word) return;
-    
-    let allFilled = true;
-    for (let i = 0; i < word.word.length; i++) {
-        if (word.current[i] === "") {
-            allFilled = false;
-            break;
-        }
-    }
-    
-    if (allFilled) {
-        // Сначала убираем старые пометки
-        clearWordWrongHighlight(word);
-        // Подсвечиваем ошибки
-        let hasError = false;
-        for (let i = 0; i < word.word.length; i++) {
-            if (word.current[i] !== word.wordOrig[i]) {
-                const cell = word.cells[i];
-                const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
-                if (cellDiv) {
-                    cellDiv.classList.add("wrong");
-                    hasError = true;
-                }
-            }
-        }
-        // Если всё верно, можно ничего не делать
-    }
-}
-
-// Подсказка: открыть случайную пустую ячейку
+// ========== ПОДСКАЗКА ==========
 function giveHint() {
     if (hintUsed) {
         alert("Подсказка уже использована для этого кроссворда.");
         return;
     }
     
-    // Собрать все пустые ячейки, которые принадлежат хотя бы одному незаполненному слову
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
             if (gridData[i][j] === "") {
-                // Проверяем, что эта ячейка принадлежит какому-то слову, которое ещё не полностью правильно
                 let belongsToIncomplete = false;
                 for (let w of wordsList) {
                     const idx = w.cells.findIndex(c => c.row === i && c.col === j);
                     if (idx !== -1) {
-                        // Проверяем, что слово не полностью заполнено верно
                         let wordComplete = true;
                         for (let k = 0; k < w.word.length; k++) {
                             if (w.current[k] !== w.wordOrig[k]) {
@@ -852,11 +760,9 @@ function giveHint() {
         return;
     }
     
-    // Выбираем случайную
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const { row, col } = emptyCells[randomIndex];
     
-    // Определяем правильную букву для этой ячейки
     let correctChar = null;
     for (let w of wordsList) {
         const idx = w.cells.findIndex(c => c.row === row && c.col === col);
@@ -870,20 +776,17 @@ function giveHint() {
         return;
     }
     
-    // Вставляем букву
     gridData[row][col] = correctChar;
     updateCellUI(row, col);
     syncWordFromGrid();
     checkCompletion();
     updateClueCompletion();
-    autoCheckActiveWordIfComplete(); // проверим слово, если оно стало заполнено
     
     hintUsed = true;
     hintBtn.disabled = true;
     hintBtn.textContent = "Подсказка использована";
 }
 
-checkWordBtn.addEventListener("click", checkActiveWord);
 hintBtn.addEventListener("click", giveHint);
 
 updatePuzzleSelect();
