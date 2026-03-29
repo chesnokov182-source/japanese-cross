@@ -128,7 +128,8 @@ function resetAllProgress() {
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
         // Перезагрузить текущий кроссворд (сбросить до исходного состояния)
-        loadCrossword(currentLevel, currentPuzzleIndex);
+        loadCrossword(currentLevel, currentPuzzleIndex, false);
+        showToast("Весь прогресс удалён.", "success");
     }
 }
 
@@ -798,8 +799,30 @@ function renderClues() {
     updateClueCompletion();
 }
 
-function resetCrossword(){
-    loadCrossword(currentLevel, currentPuzzleIndex);
+// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
+function resetCrossword() {
+    // Удаляем сохранённый прогресс для этого кроссворда
+    const progress = getStoredProgress();
+    const key = `${currentLevel}_${currentPuzzleIndex}`;
+    if (progress[key]) {
+        delete progress[key];
+        localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+    }
+    
+    // Удаляем из списка решённых, если он там был
+    const completed = getCompletedCrosswords();
+    const completedKey = `${currentLevel}_${currentPuzzleIndex}`;
+    const index = completed.indexOf(completedKey);
+    if (index !== -1) {
+        completed.splice(index, 1);
+        localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
+        updatePuzzleSelect(); // обновить список
+    }
+    
+    // Загружаем кроссворд заново, но без восстановления сохранённого (preserveSaved = false)
+    loadCrossword(currentLevel, currentPuzzleIndex, false);
+    
+    showToast("Кроссворд сброшен. Все ячейки очищены.", "success");
 }
 
 function updatePuzzleSelect() {
