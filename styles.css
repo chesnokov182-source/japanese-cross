@@ -43,6 +43,7 @@ body {
     margin: 0;
     padding: 20px;
     transition: background 0.3s, color 0.3s;
+    font-size: 18px; /* увеличен базовый шрифт */
 }
 
 body.dark {
@@ -54,8 +55,8 @@ body.dark {
     background: var(--bg-container-light);
     border-radius: 20px;
     box-shadow: 0 10px 30px var(--shadow-light);
-    padding: 20px;
-    max-width: 1200px;
+    padding: 24px;
+    max-width: 1400px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -71,18 +72,19 @@ body.dark .crossword-container {
 
 .grid-section {
     flex: 2;
-    min-width: 400px;
+    min-width: 500px;
     overflow-x: auto;
 }
 
 .clues-section {
     flex: 1;
-    min-width: 280px;
+    min-width: 320px;
     background: var(--bg-clues-light);
     border-radius: 16px;
-    padding: 15px;
+    padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: background 0.3s;
+    font-size: 16px;
 }
 
 body.dark .clues-section {
@@ -91,15 +93,15 @@ body.dark .clues-section {
 }
 
 .level-selector {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     display: flex;
-    gap: 12px;
+    gap: 15px;
     align-items: baseline;
     flex-wrap: wrap;
 }
 
 select, button {
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 16px;
     border-radius: 30px;
     border: 1px solid var(--border-light);
@@ -143,13 +145,13 @@ body.dark button:hover {
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
+    width: 70px;      /* увеличено с 60px */
+    height: 70px;
     background: var(--cell-bg-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 32px;  /* увеличен шрифт в ячейке */
     font-weight: bold;
     position: relative;
     caret-color: #4a6fa5;
@@ -164,7 +166,7 @@ body.dark .cell {
     width: 100%;
     height: 100%;
     text-align: center;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
     border: none;
     background: transparent;
@@ -209,9 +211,9 @@ body.dark .cell.wrong {
 
 .cell-number {
     position: absolute;
-    top: 2px;
-    left: 4px;
-    font-size: 12px;
+    top: 3px;
+    left: 5px;
+    font-size: 14px;  /* увеличен номер в углу */
     font-weight: normal;
     color: #666;
     pointer-events: none;
@@ -222,14 +224,14 @@ body.dark .cell-number {
 }
 
 .clue-block {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .clue-block h3 {
-    font-size: 18px;
+    font-size: 20px;
     border-left: 5px solid #4a6fa5;
-    padding-left: 12px;
-    margin: 10px 0;
+    padding-left: 14px;
+    margin: 12px 0;
 }
 
 body.dark .clue-block h3 {
@@ -242,14 +244,14 @@ body.dark .clue-block h3 {
 }
 
 .clue-list li {
-    padding: 8px 8px;
-    margin: 4px 0;
-    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 10px;
     cursor: pointer;
     transition: background 0.1s;
-    font-size: 14px;
+    font-size: 16px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .clue-list li:hover {
@@ -282,7 +284,7 @@ body.dark .clue-list li.completed {
 .clue-num {
     font-weight: bold;
     color: #4a6fa5;
-    min-width: 30px;
+    min-width: 35px;
 }
 
 body.dark .clue-num {
@@ -294,9 +296,9 @@ body.dark .clue-num {
 }
 
 .status {
-    margin-top: 20px;
+    margin-top: 24px;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     color: #2c6e2c;
 }
 
@@ -305,7 +307,8 @@ body.dark .status {
 }
 
 @media (max-width: 800px) {
-    .cell { width: 45px; height: 45px; font-size: 22px; }
-    .cell input { font-size: 22px; }
-    .cell-number { font-size: 10px; }
+    .cell { width: 50px; height: 50px; font-size: 24px; }
+    .cell input { font-size: 24px; }
+    .cell-number { font-size: 11px; }
+    .clue-list li { font-size: 14px; }
 }
