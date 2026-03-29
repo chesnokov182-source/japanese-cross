@@ -64,6 +64,61 @@ const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
 const hintBtn = document.getElementById("hintBtn");
 const themeToggle = document.getElementById("themeToggle");
+const resetProgressBtn = document.getElementById("resetProgressBtn");
+
+// ========== РАБОТА С ХРАНИЛИЩЕМ ==========
+const STORAGE_PROGRESS_KEY = "crosswordProgress";
+const STORAGE_COMPLETED_KEY = "completedCrosswords";
+
+// Сохранить состояние текущего кроссворда
+function saveCurrentProgress() {
+    const progress = getStoredProgress();
+    const key = `${currentLevel}_${currentPuzzleIndex}`;
+    progress[key] = {
+        gridData: gridData.map(row => row.map(cell => cell)), // копия
+        hintUsed: hintUsed
+    };
+    localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+}
+
+// Получить все сохранённые прогрессы
+function getStoredProgress() {
+    const saved = localStorage.getItem(STORAGE_PROGRESS_KEY);
+    return saved ? JSON.parse(saved) : {};
+}
+
+// Сохранить флаг решённости
+function markAsCompleted() {
+    const completed = getCompletedCrosswords();
+    const key = `${currentLevel}_${currentPuzzleIndex}`;
+    if (!completed.includes(key)) {
+        completed.push(key);
+        localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
+    }
+    updatePuzzleSelect(); // обновить отображение в списке
+}
+
+// Получить список решённых
+function getCompletedCrosswords() {
+    const saved = localStorage.getItem(STORAGE_COMPLETED_KEY);
+    return saved ? JSON.parse(saved) : [];
+}
+
+// Проверить, решён ли кроссворд
+function isCrosswordCompleted(level, puzzleIdx) {
+    const completed = getCompletedCrosswords();
+    return completed.includes(`${level}_${puzzleIdx}`);
+}
+
+// Полностью сбросить прогресс
+function resetAllProgress() {
+    if (confirm("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.")) {
+        localStorage.removeItem(STORAGE_PROGRESS_KEY);
+        localStorage.removeItem(STORAGE_COMPLETED_KEY);
+        // Перезагрузить текущий кроссворд (сбросить до исходного состояния)
+        loadCrossword(currentLevel, currentPuzzleIndex);
+    }
+}
 
 // ========== ТЕМА ==========
 function initTheme() {
@@ -128,7 +183,7 @@ function generateNumbering() {
 }
 
 // ========== ЗАГРУЗКА КРОССВОРДА ==========
-function loadCrossword(levelId, puzzleIdx) {
+function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const levelData = window.crosswordsData[levelId];
     if (!levelData) return;
     const puzzles = levelData.puzzles;
@@ -162,8 +217,34 @@ function loadCrossword(levelId, puzzleIdx) {
             if(emptyGrid[i][j] === null) emptyGrid[i][j] = null;
         }
     }
-    gridData = emptyGrid.map(row => row.map(cell => (cell === null ? null : "")));
+    
+    // Исходная пустая сетка
+    const freshGrid = emptyGrid.map(row => row.map(cell => (cell === null ? null : "")));
+    
+    // Проверяем сохранённые данные
+    let savedData = null;
+    if (preserveSaved) {
+        const progress = getStoredProgress();
+        const key = `${levelId}_${puzzleIdx}`;
+        if (progress[key]) {
+            savedData = progress[key];
+        }
+    }
+    
+    if (savedData) {
+        // Восстанавливаем gridData
+        gridData = savedData.gridData.map(row => [...row]);
+        hintUsed = savedData.hintUsed;
+    } else {
+        gridData = freshGrid;
+        hintUsed = false;
+    }
+    
     generateNumbering();
+    
+    // Синхронизируем current для слов на основе gridData
+    syncWordFromGrid();
+    
     renderGrid();
     renderClues();
     clearHighlight();
@@ -172,10 +253,8 @@ function loadCrossword(levelId, puzzleIdx) {
     updateClueCompletion();
     romajiBuffers.clear();
     
-    // Сброс подсказки
-    hintUsed = false;
-    hintBtn.disabled = false;
-    hintBtn.textContent = "Подсказка (1 раз)";
+    hintBtn.disabled = hintUsed;
+    hintBtn.textContent = hintUsed ? "Подсказка использована" : "Подсказка (1 раз)";
 }
 
 // ========== ОТРИСОВКА СЕТКИ ==========
@@ -327,6 +406,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
+        saveCurrentProgress(); // сохраняем после изменения
 
         if (katakanaArray.length > 1) {
             if (activeWordId !== null) {
@@ -356,6 +436,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
+        saveCurrentProgress();
 
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
@@ -539,6 +620,7 @@ function handleKeydown(e, row, col) {
                 syncWordFromGrid();
                 checkCompletion();
                 updateClueCompletion();
+                saveCurrentProgress();
             } else {
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -579,6 +661,7 @@ function handleKeydown(e, row, col) {
             syncWordFromGrid();
             checkCompletion();
             updateClueCompletion();
+            saveCurrentProgress();
         }
 
         const processed = processBuffer(row, col, buffer);
@@ -621,9 +704,24 @@ function checkCompletion() {
     if (allFilled) {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
+        // Если ещё не отмечен как решённый — отмечаем
+        if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
+            markAsCompleted();
+        }
     } else {
         statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
         statusDiv.style.color = "#666";
+        // Если кроссворд был ранее отмечен как решённый, но теперь стал нерешённым (например, стёрли буквы) — убираем из списка решённых
+        if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
+            const completed = getCompletedCrosswords();
+            const key = `${currentLevel}_${currentPuzzleIndex}`;
+            const index = completed.indexOf(key);
+            if (index !== -1) {
+                completed.splice(index, 1);
+                localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
+                updatePuzzleSelect();
+            }
+        }
     }
 }
 
@@ -698,7 +796,11 @@ function updatePuzzleSelect() {
     puzzles.forEach((puzzle, idx) => {
         const option = document.createElement("option");
         option.value = idx;
-        option.textContent = puzzle.name || `Кроссворд ${idx + 1}`;
+        const isCompleted = isCrosswordCompleted(currentLevel, idx);
+        option.textContent = (isCompleted ? "✓ " : "") + (puzzle.name || `Кроссворд ${idx + 1}`);
+        if (isCompleted) {
+            option.style.fontWeight = "bold";
+        }
         puzzleSelect.appendChild(option);
     });
     puzzleSelect.value = currentPuzzleIndex;
@@ -719,6 +821,8 @@ puzzleSelect.addEventListener("change", (e) => {
 resetBtn.addEventListener("click", () => {
     resetCrossword();
 });
+
+resetProgressBtn.addEventListener("click", resetAllProgress);
 
 // ========== ПОДСКАЗКА ==========
 function giveHint() {
@@ -781,10 +885,12 @@ function giveHint() {
     syncWordFromGrid();
     checkCompletion();
     updateClueCompletion();
+    saveCurrentProgress();
     
     hintUsed = true;
     hintBtn.disabled = true;
     hintBtn.textContent = "Подсказка использована";
+    saveCurrentProgress(); // сохраняем и флаг подсказки
 }
 
 hintBtn.addEventListener("click", giveHint);
