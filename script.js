@@ -37,12 +37,10 @@ const romajiToKatakana = {
     for (let key in romajiToKatakana) {
         const firstChar = key[0];
         if (!consonants.includes(firstChar)) continue;
-        // Пропускаем ключи, уже начинающиеся с двух одинаковых согласных (например, "kka")
         if (key.length > 1 && key[0] === key[1]) continue;
-        // Исключаем особую обработку для 'n'
         if (firstChar === 'n') continue;
         const newKey = firstChar + key;
-        if (romajiToKatakana[newKey]) continue; // не перезаписываем
+        if (romajiToKatakana[newKey]) continue;
         const originalValue = romajiToKatakana[key];
         newEntries[newKey] = ['ツ'].concat(originalValue);
     }
@@ -59,11 +57,37 @@ let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
+let hintUsed = false; // флаг использованной подсказки
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
 const resetBtn = document.getElementById("resetBtn");
+const checkWordBtn = document.getElementById("checkWordBtn");
+const hintBtn = document.getElementById("hintBtn");
+const themeToggle = document.getElementById("themeToggle");
 
+// ========== ТЕМА ==========
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+    } else {
+        document.body.classList.remove('dark');
+    }
+}
+function toggleTheme() {
+    if (document.body.classList.contains('dark')) {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+}
+themeToggle.addEventListener('click', toggleTheme);
+initTheme();
+
+// ========== НУМЕРАЦИЯ СЛОВ ==========
 function generateNumbering() {
     let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
     let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
@@ -104,6 +128,7 @@ function generateNumbering() {
     cluesDown.sort((a,b) => a.num - b.num);
 }
 
+// ========== ЗАГРУЗКА КРОССВОРДА ==========
 function loadCrossword(levelId, puzzleIdx) {
     const levelData = window.crosswordsData[levelId];
     if (!levelData) return;
@@ -147,8 +172,14 @@ function loadCrossword(levelId, puzzleIdx) {
     checkCompletion();
     updateClueCompletion();
     romajiBuffers.clear();
+    
+    // Сброс подсказки
+    hintUsed = false;
+    hintBtn.disabled = false;
+    hintBtn.textContent = "Подсказка (1 раз)";
 }
 
+// ========== ОТРИСОВКА СЕТКИ ==========
 function renderGrid() {
     const container = document.getElementById("gridContainer");
     container.innerHTML = "";
@@ -165,7 +196,7 @@ function renderGrid() {
             if(wordNumber && !isBlocked){
                 const spanNum = document.createElement("span");
                 spanNum.className = "cell-number";
-                spanNum.innerText = Math.floor(wordNumber); // только целая часть
+                spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
             const input = document.createElement("input");
@@ -177,6 +208,7 @@ function renderGrid() {
                 input.addEventListener("keydown", (e) => handleKeydown(e, i, j));
                 input.addEventListener("focus", () => onCellFocus(i,j));
                 input.addEventListener("blur", () => onCellBlur(i,j));
+                input.addEventListener("input", () => onCellInput(i,j));
             }
             cellDiv.appendChild(input);
             container.appendChild(cellDiv);
@@ -252,7 +284,7 @@ function applyHighlight(){
     for(let i=0;i<gridHeight;i++){
         for(let j=0;j<gridWidth;j++){
             const cellDiv = cellElements[i][j]?.parentElement;
-            if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
+            if(cellDiv) cellDiv.classList.remove("highlight", "active-word", "wrong");
         }
     }
     if(activeWordId !== null){
@@ -286,6 +318,7 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     return null;
 }
 
+// ========== ВСТАВКА СИМВОЛОВ ==========
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     if (startIndex >= katakanaArray.length) return;
     const char = katakanaArray[startIndex];
@@ -295,6 +328,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
+        autoCheckActiveWordIfComplete(); // автоматическая проверка при заполнении
 
         if (katakanaArray.length > 1) {
             if (activeWordId !== null) {
@@ -324,6 +358,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
+        autoCheckActiveWordIfComplete();
 
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
@@ -350,13 +385,10 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     }
 }
 
-// Новая логика перехода: ищем следующее незаполненное слово с большим номером, иначе первое незаполненное
 function focusNextWord(currentNumber) {
-    // Получаем все слова, отсортированные по полному номеру
     let allWords = [...cluesAcross, ...cluesDown];
     allWords.sort((a,b) => a.num - b.num);
     
-    // Сначала ищем слово с номером > currentNumber, которое не заполнено
     for (let w of allWords) {
         if (w.num > currentNumber) {
             const wordObj = wordsList.find(word => word.id === w.wordId);
@@ -375,7 +407,6 @@ function focusNextWord(currentNumber) {
         }
     }
     
-    // Если нет незаполненных с большим номером, ищем первое незаполненное (с наименьшим номером)
     for (let w of allWords) {
         const wordObj = wordsList.find(word => word.id === w.wordId);
         if (!wordObj) continue;
@@ -391,7 +422,6 @@ function focusNextWord(currentNumber) {
             return;
         }
     }
-    // Все слова заполнены — ничего не делаем
 }
 
 function processBuffer(row, col, buffer) {
@@ -512,6 +542,7 @@ function handleKeydown(e, row, col) {
                 syncWordFromGrid();
                 checkCompletion();
                 updateClueCompletion();
+                autoCheckActiveWordIfComplete();
             } else {
                 if (activeWordId !== null) {
                     const activeWord = wordsList.find(w => w.id === activeWordId);
@@ -552,6 +583,7 @@ function handleKeydown(e, row, col) {
             syncWordFromGrid();
             checkCompletion();
             updateClueCompletion();
+            autoCheckActiveWordIfComplete();
         }
 
         const processed = processBuffer(row, col, buffer);
@@ -559,6 +591,16 @@ function handleKeydown(e, row, col) {
             romajiBuffers.set(key, "");
             updateCellUI(row, col);
         }
+    }
+}
+
+function onCellInput(row, col) {
+    // Если пользователь вводит что-то напрямую (например, вставка), но у нас уже есть обработка keydown,
+    // но на всякий случай очистим буфер при ручном вводе.
+    const key = `${row},${col}`;
+    if (romajiBuffers.has(key)) {
+        romajiBuffers.delete(key);
+        updateCellUI(row, col);
     }
 }
 
@@ -627,7 +669,6 @@ function renderClues() {
     for(let clue of cluesAcross){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
-        // Отображаем целую часть номера
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
             setActiveWord(clue.wordId);
@@ -685,6 +726,165 @@ puzzleSelect.addEventListener("change", (e) => {
 resetBtn.addEventListener("click", () => {
     resetCrossword();
 });
+
+// ========== НОВЫЕ ФУНКЦИИ ==========
+
+// Проверка активного слова
+function checkActiveWord() {
+    if (activeWordId === null) return;
+    const word = wordsList.find(w => w.id === activeWordId);
+    if (!word) return;
+    
+    // Убираем предыдущие пометки
+    clearWordWrongHighlight(word);
+    
+    // Проверяем, все ли ячейки заполнены
+    let allFilled = true;
+    for (let i = 0; i < word.word.length; i++) {
+        if (word.current[i] === "") {
+            allFilled = false;
+            break;
+        }
+    }
+    
+    if (!allFilled) {
+        alert("Слово не заполнено полностью. Заполните все буквы.");
+        return;
+    }
+    
+    // Проверяем каждую букву
+    let hasError = false;
+    for (let i = 0; i < word.word.length; i++) {
+        if (word.current[i] !== word.wordOrig[i]) {
+            const cell = word.cells[i];
+            const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
+            if (cellDiv) {
+                cellDiv.classList.add("wrong");
+                hasError = true;
+            }
+        }
+    }
+    if (!hasError) {
+        alert("Слово верное!");
+    }
+}
+
+function clearWordWrongHighlight(word) {
+    for (let cell of word.cells) {
+        const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
+        if (cellDiv) cellDiv.classList.remove("wrong");
+    }
+}
+
+// Автоматическая проверка, если слово заполнено
+function autoCheckActiveWordIfComplete() {
+    if (activeWordId === null) return;
+    const word = wordsList.find(w => w.id === activeWordId);
+    if (!word) return;
+    
+    let allFilled = true;
+    for (let i = 0; i < word.word.length; i++) {
+        if (word.current[i] === "") {
+            allFilled = false;
+            break;
+        }
+    }
+    
+    if (allFilled) {
+        // Сначала убираем старые пометки
+        clearWordWrongHighlight(word);
+        // Подсвечиваем ошибки
+        let hasError = false;
+        for (let i = 0; i < word.word.length; i++) {
+            if (word.current[i] !== word.wordOrig[i]) {
+                const cell = word.cells[i];
+                const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
+                if (cellDiv) {
+                    cellDiv.classList.add("wrong");
+                    hasError = true;
+                }
+            }
+        }
+        // Если всё верно, можно ничего не делать
+    }
+}
+
+// Подсказка: открыть случайную пустую ячейку
+function giveHint() {
+    if (hintUsed) {
+        alert("Подсказка уже использована для этого кроссворда.");
+        return;
+    }
+    
+    // Собрать все пустые ячейки, которые принадлежат хотя бы одному незаполненному слову
+    let emptyCells = [];
+    for (let i = 0; i < gridHeight; i++) {
+        for (let j = 0; j < gridWidth; j++) {
+            if (gridData[i][j] === "") {
+                // Проверяем, что эта ячейка принадлежит какому-то слову, которое ещё не полностью правильно
+                let belongsToIncomplete = false;
+                for (let w of wordsList) {
+                    const idx = w.cells.findIndex(c => c.row === i && c.col === j);
+                    if (idx !== -1) {
+                        // Проверяем, что слово не полностью заполнено верно
+                        let wordComplete = true;
+                        for (let k = 0; k < w.word.length; k++) {
+                            if (w.current[k] !== w.wordOrig[k]) {
+                                wordComplete = false;
+                                break;
+                            }
+                        }
+                        if (!wordComplete) {
+                            belongsToIncomplete = true;
+                            break;
+                        }
+                    }
+                }
+                if (belongsToIncomplete) {
+                    emptyCells.push({row: i, col: j});
+                }
+            }
+        }
+    }
+    
+    if (emptyCells.length === 0) {
+        alert("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)");
+        return;
+    }
+    
+    // Выбираем случайную
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+    const { row, col } = emptyCells[randomIndex];
+    
+    // Определяем правильную букву для этой ячейки
+    let correctChar = null;
+    for (let w of wordsList) {
+        const idx = w.cells.findIndex(c => c.row === row && c.col === col);
+        if (idx !== -1) {
+            correctChar = w.wordOrig[idx];
+            break;
+        }
+    }
+    if (!correctChar) {
+        alert("Ошибка: не удалось определить правильную букву.");
+        return;
+    }
+    
+    // Вставляем букву
+    gridData[row][col] = correctChar;
+    updateCellUI(row, col);
+    syncWordFromGrid();
+    checkCompletion();
+    updateClueCompletion();
+    autoCheckActiveWordIfComplete(); // проверим слово, если оно стало заполнено
+    
+    hintUsed = true;
+    hintBtn.disabled = true;
+    hintBtn.textContent = "Подсказка использована";
+}
+
+checkWordBtn.addEventListener("click", checkActiveWord);
+hintBtn.addEventListener("click", giveHint);
 
 updatePuzzleSelect();
 loadCrossword("n5", 0);
