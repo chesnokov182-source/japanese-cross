@@ -1,52 +1,245 @@
-// Таблица соответствия ромадзи → массив катаканы
-const romajiToKatakana = {
-    "a": ["ア"], "i": ["イ"], "u": ["ウ"], "e": ["エ"], "o": ["オ"],
-    "ka": ["カ"], "ki": ["キ"], "ku": ["ク"], "ke": ["ケ"], "ko": ["コ"],
-    "sa": ["サ"], "shi": ["シ"], "su": ["ス"], "se": ["セ"], "so": ["ソ"],
-    "ta": ["タ"], "chi": ["チ"], "tsu": ["ツ"], "te": ["テ"], "to": ["ト"],
-    "na": ["ナ"], "ni": ["ニ"], "nu": ["ヌ"], "ne": ["ネ"], "no": ["ノ"],
-    "ha": ["ハ"], "hi": ["ヒ"], "fu": ["フ"], "he": ["ヘ"], "ho": ["ホ"],
-    "ma": ["マ"], "mi": ["ミ"], "mu": ["ム"], "me": ["メ"], "mo": ["モ"],
-    "ya": ["ヤ"], "yu": ["ユ"], "yo": ["ヨ"],
-    "ra": ["ラ"], "ri": ["リ"], "ru": ["ル"], "re": ["レ"], "ro": ["ロ"],
-    "wa": ["ワ"], "wo": ["ヲ"],
-    "ga": ["ガ"], "gi": ["ギ"], "gu": ["グ"], "ge": ["ゲ"], "go": ["ゴ"],
-    "za": ["ザ"], "ji": ["ジ"], "zu": ["ズ"], "ze": ["ゼ"], "zo": ["ゾ"],
-    "da": ["ダ"], "di": ["ヂ"], "du": ["ヅ"], "de": ["デ"], "do": ["ド"],
-    "ba": ["バ"], "bi": ["ビ"], "bu": ["ブ"], "be": ["ベ"], "bo": ["ボ"],
-    "pa": ["パ"], "pi": ["ピ"], "pu": ["プ"], "pe": ["ペ"], "po": ["ポ"],
-    "kya": ["キ", "ヤ"], "kyu": ["キ", "ユ"], "kyo": ["キ", "ヨ"],
-    "sha": ["シ", "ヤ"], "shu": ["シ", "ユ"], "sho": ["シ", "ヨ"],
-    "cha": ["チ", "ヤ"], "chu": ["チ", "ユ"], "cho": ["チ", "ヨ"],
-    "nya": ["ニ", "ヤ"], "nyu": ["ニ", "ユ"], "nyo": ["ニ", "ヨ"],
-    "hya": ["ヒ", "ヤ"], "hyu": ["ヒ", "ユ"], "hyo": ["ヒ", "ヨ"],
-    "mya": ["ミ", "ヤ"], "myu": ["ミ", "ユ"], "myo": ["ミ", "ヨ"],
-    "rya": ["リ", "ヤ"], "ryu": ["リ", "ユ"], "ryo": ["リ", "ヨ"],
-    "gya": ["ギ", "ヤ"], "gyu": ["ギ", "ユ"], "gyo": ["ギ", "ヨ"],
-    "ja": ["ジ", "ヤ"], "ju": ["ジ", "ユ"], "jo": ["ジ", "ヨ"],
-    "bya": ["ビ", "ヤ"], "byu": ["ビ", "ユ"], "byo": ["ビ", "ヨ"],
-    "pya": ["ピ", "ヤ"], "pyu": ["ピ", "ユ"], "pyo": ["ピ", "ヨ"],
-    "nn": ["ン"],
-    "-": ["ー"]
+// ========== СЛОВАРЬ СЛОВ ПО УРОВНЯМ (можете дополнять) ==========
+const wordLists = {
+    n5: [
+        { word: "ニホンゴ", clue: "Японский язык" },
+        { word: "ウンテンシユ", clue: "Водитель" },
+        { word: "デンワバンゴウ", clue: "Номер телефона" },
+        { word: "ギンコウ", clue: "Банк" },
+        { word: "イソガシイ", clue: "Занятой" },
+        { word: "オシエル", clue: "Учить, рассказывать" },
+        { word: "オハヨウ", clue: "Доброе утро" },
+        { word: "メイシ", clue: "Визитка" },
+        { word: "ハイ", clue: "Да" }
+    ],
+    n4: [
+        { word: "デンシャ", clue: "Электричка, поезд" },
+        { word: "ヨミカタ", clue: "Способ чтения (как читается)" },
+        { word: "ハナシ", clue: "Разговор, история" },
+        { word: "テンプラ", clue: "Блюдо во фритюре" },
+        { word: "マチ", clue: "Город" },
+        { word: "アメ", clue: "Дождь / конфета" }
+    ],
+    n3: [
+        { word: "ケイザイ", clue: "Экономика" },
+        { word: "セイジ", clue: "Политика" },
+        { word: "ブンカ", clue: "Культура" },
+        { word: "レキシ", clue: "История" },
+        { word: "ガクシュウ", clue: "Обучение" },
+        { word: "ケンキュウ", clue: "Исследование" }
+    ],
+    n2: [
+        { word: "チョウサ", clue: "Расследование, исследование" },
+        { word: "ハッテン", clue: "Развитие" },
+        { word: "カンリョウ", clue: "Чиновник, бюрократ" },
+        { word: "コクサイ", clue: "Международный" },
+        { word: "ジョウホウ", clue: "Информация" },
+        { word: "イノベーション", clue: "Инновация" }
+    ],
+    n1: [
+        { word: "ジッソウ", clue: "Внедрение, реализация" },
+        { word: "ソウゴウテキ", clue: "Комплексный, всесторонний" },
+        { word: "ケイショウ", clue: "Наследование" },
+        { word: "ホショウ", clue: "Гарантия" },
+        { word: "チイキ", clue: "Регион, район" },
+        { word: "サクセイ", clue: "Составление (документа)" }
+    ]
 };
 
-// Генерация удвоенных согласных
-(function generateDoubledConsonants() {
-    const consonants = ['k','s','t','p','c','j','d','b','g','z','r','m','h','f','w'];
-    const newEntries = {};
-    for (let key in romajiToKatakana) {
-        const firstChar = key[0];
-        if (!consonants.includes(firstChar)) continue;
-        if (key.length > 1 && key[0] === key[1]) continue;
-        if (firstChar === 'n') continue;
-        const newKey = firstChar + key;
-        if (romajiToKatakana[newKey]) continue;
-        const originalValue = romajiToKatakana[key];
-        newEntries[newKey] = ['ツ'].concat(originalValue);
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+function getRandomWords(list, maxWords = 12) {
+    const shuffled = [...list];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    Object.assign(romajiToKatakana, newEntries);
-})();
+    return shuffled.slice(0, maxWords);
+}
 
+// Улучшенный генератор кроссворда
+function generateCrosswordFromWords(words) {
+    if (!words || words.length === 0) return null;
+    
+    // Сортируем по длине (самые длинные — в начало)
+    const sorted = [...words].sort((a,b) => b.word.length - a.word.length);
+    const placed = []; // размещённые слова
+    const grid = new Map(); // key "row,col" -> char
+    let minRow = 0, maxRow = 0, minCol = 0, maxCol = 0;
+    
+    // Размещаем первое слово горизонтально по центру
+    const first = sorted[0];
+    const startRow = 0;
+    const startCol = 0;
+    for (let i = 0; i < first.word.length; i++) {
+        const key = `${startRow},${startCol + i}`;
+        grid.set(key, first.word[i]);
+        minRow = Math.min(minRow, startRow);
+        maxRow = Math.max(maxRow, startRow);
+        minCol = Math.min(minCol, startCol + i);
+        maxCol = Math.max(maxCol, startCol + i);
+    }
+    placed.push({
+        ...first,
+        row: startRow,
+        col: startCol,
+        dir: 'across',
+        cells: Array.from({ length: first.word.length }, (_, i) => ({ row: startRow, col: startCol + i }))
+    });
+    
+    // Остальные слова пытаемся разместить
+    const remaining = sorted.slice(1);
+    for (const word of remaining) {
+        let bestPlacement = null;
+        let bestScore = -Infinity;
+        
+        // Пробуем все возможные пересечения со всеми размещёнными словами
+        for (const existing of placed) {
+            for (let dir of ['across', 'down']) {
+                for (let i = 0; i < word.word.length; i++) {
+                    for (let j = 0; j < existing.word.length; j++) {
+                        if (word.word[i] !== existing.word[j]) continue;
+                        
+                        // Вычисляем позицию нового слова
+                        let newRow, newCol;
+                        if (dir === 'across') {
+                            // новое слово горизонтально
+                            newRow = (existing.dir === 'across') ? existing.row : existing.row + j;
+                            newCol = (existing.dir === 'across') ? existing.col + j : existing.col;
+                            newCol = newCol - i;
+                        } else {
+                            // новое слово вертикально
+                            newRow = (existing.dir === 'across') ? existing.row + j : existing.row;
+                            newCol = (existing.dir === 'across') ? existing.col + j : existing.col;
+                            newRow = newRow - i;
+                        }
+                        
+                        // Проверяем, что все клетки нового слова либо свободны, либо совпадают
+                        let ok = true;
+                        const newCells = [];
+                        for (let k = 0; k < word.word.length; k++) {
+                            const r = (dir === 'across') ? newRow : newRow + k;
+                            const c = (dir === 'across') ? newCol + k : newCol;
+                            const key = `${r},${c}`;
+                            const existingChar = grid.get(key);
+                            if (existingChar && existingChar !== word.word[k]) {
+                                ok = false;
+                                break;
+                            }
+                            newCells.push({ row: r, col: c });
+                        }
+                        if (!ok) continue;
+                        
+                        // Дополнительно проверяем, что слово не создаёт конфликтов с другими словами (кроме пересечения)
+                        // (уже проверено выше)
+                        
+                        // Оцениваем качество размещения: чем ближе к уже существующим клеткам, тем лучше
+                        let score = 0;
+                        for (const cell of newCells) {
+                            const key = `${cell.row},${cell.col}`;
+                            if (grid.has(key)) score += 100; // пересечение даёт большой бонус
+                            // Проверяем соседей, чтобы слово не касалось других слов без пересечения (желательно, чтобы не было)
+                            const neighbors = [
+                                [cell.row-1, cell.col], [cell.row+1, cell.col],
+                                [cell.row, cell.col-1], [cell.row, cell.col+1]
+                            ];
+                            for (let [nr, nc] of neighbors) {
+                                const nkey = `${nr},${nc}`;
+                                if (grid.has(nkey) && !newCells.some(c => c.row === nr && c.col === nc)) {
+                                    // Если соседняя клетка занята, но не является частью нового слова — это плохо
+                                    score -= 50;
+                                }
+                            }
+                        }
+                        // Штраф за удалённость от центра
+                        const avgRow = (Math.min(...newCells.map(c=>c.row)) + Math.max(...newCells.map(c=>c.row))) / 2;
+                        const avgCol = (Math.min(...newCells.map(c=>c.col)) + Math.max(...newCells.map(c=>c.col))) / 2;
+                        score -= Math.abs(avgRow) * 2 + Math.abs(avgCol) * 2;
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestPlacement = {
+                                word: word.word,
+                                clue: word.clue,
+                                id: word.id,
+                                row: newRow,
+                                col: newCol,
+                                dir: dir,
+                                cells: newCells
+                            };
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (bestPlacement) {
+            // Размещаем слово
+            for (const cell of bestPlacement.cells) {
+                const idx = (bestPlacement.dir === 'across') ? (cell.col - bestPlacement.col) : (cell.row - bestPlacement.row);
+                const key = `${cell.row},${cell.col}`;
+                if (!grid.has(key)) {
+                    grid.set(key, bestPlacement.word[idx]);
+                }
+                minRow = Math.min(minRow, cell.row);
+                maxRow = Math.max(maxRow, cell.row);
+                minCol = Math.min(minCol, cell.col);
+                maxCol = Math.max(maxCol, cell.col);
+            }
+            placed.push(bestPlacement);
+        } else {
+            // Не удалось разместить слово — пропускаем
+            console.warn(`Не удалось разместить слово: ${word.word}`);
+        }
+    }
+    
+    if (placed.length === 0) return null;
+    
+    // Создаём прямоугольную сетку, обрезая пустые края
+    const height = maxRow - minRow + 1;
+    const width = maxCol - minCol + 1;
+    const gridArray = Array(height).fill().map(() => Array(width).fill(null));
+    const wordObjects = [];
+    
+    // Заполняем сетку
+    for (let [key, char] of grid.entries()) {
+        const [r, c] = key.split(',').map(Number);
+        const row = r - minRow;
+        const col = c - minCol;
+        gridArray[row][col] = char;
+    }
+    
+    // Строим объекты слов с координатами в новой сетке
+    for (let p of placed) {
+        const cells = [];
+        for (let cell of p.cells) {
+            cells.push({ row: cell.row - minRow, col: cell.col - minCol });
+        }
+        wordObjects.push({
+            id: p.id,
+            word: p.word,
+            clue: p.clue,
+            dir: p.dir,
+            row: p.row - minRow,
+            col: p.col - minCol,
+            cells: cells
+        });
+    }
+    
+    return { grid: gridArray, words: wordObjects, width, height };
+}
+
+// ========== ПРЕДВАРИТЕЛЬНЫЕ ЗАГОТОВКИ (на случай ошибки генерации) ==========
+const fallbackCrosswords = {
+    n5: {
+        width: 8,
+        height: 6,
+        words: [
+            { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык", id: 0 },
+            { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель", id: 1 }
+        ]
+    }
+};
+
+// ========== ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ ==========
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
 let gridData = [];
@@ -58,6 +251,7 @@ let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
 let hintUsed = false;
+let generatedPuzzles = {};
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -66,19 +260,16 @@ const hintBtn = document.getElementById("hintBtn");
 const themeToggle = document.getElementById("themeToggle");
 const resetProgressBtn = document.getElementById("resetProgressBtn");
 
-// ========== КАСТОМНОЕ УВЕДОМЛЕНИЕ ==========
+// ========== УВЕДОМЛЕНИЯ И ПОДТВЕРЖДЕНИЯ ==========
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ========== КАСТОМНОЕ ПОДТВЕРЖДЕНИЕ ==========
 let confirmResolve = null;
 const confirmModal = document.getElementById('confirmModal');
 const confirmMessage = document.getElementById('confirmMessage');
@@ -92,124 +283,164 @@ function showConfirmDialog(message) {
         confirmModal.style.display = 'flex';
     });
 }
-
 function closeConfirmDialog(result) {
-    if (confirmResolve) {
-        confirmResolve(result);
-        confirmResolve = null;
-    }
+    if (confirmResolve) confirmResolve(result);
+    confirmResolve = null;
     confirmModal.style.display = 'none';
 }
-
 confirmYes.addEventListener('click', () => closeConfirmDialog(true));
 confirmNo.addEventListener('click', () => closeConfirmDialog(false));
 
-// ========== РАБОТА С ХРАНИЛИЩЕМ ==========
+// ========== ХРАНИЛИЩЕ ==========
 const STORAGE_PROGRESS_KEY = "crosswordProgress";
 const STORAGE_COMPLETED_KEY = "completedCrosswords";
 
-// Сохранить состояние текущего кроссворда
-function saveCurrentProgress() {
-    const progress = getStoredProgress();
-    const key = `${currentLevel}_${currentPuzzleIndex}`;
-    progress[key] = {
-        gridData: gridData.map(row => row.map(cell => cell)), // копия
-        hintUsed: hintUsed
-    };
-    localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
-}
-
-// Получить все сохранённые прогрессы
 function getStoredProgress() {
     const saved = localStorage.getItem(STORAGE_PROGRESS_KEY);
     return saved ? JSON.parse(saved) : {};
 }
-
-// Сохранить флаг решённости
+function saveCurrentProgress() {
+    const progress = getStoredProgress();
+    const key = `${currentLevel}_${currentPuzzleIndex}`;
+    progress[key] = {
+        gridData: gridData.map(row => row.map(cell => cell)),
+        hintUsed: hintUsed
+    };
+    localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+}
+function getCompletedCrosswords() {
+    const saved = localStorage.getItem(STORAGE_COMPLETED_KEY);
+    return saved ? JSON.parse(saved) : [];
+}
 function markAsCompleted() {
     const completed = getCompletedCrosswords();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     if (!completed.includes(key)) {
         completed.push(key);
         localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
+        updatePuzzleSelect();
     }
-    updatePuzzleSelect(); // обновить отображение в списке
 }
-
-// Получить список решённых
-function getCompletedCrosswords() {
-    const saved = localStorage.getItem(STORAGE_COMPLETED_KEY);
-    return saved ? JSON.parse(saved) : [];
-}
-
-// Проверить, решён ли кроссворд
 function isCrosswordCompleted(level, puzzleIdx) {
-    const completed = getCompletedCrosswords();
-    return completed.includes(`${level}_${puzzleIdx}`);
+    return getCompletedCrosswords().includes(`${level}_${puzzleIdx}`);
 }
-
-// Полностью сбросить прогресс
 async function resetAllProgress() {
-    const confirmed = await showConfirmDialog("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.");
+    const confirmed = await showConfirmDialog("Удалить весь сохранённый прогресс?");
     if (confirmed) {
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
-        // Перезагрузить текущий кроссворд (сбросить до исходного состояния)
         loadCrossword(currentLevel, currentPuzzleIndex, false);
         showToast("Весь прогресс удалён.", "success");
     }
 }
+resetProgressBtn.addEventListener("click", resetAllProgress);
 
 // ========== ТЕМА ==========
 function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-    } else {
-        document.body.classList.remove('dark');
-    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') document.body.classList.add('dark');
 }
 function toggleTheme() {
-    if (document.body.classList.contains('dark')) {
-        document.body.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-    } else {
-        document.body.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-    }
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
 }
 themeToggle.addEventListener('click', toggleTheme);
 initTheme();
 
-// ========== НУМЕРАЦИЯ СЛОВ ==========
+// ========== ГЕНЕРАЦИЯ КРОССВОРДОВ ДЛЯ УРОВНЯ ==========
+function generateOrGetPuzzles(level) {
+    if (generatedPuzzles[level]) return generatedPuzzles[level];
+    const words = wordLists[level];
+    if (!words || words.length === 0) return [];
+    const puzzles = [];
+    // Генерируем несколько вариантов
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const selected = getRandomWords(words, 8); // ограничим 8 словами для компактности
+        const wordObjs = selected.map((w, idx) => ({ ...w, id: idx }));
+        const result = generateCrosswordFromWords(wordObjs);
+        if (result && result.words.length >= 3) {
+            puzzles.push({
+                name: `Вариант ${attempt+1}`,
+                width: result.width,
+                height: result.height,
+                words: result.words
+            });
+        }
+    }
+    if (puzzles.length === 0 && fallbackCrosswords[level]) {
+        puzzles.push(fallbackCrosswords[level]);
+    }
+    generatedPuzzles[level] = puzzles;
+    return puzzles;
+}
+
+// ========== ЗАГРУЗКА КРОССВОРДА ==========
+function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
+    const puzzles = generateOrGetPuzzles(levelId);
+    if (puzzleIdx >= puzzles.length) puzzleIdx = 0;
+    const puzzle = puzzles[puzzleIdx];
+    if (!puzzle) return;
+    
+    gridWidth = puzzle.width;
+    gridHeight = puzzle.height;
+    wordsList = puzzle.words.map((w, idx) => ({
+        ...w,
+        id: w.id !== undefined ? w.id : idx,
+        current: Array(w.word.length).fill(""),
+        wordOrig: w.word
+    }));
+    
+    // Инициализация сетки
+    const freshGrid = Array(gridHeight).fill().map(() => Array(gridWidth).fill(null));
+    for (let w of wordsList) {
+        for (let i = 0; i < w.cells.length; i++) {
+            const cell = w.cells[i];
+            if (freshGrid[cell.row][cell.col] === null) freshGrid[cell.row][cell.col] = "";
+        }
+    }
+    
+    let savedData = null;
+    if (preserveSaved) {
+        const progress = getStoredProgress();
+        const key = `${levelId}_${puzzleIdx}`;
+        if (progress[key]) savedData = progress[key];
+    }
+    if (savedData) {
+        gridData = savedData.gridData.map(row => [...row]);
+        hintUsed = savedData.hintUsed;
+    } else {
+        gridData = freshGrid;
+        hintUsed = false;
+    }
+    
+    generateNumbering();
+    syncWordFromGrid();
+    renderGrid();
+    renderClues();
+    clearHighlight();
+    activeWordId = null;
+    checkCompletion();
+    updateClueCompletion();
+    romajiBuffers.clear();
+    hintBtn.disabled = hintUsed;
+    hintBtn.textContent = hintUsed ? "Подсказка использована" : "Подсказка (1 раз)";
+}
+
 function generateNumbering() {
     let allWords = wordsList.map((w, idx) => ({ ...w, id: idx }));
-    let hasManualNumbers = allWords.some(w => w.number !== undefined && w.number !== null);
-    
-    if (!hasManualNumbers) {
-        let numberMap = new Map();
-        let counter = 1;
-        let sorted = [...allWords].sort((a,b) => {
-            if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
-            if(a.row === b.row) return a.col - b.col;
-            return a.row - b.row;
-        });
-        for(let w of sorted) {
-            let key = `${w.row},${w.col}`;
-            if(!numberMap.has(key)) {
-                numberMap.set(key, counter++);
-            }
-            w.number = numberMap.get(key);
-        }
-        allWords.forEach(w => {
-            wordsList[w.id].number = w.number;
-        });
-    } else {
-        allWords.forEach(w => {
-            if (typeof w.number !== 'number') w.number = 0;
-            wordsList[w.id].number = w.number;
-        });
+    let numberMap = new Map();
+    let counter = 1;
+    let sorted = [...allWords].sort((a,b) => {
+        if(a.row === b.row && a.col === b.col) return a.dir === "across" ? -1 : 1;
+        if(a.row === b.row) return a.col - b.col;
+        return a.row - b.row;
+    });
+    for(let w of sorted) {
+        let key = `${w.row},${w.col}`;
+        if(!numberMap.has(key)) numberMap.set(key, counter++);
+        w.number = numberMap.get(key);
     }
+    allWords.forEach(w => { wordsList[w.id].number = w.number; });
     
     cluesAcross = [];
     cluesDown = [];
@@ -222,79 +453,14 @@ function generateNumbering() {
     cluesDown.sort((a,b) => a.num - b.num);
 }
 
-// ========== ЗАГРУЗКА КРОССВОРДА ==========
-function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
-    const levelData = window.crosswordsData[levelId];
-    if (!levelData) return;
-    const puzzles = levelData.puzzles;
-    if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
-    const puzzle = puzzles[puzzleIdx];
-    
-    gridWidth = puzzle.width;
-    gridHeight = puzzle.height;
-    wordsList = puzzle.words.map((w, idx) => ({
-        ...w,
-        id: idx,
-        current: Array(w.word.length).fill(""),
-        wordOrig: w.word
-    }));
-    
-    let emptyGrid = Array(gridHeight).fill().map(() => Array(gridWidth).fill(null));
-    for(let w of wordsList) {
-        let cells = [];
-        for(let i=0;i<w.word.length;i++){
-            let r = w.dir === "across" ? w.row : w.row + i;
-            let c = w.dir === "across" ? w.col + i : w.col;
-            if(r>=0 && r<gridHeight && c>=0 && c<gridWidth){
-                cells.push({row:r, col:c});
-                if(emptyGrid[r][c] === null) emptyGrid[r][c] = "";
-            }
-        }
-        w.cells = cells;
-    }
-    for(let i=0;i<gridHeight;i++){
-        for(let j=0;j<gridWidth;j++){
-            if(emptyGrid[i][j] === null) emptyGrid[i][j] = null;
+function syncWordFromGrid() {
+    for (let w of wordsList) {
+        for (let i = 0; i < w.cells.length; i++) {
+            let cell = w.cells[i];
+            let val = gridData[cell.row][cell.col] || "";
+            w.current[i] = val;
         }
     }
-    
-    // Исходная пустая сетка
-    const freshGrid = emptyGrid.map(row => row.map(cell => (cell === null ? null : "")));
-    
-    // Проверяем сохранённые данные
-    let savedData = null;
-    if (preserveSaved) {
-        const progress = getStoredProgress();
-        const key = `${levelId}_${puzzleIdx}`;
-        if (progress[key]) {
-            savedData = progress[key];
-        }
-    }
-    
-    if (savedData) {
-        // Восстанавливаем gridData
-        gridData = savedData.gridData.map(row => [...row]);
-        hintUsed = savedData.hintUsed;
-    } else {
-        gridData = freshGrid;
-        hintUsed = false;
-    }
-    
-    generateNumbering();
-    
-    // Синхронизируем current для слов на основе gridData
-    syncWordFromGrid();
-    
-    renderGrid();
-    renderClues();
-    clearHighlight();
-    activeWordId = null;
-    checkCompletion();
-    updateClueCompletion();
-    romajiBuffers.clear();
-    
-    hintBtn.disabled = hintUsed;
-    hintBtn.textContent = hintUsed ? "Подсказка использована" : "Подсказка (1 раз)";
 }
 
 // ========== ОТРИСОВКА СЕТКИ ==========
@@ -342,22 +508,15 @@ function getDisplayValue(row, col) {
     if (buffer !== "") return buffer;
     return gridData[row][col] !== null ? gridData[row][col] : "";
 }
-
 function updateCellUI(row, col) {
-    if (cellElements[row][col]) {
-        cellElements[row][col].value = getDisplayValue(row, col);
-    }
+    if (cellElements[row][col]) cellElements[row][col].value = getDisplayValue(row, col);
 }
-
 function getWordNumberAt(row, col) {
     for (let w of wordsList) {
-        if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
-            return w.number;
-        }
+        if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) return w.number;
     }
     return null;
 }
-
 function onCellFocus(row, col){
     let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
     if (containingWords.length === 0) return;
@@ -373,7 +532,6 @@ function onCellFocus(row, col){
     if (!newWord) newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
     setActiveWord(newWord.id);
 }
-
 function onCellBlur(row, col) {
     const key = `${row},${col}`;
     const buffer = romajiBuffers.get(key);
@@ -386,7 +544,6 @@ function onCellBlur(row, col) {
         updateCellUI(row, col);
     }
 }
-
 function setActiveWord(wordId){
     activeWordId = wordId;
     applyHighlight();
@@ -397,7 +554,6 @@ function setActiveWord(wordId){
         else cellElements[word.cells[0].row][word.cells[0].col]?.focus();
     }
 }
-
 function applyHighlight(){
     for(let i=0;i<gridHeight;i++){
         for(let j=0;j<gridWidth;j++){
@@ -420,12 +576,7 @@ function applyHighlight(){
         if(target) target.classList.add("active-clue");
     }
 }
-
-function clearHighlight(){
-    activeWordId = null;
-    applyHighlight();
-}
-
+function clearHighlight(){ activeWordId = null; applyHighlight(); }
 function getNextEmptyCellInWord(word, currentRow, currentCol) {
     let currentIndex = word.cells.findIndex(cell => cell.row === currentRow && cell.col === currentCol);
     if (currentIndex === -1) return null;
@@ -435,8 +586,58 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     }
     return null;
 }
+function focusNextWord(currentNumber) {
+    let allWords = [...cluesAcross, ...cluesDown];
+    allWords.sort((a,b) => a.num - b.num);
+    for (let w of allWords) {
+        if (w.num > currentNumber) {
+            const wordObj = wordsList.find(word => word.id === w.wordId);
+            if (!wordObj) continue;
+            let isComplete = true;
+            for (let i = 0; i < wordObj.word.length; i++) if (wordObj.current[i] !== wordObj.wordOrig[i]) { isComplete = false; break; }
+            if (!isComplete) { setActiveWord(wordObj.id); return; }
+        }
+    }
+    for (let w of allWords) {
+        const wordObj = wordsList.find(word => word.id === w.wordId);
+        if (!wordObj) continue;
+        let isComplete = true;
+        for (let i = 0; i < wordObj.word.length; i++) if (wordObj.current[i] !== wordObj.wordOrig[i]) { isComplete = false; break; }
+        if (!isComplete) { setActiveWord(wordObj.id); return; }
+    }
+}
 
-// ========== ВСТАВКА СИМВОЛОВ ==========
+// ========== ВВОД РОМАДЗИ → КАТАКАНА ==========
+const romajiToKatakana = {
+    "a":["ア"],"i":["イ"],"u":["ウ"],"e":["エ"],"o":["オ"],"ka":["カ"],"ki":["キ"],"ku":["ク"],"ke":["ケ"],"ko":["コ"],
+    "sa":["サ"],"shi":["シ"],"su":["ス"],"se":["セ"],"so":["ソ"],"ta":["タ"],"chi":["チ"],"tsu":["ツ"],"te":["テ"],"to":["ト"],
+    "na":["ナ"],"ni":["ニ"],"nu":["ヌ"],"ne":["ネ"],"no":["ノ"],"ha":["ハ"],"hi":["ヒ"],"fu":["フ"],"he":["ヘ"],"ho":["ホ"],
+    "ma":["マ"],"mi":["ミ"],"mu":["ム"],"me":["メ"],"mo":["モ"],"ya":["ヤ"],"yu":["ユ"],"yo":["ヨ"],"ra":["ラ"],"ri":["リ"],
+    "ru":["ル"],"re":["レ"],"ro":["ロ"],"wa":["ワ"],"wo":["ヲ"],"ga":["ガ"],"gi":["ギ"],"gu":["グ"],"ge":["ゲ"],"go":["ゴ"],
+    "za":["ザ"],"ji":["ジ"],"zu":["ズ"],"ze":["ゼ"],"zo":["ゾ"],"da":["ダ"],"di":["ヂ"],"du":["ヅ"],"de":["デ"],"do":["ド"],
+    "ba":["バ"],"bi":["ビ"],"bu":["ブ"],"be":["ベ"],"bo":["ボ"],"pa":["パ"],"pi":["ピ"],"pu":["プ"],"pe":["ペ"],"po":["ポ"],
+    "kya":["キ","ヤ"],"kyu":["キ","ユ"],"kyo":["キ","ヨ"],"sha":["シ","ヤ"],"shu":["シ","ユ"],"sho":["シ","ヨ"],
+    "cha":["チ","ヤ"],"chu":["チ","ユ"],"cho":["チ","ヨ"],"nya":["ニ","ヤ"],"nyu":["ニ","ユ"],"nyo":["ニ","ヨ"],
+    "hya":["ヒ","ヤ"],"hyu":["ヒ","ユ"],"hyo":["ヒ","ヨ"],"mya":["ミ","ヤ"],"myu":["ミ","ユ"],"myo":["ミ","ヨ"],
+    "rya":["リ","ヤ"],"ryu":["リ","ユ"],"ryo":["リ","ヨ"],"gya":["ギ","ヤ"],"gyu":["ギ","ユ"],"gyo":["ギ","ヨ"],
+    "ja":["ジ","ヤ"],"ju":["ジ","ユ"],"jo":["ジ","ヨ"],"bya":["ビ","ヤ"],"byu":["ビ","ユ"],"byo":["ビ","ヨ"],
+    "pya":["ピ","ヤ"],"pyu":["ピ","ユ"],"pyo":["ピ","ヨ"],"nn":["ン"],"-":["ー"]
+};
+(function generateDoubled() {
+    const cons=['k','s','t','p','c','j','d','b','g','z','r','m','h','f','w'];
+    const newEntries={};
+    for(let key in romajiToKatakana){
+        const fc=key[0];
+        if(!cons.includes(fc)) continue;
+        if(key.length>1 && key[0]===key[1]) continue;
+        if(fc==='n') continue;
+        const newKey=fc+key;
+        if(romajiToKatakana[newKey]) continue;
+        newEntries[newKey]=['ツ'].concat(romajiToKatakana[key]);
+    }
+    Object.assign(romajiToKatakana,newEntries);
+})();
+
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     if (startIndex >= katakanaArray.length) return;
     const char = katakanaArray[startIndex];
@@ -446,28 +647,23 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         syncWordFromGrid();
         checkCompletion();
         updateClueCompletion();
-        saveCurrentProgress(); // сохраняем после изменения
-
-        if (katakanaArray.length > 1) {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
-                        return;
-                    }
+        saveCurrentProgress();
+        if (katakanaArray.length > 1 && activeWordId !== null) {
+            const activeWord = wordsList.find(w => w.id === activeWordId);
+            if (activeWord) {
+                let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                    let nextCell = activeWord.cells[idx + 1];
+                    insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
+                    return;
                 }
             }
-        } else {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    else focusNextWord(activeWord.number);
-                }
+        } else if (activeWordId !== null) {
+            const activeWord = wordsList.find(w => w.id === activeWordId);
+            if (activeWord) {
+                let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                else focusNextWord(activeWord.number);
             }
         }
     } else {
@@ -477,67 +673,23 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         checkCompletion();
         updateClueCompletion();
         saveCurrentProgress();
-
-        if (startIndex + 1 < katakanaArray.length) {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
-                        return;
-                    }
+        if (startIndex + 1 < katakanaArray.length && activeWordId !== null) {
+            const activeWord = wordsList.find(w => w.id === activeWordId);
+            if (activeWord) {
+                let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                    let nextCell = activeWord.cells[idx + 1];
+                    insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
+                    return;
                 }
             }
-        } else {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    else focusNextWord(activeWord.number);
-                }
+        } else if (activeWordId !== null) {
+            const activeWord = wordsList.find(w => w.id === activeWordId);
+            if (activeWord) {
+                let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                else focusNextWord(activeWord.number);
             }
-        }
-    }
-}
-
-function focusNextWord(currentNumber) {
-    let allWords = [...cluesAcross, ...cluesDown];
-    allWords.sort((a,b) => a.num - b.num);
-    
-    for (let w of allWords) {
-        if (w.num > currentNumber) {
-            const wordObj = wordsList.find(word => word.id === w.wordId);
-            if (!wordObj) continue;
-            let isComplete = true;
-            for (let i = 0; i < wordObj.word.length; i++) {
-                if (wordObj.current[i] !== wordObj.wordOrig[i]) {
-                    isComplete = false;
-                    break;
-                }
-            }
-            if (!isComplete) {
-                setActiveWord(wordObj.id);
-                return;
-            }
-        }
-    }
-    
-    for (let w of allWords) {
-        const wordObj = wordsList.find(word => word.id === w.wordId);
-        if (!wordObj) continue;
-        let isComplete = true;
-        for (let i = 0; i < wordObj.word.length; i++) {
-            if (wordObj.current[i] !== wordObj.wordOrig[i]) {
-                isComplete = false;
-                break;
-            }
-        }
-        if (!isComplete) {
-            setActiveWord(wordObj.id);
-            return;
         }
     }
 }
@@ -582,51 +734,47 @@ function processBuffer(row, col, buffer) {
         }
         return true;
     }
-
     if (romajiToKatakana.hasOwnProperty(buffer)) {
         insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
         return true;
     }
-
     for (let i = buffer.length - 1; i >= 1; i--) {
         let prefix = buffer.slice(0, i);
         if (romajiToKatakana.hasOwnProperty(prefix)) {
             const katakanaArray = romajiToKatakana[prefix];
             const remaining = buffer.slice(i);
             insertKatakanaArray(row, col, katakanaArray, 0);
-            if (remaining.length > 0) {
-                if (activeWordId !== null) {
-                    const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if (activeWord) {
-                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                            let nextCell = activeWord.cells[idx + 1];
-                            const nextKey = `${nextCell.row},${nextCell.col}`;
+            if (remaining.length > 0 && activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        const nextKey = `${nextCell.row},${nextCell.col}`;
+                        romajiBuffers.set(nextKey, remaining);
+                        updateCellUI(nextCell.row, nextCell.col);
+                        cellElements[nextCell.row][nextCell.col]?.focus();
+                    } else {
+                        let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                        if (nextEmpty) {
+                            const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
                             romajiBuffers.set(nextKey, remaining);
-                            updateCellUI(nextCell.row, nextCell.col);
-                            cellElements[nextCell.row][nextCell.col]?.focus();
+                            updateCellUI(nextEmpty.row, nextEmpty.col);
+                            cellElements[nextEmpty.row][nextEmpty.col]?.focus();
                         } else {
-                            let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                            if (nextEmpty) {
-                                const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
-                                romajiBuffers.set(nextKey, remaining);
-                                updateCellUI(nextEmpty.row, nextEmpty.col);
-                                cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                            } else {
-                                focusNextWord(activeWord.number);
-                                setTimeout(() => {
-                                    if (activeWordId !== null) {
-                                        const newWord = wordsList.find(w => w.id === activeWordId);
-                                        if (newWord && newWord.cells.length) {
-                                            let firstCell = newWord.cells[0];
-                                            const firstKey = `${firstCell.row},${firstCell.col}`;
-                                            romajiBuffers.set(firstKey, remaining);
-                                            updateCellUI(firstCell.row, firstCell.col);
-                                            cellElements[firstCell.row][firstCell.col]?.focus();
-                                        }
+                            focusNextWord(activeWord.number);
+                            setTimeout(() => {
+                                if (activeWordId !== null) {
+                                    const newWord = wordsList.find(w => w.id === activeWordId);
+                                    if (newWord && newWord.cells.length) {
+                                        let firstCell = newWord.cells[0];
+                                        const firstKey = `${firstCell.row},${firstCell.col}`;
+                                        romajiBuffers.set(firstKey, remaining);
+                                        updateCellUI(firstCell.row, firstCell.col);
+                                        cellElements[firstCell.row][firstCell.col]?.focus();
                                     }
-                                }, 10);
-                            }
+                                }
+                            }, 10);
                         }
                     }
                 }
@@ -661,22 +809,19 @@ function handleKeydown(e, row, col) {
                 checkCompletion();
                 updateClueCompletion();
                 saveCurrentProgress();
-            } else {
-                if (activeWordId !== null) {
-                    const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if (activeWord) {
-                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if (idx > 0) {
-                            let prev = activeWord.cells[idx - 1];
-                            cellElements[prev.row][prev.col]?.focus();
-                        }
+            } else if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx > 0) {
+                        let prev = activeWord.cells[idx - 1];
+                        cellElements[prev.row][prev.col]?.focus();
                     }
                 }
             }
         }
         return;
     }
-
     if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
         let newRow = row, newCol = col;
         if (e.key === "ArrowLeft") newCol--;
@@ -688,13 +833,11 @@ function handleKeydown(e, row, col) {
         }
         return;
     }
-
     if (e.key.length === 1 && allowedChars.test(e.key)) {
         const key = `${row},${col}`;
         let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
         romajiBuffers.set(key, buffer);
         updateCellUI(row, col);
-
         if (buffer.length === 1 && gridData[row][col] !== "") {
             gridData[row][col] = "";
             updateCellUI(row, col);
@@ -703,7 +846,6 @@ function handleKeydown(e, row, col) {
             updateClueCompletion();
             saveCurrentProgress();
         }
-
         const processed = processBuffer(row, col, buffer);
         if (processed) {
             romajiBuffers.set(key, "");
@@ -711,7 +853,6 @@ function handleKeydown(e, row, col) {
         }
     }
 }
-
 function onCellInput(row, col) {
     const key = `${row},${col}`;
     if (romajiBuffers.has(key)) {
@@ -720,38 +861,20 @@ function onCellInput(row, col) {
     }
 }
 
-function syncWordFromGrid() {
-    for (let w of wordsList) {
-        for (let i = 0; i < w.cells.length; i++) {
-            let cell = w.cells[i];
-            let val = gridData[cell.row][cell.col] || "";
-            w.current[i] = val;
-        }
-    }
-}
-
+// ========== ПРОВЕРКА ЗАВЕРШЕНИЯ ==========
 function checkCompletion() {
     let allFilled = true;
     for (let w of wordsList) {
         for (let i = 0; i < w.word.length; i++) {
-            if (w.current[i] !== w.wordOrig[i]) {
-                allFilled = false;
-                break;
-            }
+            if (w.current[i] !== w.wordOrig[i]) { allFilled = false; break; }
         }
     }
     const statusDiv = document.getElementById("statusMsg");
     if (allFilled) {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
-        statusDiv.style.color = "#2c6e2c";
-        // Если ещё не отмечен как решённый — отмечаем
-        if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
-            markAsCompleted();
-        }
+        if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) markAsCompleted();
     } else {
         statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
-        statusDiv.style.color = "#666";
-        // Если кроссворд был ранее отмечен как решённый, но теперь стал нерешённым (например, стёрли буквы) — убираем из списка решённых
         if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             const completed = getCompletedCrosswords();
             const key = `${currentLevel}_${currentPuzzleIndex}`;
@@ -764,198 +887,106 @@ function checkCompletion() {
         }
     }
 }
-
 function updateClueCompletion() {
     for (let w of wordsList) {
         let isComplete = true;
-        for (let i = 0; i < w.word.length; i++) {
-            if (w.current[i] !== w.wordOrig[i]) {
-                isComplete = false;
-                break;
-            }
-        }
+        for (let i = 0; i < w.word.length; i++) if (w.current[i] !== w.wordOrig[i]) { isComplete = false; break; }
         const clueLi = document.querySelector(`.clue-list li[data-word-id='${w.id}']`);
-        if (clueLi) {
-            if (isComplete) clueLi.classList.add("completed");
-            else clueLi.classList.remove("completed");
-        }
+        if (clueLi) isComplete ? clueLi.classList.add("completed") : clueLi.classList.remove("completed");
     }
 }
-
 function renderClues() {
     const container = document.getElementById("cluesContainer");
     container.innerHTML = `
-        <div class="clue-block">
-            <h3>По горизонтали</h3>
-            <ul class="clue-list" id="acrossList"></ul>
-        </div>
-        <div class="clue-block">
-            <h3>По вертикали</h3>
-            <ul class="clue-list" id="downList"></ul>
-        </div>
+        <div class="clue-block"><h3>По горизонтали</h3><ul class="clue-list" id="acrossList"></ul></div>
+        <div class="clue-block"><h3>По вертикали</h3><ul class="clue-list" id="downList"></ul></div>
     `;
     const acrossUl = document.getElementById("acrossList");
     const downUl = document.getElementById("downList");
-    
     for(let clue of cluesAcross){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
-        li.addEventListener("click", () => {
-            setActiveWord(clue.wordId);
-            const word = wordsList.find(w => w.id === clue.wordId);
-            if(word && word.cells.length){
-                cellElements[word.cells[0].row][word.cells[0].col]?.focus();
-            }
-        });
+        li.addEventListener("click", () => { setActiveWord(clue.wordId); const word = wordsList.find(w => w.id === clue.wordId); if(word && word.cells.length) cellElements[word.cells[0].row][word.cells[0].col]?.focus(); });
         acrossUl.appendChild(li);
     }
     for(let clue of cluesDown){
         const li = document.createElement("li");
         li.setAttribute("data-word-id", clue.wordId);
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
-        li.addEventListener("click", () => {
-            setActiveWord(clue.wordId);
-            const word = wordsList.find(w => w.id === clue.wordId);
-            if(word && word.cells.length){
-                cellElements[word.cells[0].row][word.cells[0].col]?.focus();
-            }
-        });
+        li.addEventListener("click", () => { setActiveWord(clue.wordId); const word = wordsList.find(w => w.id === clue.wordId); if(word && word.cells.length) cellElements[word.cells[0].row][word.cells[0].col]?.focus(); });
         downUl.appendChild(li);
     }
     updateClueCompletion();
 }
 
-// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
+// ========== СБРОС ==========
 function resetCrossword() {
-    // Удаляем сохранённый прогресс для этого кроссворда
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
-    if (progress[key]) {
-        delete progress[key];
-        localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
-    }
-    
-    // Удаляем из списка решённых, если он там был
+    if (progress[key]) delete progress[key];
+    localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
     const completed = getCompletedCrosswords();
     const completedKey = `${currentLevel}_${currentPuzzleIndex}`;
     const index = completed.indexOf(completedKey);
-    if (index !== -1) {
-        completed.splice(index, 1);
-        localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
-        updatePuzzleSelect(); // обновить список
-    }
-    
-    // Загружаем кроссворд заново, но без восстановления сохранённого (preserveSaved = false)
-    loadCrossword(currentLevel, currentPuzzleIndex, false);
-    
-    showToast("Кроссворд сброшен. Все ячейки очищены.", "success");
-}
-
-function updatePuzzleSelect() {
-    const puzzles = window.crosswordsData[currentLevel].puzzles;
-    puzzleSelect.innerHTML = "";
-    puzzles.forEach((puzzle, idx) => {
-        const option = document.createElement("option");
-        option.value = idx;
-        const isCompleted = isCrosswordCompleted(currentLevel, idx);
-        option.textContent = (isCompleted ? "✓ " : "") + (puzzle.name || `Кроссворд ${idx + 1}`);
-        if (isCompleted) {
-            option.style.fontWeight = "bold";
-        }
-        puzzleSelect.appendChild(option);
-    });
-    puzzleSelect.value = currentPuzzleIndex;
-}
-
-levelSelect.addEventListener("change", (e) => {
-    currentLevel = e.target.value;
-    currentPuzzleIndex = 0;
+    if (index !== -1) { completed.splice(index,1); localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed)); }
     updatePuzzleSelect();
-    loadCrossword(currentLevel, currentPuzzleIndex);
-});
+    loadCrossword(currentLevel, currentPuzzleIndex, false);
+    showToast("Кроссворд сброшен.", "success");
+}
+resetBtn.addEventListener("click", resetCrossword);
 
-puzzleSelect.addEventListener("change", (e) => {
-    currentPuzzleIndex = parseInt(e.target.value, 10);
-    loadCrossword(currentLevel, currentPuzzleIndex);
-});
-
-resetBtn.addEventListener("click", () => {
-    resetCrossword();
-});
-
-resetProgressBtn.addEventListener("click", resetAllProgress);
-
-// ========== ПОДСКАЗКА С КАСТОМНЫМ УВЕДОМЛЕНИЕМ ==========
+// ========== ПОДСКАЗКА ==========
 function giveHint() {
-    if (hintUsed) {
-        showToast("Подсказка уже использована для этого кроссворда.", "error");
-        return;
-    }
-    
+    if (hintUsed) { showToast("Подсказка уже использована.", "error"); return; }
     let emptyCells = [];
-    for (let i = 0; i < gridHeight; i++) {
-        for (let j = 0; j < gridWidth; j++) {
-            if (gridData[i][j] === "") {
-                let belongsToIncomplete = false;
-                for (let w of wordsList) {
-                    const idx = w.cells.findIndex(c => c.row === i && c.col === j);
-                    if (idx !== -1) {
-                        let wordComplete = true;
-                        for (let k = 0; k < w.word.length; k++) {
-                            if (w.current[k] !== w.wordOrig[k]) {
-                                wordComplete = false;
-                                break;
-                            }
-                        }
-                        if (!wordComplete) {
-                            belongsToIncomplete = true;
-                            break;
-                        }
-                    }
-                }
-                if (belongsToIncomplete) {
-                    emptyCells.push({row: i, col: j});
-                }
-            }
-        }
-    }
-    
-    if (emptyCells.length === 0) {
-        showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
-        return;
-    }
-    
+    for (let i=0;i<gridHeight;i++) for(let j=0;j<gridWidth;j++) if(gridData[i][j]==="") emptyCells.push({row:i,col:j});
+    if (emptyCells.length===0) { showToast("Нет пустых ячеек.", "error"); return; }
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const { row, col } = emptyCells[randomIndex];
-    
     let correctChar = null;
     for (let w of wordsList) {
         const idx = w.cells.findIndex(c => c.row === row && c.col === col);
-        if (idx !== -1) {
-            correctChar = w.wordOrig[idx];
-            break;
-        }
+        if (idx !== -1) { correctChar = w.wordOrig[idx]; break; }
     }
-    if (!correctChar) {
-        showToast("Ошибка: не удалось определить правильную букву.", "error");
-        return;
-    }
-    
+    if (!correctChar) return;
     gridData[row][col] = correctChar;
     updateCellUI(row, col);
     syncWordFromGrid();
     checkCompletion();
     updateClueCompletion();
     saveCurrentProgress();
-    
     hintUsed = true;
     hintBtn.disabled = true;
     hintBtn.textContent = "Подсказка использована";
     saveCurrentProgress();
 }
-
 hintBtn.addEventListener("click", giveHint);
 
+// ========== ОБНОВЛЕНИЕ СПИСКА КРОССВОРДОВ ==========
+function updatePuzzleSelect() {
+    const puzzles = generateOrGetPuzzles(currentLevel);
+    puzzleSelect.innerHTML = "";
+    puzzles.forEach((puzzle, idx) => {
+        const option = document.createElement("option");
+        option.value = idx;
+        const isCompleted = isCrosswordCompleted(currentLevel, idx);
+        option.textContent = (isCompleted ? "✓ " : "") + (puzzle.name || `Кроссворд ${idx + 1}`);
+        puzzleSelect.appendChild(option);
+    });
+    puzzleSelect.value = currentPuzzleIndex;
+}
+levelSelect.addEventListener("change", (e) => {
+    currentLevel = e.target.value;
+    currentPuzzleIndex = 0;
+    updatePuzzleSelect();
+    loadCrossword(currentLevel, currentPuzzleIndex);
+});
+puzzleSelect.addEventListener("change", (e) => {
+    currentPuzzleIndex = parseInt(e.target.value, 10);
+    loadCrossword(currentLevel, currentPuzzleIndex);
+});
+
+// ========== ЗАПУСК ==========
 updatePuzzleSelect();
 loadCrossword("n5", 0);
