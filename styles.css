@@ -21,8 +21,8 @@
     --cell-bg-dark: #3a3a4a;
     --cell-blocked-dark: #4a4a5a;
     --highlight-dark: #6b4e2e;
-    --active-word-dark: #2a4c6e;
-    --wrong-dark: #8b3a3a;
+    --active-word-dark: #3a7ca5;    /* более яркий */
+    --wrong-dark: #c94f4f;          /* насыщенный красный */
     --btn-bg-dark: #6c8fb5;
     --btn-hover-dark: #5a7a9e;
     --shadow-dark: rgba(0,0,0,0.3);
@@ -306,14 +306,50 @@ body.dark .status {
     color: #8bc34a;
 }
 
-/* Стиль для галочки в выпадающем списке */
-.puzzle-option-completed::before {
-    content: "✓ ";
-    color: #2c6e2c;
+/* Стили для очков и прогресса */
+.score-container {
+    background: var(--bg-container-light);
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
     font-weight: bold;
+    border: 1px solid var(--border-light);
 }
 
-/* Стили для кастомного уведомления (тост) */
+body.dark .score-container {
+    background: var(--bg-container-dark);
+}
+
+.level-progress {
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    background: #e0e0e0;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+body.dark .progress-bar {
+    background: #4a4a5a;
+}
+
+.progress-fill {
+    background: #4a6fa5;
+    width: 0%;
+    height: 100%;
+    transition: width 0.3s;
+}
+
+body.dark .progress-fill {
+    background: #6c8fb5;
+}
+
+/* toast, modal и адаптивность оставляем как есть */
 .toast {
     position: fixed;
     bottom: 20px;
@@ -366,14 +402,6 @@ body.dark .toast.error {
     border-left-color: #ff6b6b;
 }
 
-@media (max-width: 800px) {
-    .cell { width: 50px; height: 50px; font-size: 24px; }
-    .cell input { font-size: 24px; }
-    .cell-number { font-size: 11px; }
-    .clue-list li { font-size: 14px; }
-}
-
-/* Модальное окно */
 .modal {
     display: none;
     position: fixed;
@@ -461,4 +489,11 @@ body.dark .modal-no {
 
 body.dark .modal-no:hover {
     background: #5a5a6a;
+}
+
+@media (max-width: 800px) {
+    .cell { width: 50px; height: 50px; font-size: 24px; }
+    .cell input { font-size: 24px; }
+    .cell-number { font-size: 11px; }
+    .clue-list li { font-size: 14px; }
 }
