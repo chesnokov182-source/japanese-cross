@@ -69,37 +69,6 @@ const resetProgressBtn = document.getElementById("resetProgressBtn");
 const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
 
-// Модальное окно покупки
-const buyModal = document.getElementById("buyModal");
-const buyModalMessage = document.getElementById("buyModalMessage");
-const buyModalConfirm = document.getElementById("buyModalConfirm");
-const buyModalCancel = document.getElementById("buyModalCancel");
-let pendingPurchase = null;
-
-function showBuyModal(level, puzzleIdx, price) {
-    return new Promise((resolve) => {
-        pendingPurchase = { level, puzzleIdx, price, resolve };
-        buyModalMessage.innerText = `Купить кроссворд "${window.crosswordsData[level].puzzles[puzzleIdx].name}" за ${price} очков?`;
-        buyModal.style.display = 'flex';
-    });
-}
-
-function closeBuyModal() {
-    buyModal.style.display = 'none';
-    if (pendingPurchase) {
-        pendingPurchase.resolve(false);
-        pendingPurchase = null;
-    }
-}
-
-buyModalConfirm.addEventListener('click', () => {
-    if (pendingPurchase) {
-        pendingPurchase.resolve(true);
-        closeBuyModal();
-    }
-});
-buyModalCancel.addEventListener('click', () => closeBuyModal());
-
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -335,7 +304,6 @@ function unlockPuzzle(level, puzzleIdx, price) {
         saveUnlockedCrosswords(unlocked);
         subtractPoints(price);
         showToast(`Кроссворд разблокирован! -${price} очков`, "success");
-        updatePuzzleSelect();
         return true;
     } else {
         showToast(`Недостаточно очков! Нужно ${price} очков.`, "error");
@@ -501,12 +469,20 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const puzzle = puzzles[puzzleIdx];
     
     if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
-        // Не загружаем заблокированный, просто показываем сообщение в статусе
-        document.getElementById("statusMsg").innerHTML = `Этот кроссворд заблокирован. Цена: ${puzzle.price || 0} очков. Нажмите "Купить" для разблокировки.`;
-        // Очищаем сетку, чтобы не было старого содержимого
-        const container = document.getElementById("gridContainer");
-        container.innerHTML = "";
-        document.getElementById("cluesContainer").innerHTML = "";
+        // Очищаем сетку и подсказки
+        const gridContainer = document.getElementById("gridContainer");
+        gridContainer.innerHTML = "";
+        const cluesContainer = document.getElementById("cluesContainer");
+        cluesContainer.innerHTML = "";
+        const statusDiv = document.getElementById("statusMsg");
+        statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${puzzle.price || 0} очков. Нажмите "Купить", чтобы разблокировать.`;
+        statusDiv.style.color = "#c94f4f";
+        // Сбрасываем внутренние переменные
+        gridData = [];
+        wordsList = [];
+        cellElements = [];
+        activeWordId = null;
+        hintUsed = false;
         return;
     }
     
@@ -574,8 +550,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     
     updateLevelProgress();
     updatePuzzleSelect();
-    // Убираем сообщение о блокировке, если оно было
-    document.getElementById("statusMsg").innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z).";
 }
 
 // ========== ОТРИСОВКА СЕТКИ ==========
@@ -1034,8 +1008,11 @@ function checkCompletion() {
             markAsCompleted();
         }
     } else {
-        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
-        statusDiv.style.color = "#666";
+        // Если кроссворд разблокирован, показываем обычную подсказку
+        if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
+            statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
+            statusDiv.style.color = "#666";
+        }
         if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             const completed = getCompletedCrosswords();
             const key = `${currentLevel}_${currentPuzzleIndex}`;
@@ -1169,25 +1146,45 @@ function updatePuzzleSelect() {
     const currentUnlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
     const currentPrice = currentPuzzle.price !== undefined ? currentPuzzle.price : 0;
     if (!currentUnlocked && currentPrice > 0) {
-        buyPuzzleBtn.style.display = "inline-block";
+        buyPuzzleBtn.disabled = false;
         buyPuzzleBtn.textContent = `💰 Купить (${currentPrice} очков)`;
+        buyPuzzleBtn.style.opacity = "1";
     } else {
-        buyPuzzleBtn.style.display = "none";
+        buyPuzzleBtn.disabled = true;
+        buyPuzzleBtn.textContent = currentUnlocked ? "✅ Разблокирован" : `💰 Купить (0 очков)`;
+        buyPuzzleBtn.style.opacity = "0.6";
     }
 }
 
-async function buyCurrentPuzzle() {
+function buyCurrentPuzzle() {
     const puzzles = window.crosswordsData[currentLevel].puzzles;
     const puzzle = puzzles[currentPuzzleIndex];
     const price = puzzle.price !== undefined ? puzzle.price : 0;
     if (price > 0 && !isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
-        const confirmed = await showBuyModal(currentLevel, currentPuzzleIndex, price);
-        if (confirmed) {
+        const modal = document.getElementById("buyModal");
+        const message = document.getElementById("buyModalMessage");
+        message.innerText = `Купить "${puzzle.name}" за ${price} очков?`;
+        modal.style.display = "flex";
+        
+        const confirmBtn = document.getElementById("buyModalConfirm");
+        const cancelBtn = document.getElementById("buyModalCancel");
+        
+        const handleConfirm = () => {
             if (unlockPuzzle(currentLevel, currentPuzzleIndex, price)) {
                 loadCrossword(currentLevel, currentPuzzleIndex, true);
                 updatePuzzleSelect();
             }
-        }
+            modal.style.display = "none";
+            confirmBtn.removeEventListener("click", handleConfirm);
+            cancelBtn.removeEventListener("click", handleCancel);
+        };
+        const handleCancel = () => {
+            modal.style.display = "none";
+            confirmBtn.removeEventListener("click", handleConfirm);
+            cancelBtn.removeEventListener("click", handleCancel);
+        };
+        confirmBtn.addEventListener("click", handleConfirm);
+        cancelBtn.addEventListener("click", handleCancel);
     } else {
         showToast("Этот кроссворд уже разблокирован!", "info");
     }
@@ -1210,21 +1207,8 @@ levelSelect.addEventListener("change", (e) => {
 
 puzzleSelect.addEventListener("change", (e) => {
     const newIndex = parseInt(e.target.value, 10);
-    const puzzles = window.crosswordsData[currentLevel].puzzles;
-    const isUnlocked = isPuzzleUnlocked(currentLevel, newIndex);
     currentPuzzleIndex = newIndex;
-    updatePuzzleSelect(); // обновляем кнопку покупки
-    if (isUnlocked) {
-        loadCrossword(currentLevel, currentPuzzleIndex);
-    } else {
-        // Показываем сообщение о блокировке
-        const puzzle = puzzles[newIndex];
-        document.getElementById("statusMsg").innerHTML = `Этот кроссворд заблокирован. Цена: ${puzzle.price || 0} очков. Нажмите "Купить" для разблокировки.`;
-        // Очищаем сетку и подсказки
-        const container = document.getElementById("gridContainer");
-        container.innerHTML = "";
-        document.getElementById("cluesContainer").innerHTML = "";
-    }
+    loadCrossword(currentLevel, currentPuzzleIndex);
 });
 
 resetBtn.addEventListener("click", () => {
