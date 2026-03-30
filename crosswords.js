@@ -7,6 +7,7 @@ window.crosswordsData = {
                 name: "Кроссворд 1",
                 width: 8,
                 height: 6,
+                price: 0,
                 words: [
                     { word: "ニホンゴ", row: 3, col: 0, dir: "across", clue: "Японский язык", number: 1 },
                     { word: "ウンテンシユ", row: 0, col: 2, dir: "down", clue: "Водитель", number: 2},
@@ -18,6 +19,7 @@ window.crosswordsData = {
                 name: "Кроссворд 2",
                 width: 7,
                 height: 4,
+                price: 50,
                 words: [
                     { word: "イソガシイ", row: 1, col: 0, dir: "across", clue: "Занятой", number: 1},
                     { word: "オシエル", row: 0, col: 3, dir: "down", clue: "Учить, рассказывать", number: 2},
@@ -30,6 +32,7 @@ window.crosswordsData = {
                 name: "Кроссворд 3",
                 width: 6,
                 height: 6,
+                price: 100,
                 words: [
                     { word: "マイシユウ", row: 2, col: 1, dir: "across", clue: "Каждую неделю", number: 1},
                     { word: "キノウ", row: 4, col: 0, dir: "across", clue: "День перед сегодня", number: 2},
@@ -41,6 +44,7 @@ window.crosswordsData = {
                 name: "Кроссворд 4",
                 width: 8,
                 height: 6,
+                price: 150,
                 words: [
                     { word: "コンシユウ", row: 2, col: 3, dir: "across", clue: "Текущая неделя", number: 1},
                     { word: "キヨネン", row: 5, col: 0, dir: "across", clue: "Прошлый год", number: 2},
@@ -53,6 +57,7 @@ window.crosswordsData = {
                 name: "Кроссворд 5",
                 width: 7,
                 height: 6,
+                price: 200,
                 words: [
                     { word: "ハタラキマス", row: 1, col: 1, dir: "across", clue: "Работать", number: 1},
                     { word: "ハナシマス", row: 1, col: 1, dir: "down", clue: "Говорить, рассказывать", number: 1.1},
@@ -65,6 +70,7 @@ window.crosswordsData = {
                 name: "Кроссворд 6",
                 width: 8,
                 height: 6,
+                price: 250,
                 words: [
                     { word: "ベンキヨウシマス", row: 1, col: 0, dir: "across", clue: "Учиться", number: 1},
                     { word: "ナキマス", row: 5, col: 1, dir: "across", clue: "Плакать", number: 2},
@@ -77,6 +83,7 @@ window.crosswordsData = {
                 name: "Кроссворд 7",
                 width: 8,
                 height: 7,
+                price: 300,
                 words: [
                     { word: "ケシマス", row: 0, col: 1, dir: "across", clue: "Тушить, гасить; Выключать", number: 1},
                     { word: "ケツコンシマス", row: 0, col: 1, dir: "down", clue: "Жениться, Выходить замуж", number: 1.1},
@@ -89,6 +96,7 @@ window.crosswordsData = {
                 name: "Кроссворд 8",
                 width: 6,
                 height: 6,
+                price: 350,
                 words: [
                     { word: "ツカイマス", row: 0, col: 1, dir: "across", clue: "Использовать", number: 1},
                     { word: "オコリマス", row: 2, col: 0, dir: "across", clue: "Злиться", number: 2.1},
@@ -101,6 +109,7 @@ window.crosswordsData = {
                 name: "Кроссворд 9",
                 width: 7,
                 height: 4,
+                price: 400,
                 words: [
                     { word: "エンピツ", row: 2, col: 0, dir: "across", clue: "Используется для письма. Написанное можно стереть", number: 1},
                     { word: "ガクセイ", row: 1, col: 3, dir: "across", clue: "Учится в школе", number: 2},
@@ -113,6 +122,7 @@ window.crosswordsData = {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
+                price: 450,
                 words: [
                     { word: "アイスクリーム", row: 0, col: 1, dir: "across", clue: "Холодная еда из смеси молока и яиц", number: 1},
                     { word: "パン", row: 4, col: 0, dir: "across", clue: "Выпекаемое мучное изделие", number: 2},
@@ -125,6 +135,7 @@ window.crosswordsData = {
                 name: "Кроссворд Еда 2",
                 width: 6,
                 height: 8,
+                price: 500,
                 words: [
                     { word: "ヒルゴハン", row: 2, col: 0, dir: "across", clue: "Рис на обед", number: 1},
                     { word: "バナナ", row: 4, col: 3, dir: "across", clue: "Длинный продолговатый фрукт", number: 2},
@@ -142,6 +153,7 @@ window.crosswordsData = {
                 name: "Кроссворд 1",
                 width: 8,
                 height: 8,
+                price: 0,
                 words: [
                     { word: "デンシャ", row: 0, col: 1, dir: "across", clue: "Электричка, поезд" },
                     { word: "ヨミカタ", row: 3, col: 0, dir: "across", clue: "Способ чтения (как читается)" },
@@ -160,6 +172,7 @@ window.crosswordsData = {
                 name: "Кроссворд 1",
                 width: 9,
                 height: 9,
+                price: 0,
                 words: [
                     { word: "ケイザイ", row: 0, col: 2, dir: "across", clue: "Экономика" },
                     { word: "セイジ", row: 2, col: 1, dir: "across", clue: "Политика" },
@@ -178,6 +191,7 @@ window.crosswordsData = {
                 name: "Кроссворд 1",
                 width: 10,
                 height: 10,
+                price: 0,
                 words: [
                     { word: "チョウサ", row: 0, col: 3, dir: "across", clue: "Расследование, исследование" },
                     { word: "ハッテン", row: 2, col: 1, dir: "across", clue: "Развитие" },
@@ -196,6 +210,7 @@ window.crosswordsData = {
                 name: "Кроссворд 1",
                 width: 12,
                 height: 12,
+                price: 0,
                 words: [
                     { word: "ジッソウ", row: 0, col: 2, dir: "across", clue: "Внедрение, реализация" },
                     { word: "ソウゴウテキ", row: 2, col: 1, dir: "across", clue: "Комплексный, всесторонний" },
