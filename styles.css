@@ -21,8 +21,8 @@
     --cell-bg-dark: #3a3a4a;
     --cell-blocked-dark: #4a4a5a;
     --highlight-dark: #6b4e2e;
-    --active-word-dark: #3a7ca5;    /* более яркий */
-    --wrong-dark: #c94f4f;          /* насыщенный красный */
+    --active-word-dark: #3a7ca5;
+    --wrong-dark: #c94f4f;
     --btn-bg-dark: #6c8fb5;
     --btn-hover-dark: #5a7a9e;
     --shadow-dark: rgba(0,0,0,0.3);
@@ -160,6 +160,11 @@ body.dark button:hover {
 
 body.dark .cell {
     background: var(--cell-bg-dark);
+}
+
+body.dark .cell input {
+    caret-color: white;
+    color: white;
 }
 
 .cell input {
@@ -306,7 +311,6 @@ body.dark .status {
     color: #8bc34a;
 }
 
-/* Стили для очков и прогресса */
 .score-container {
     background: var(--bg-container-light);
     padding: 10px;
@@ -349,7 +353,6 @@ body.dark .progress-fill {
     background: #6c8fb5;
 }
 
-/* toast, modal и адаптивность оставляем как есть */
 .toast {
     position: fixed;
     bottom: 20px;
@@ -496,9 +499,4 @@ body.dark .modal-no:hover {
     .cell input { font-size: 24px; }
     .cell-number { font-size: 11px; }
     .clue-list li { font-size: 14px; }
-}
-
-body.dark .cell input {
-    caret-color: white;
-    color: white;
 }
