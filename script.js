@@ -483,6 +483,8 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         cellElements = [];
         activeWordId = null;
         hintUsed = false;
+        // Обновляем состояние кнопки (на случай, если не вызвано ранее)
+        updatePuzzleSelect();
         return;
     }
     
@@ -1208,6 +1210,7 @@ levelSelect.addEventListener("change", (e) => {
 puzzleSelect.addEventListener("change", (e) => {
     const newIndex = parseInt(e.target.value, 10);
     currentPuzzleIndex = newIndex;
+    updatePuzzleSelect(); // Сразу обновляем кнопку
     loadCrossword(currentLevel, currentPuzzleIndex);
 });
 
