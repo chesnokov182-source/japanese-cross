@@ -455,3 +455,23 @@ body.dark .modal-no {
     .cell-number { font-size: 11px; }
     .clue-list li { font-size: 14px; }
 }
+
+/* Увеличенный шрифт в модальных окнах и тостах */
+.modal-message {
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.toast {
+    font-size: 16px;
+    padding: 15px 25px;
+}
+
+.modal-btn {
+    font-size: 18px;
+    padding: 12px 28px;
+}
+
+#confirmMessage, #buyModalMessage, #tutorialMessage {
+    font-size: 18px;
+}
