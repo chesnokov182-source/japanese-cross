@@ -129,8 +129,10 @@ function saveGameStats() {
 }
 
 function updateScoreUI() {
-    document.getElementById("scoreValue").innerText = gameStats.score;
-    document.getElementById("wordsCompleted").innerText = gameStats.wordsCompleted;
+    const scoreSpan = document.getElementById("scoreValue");
+    const wordsSpan = document.getElementById("wordsCompleted");
+    if (scoreSpan) scoreSpan.innerText = gameStats.score;
+    if (wordsSpan) wordsSpan.innerText = gameStats.wordsCompleted;
 }
 
 function addPoints(points) {
@@ -217,16 +219,18 @@ function updateLevelProgress() {
     for (let i = 0; i < total; i++) {
         if (completedKeys.includes(`${currentLevel}_${i}`)) completedCount++;
     }
-    document.getElementById("levelProgressText").innerText = `${completedCount}/${total}`;
+    const textSpan = document.getElementById("levelProgressText");
+    const fillDiv = document.getElementById("levelProgressFill");
+    if (textSpan) textSpan.innerText = `${completedCount}/${total}`;
     const percent = total === 0 ? 0 : (completedCount / total) * 100;
-    document.getElementById("levelProgressFill").style.width = `${percent}%`;
+    if (fillDiv) fillDiv.style.width = `${percent}%`;
 }
 
 // ========== ПОДСВЕТКА ОШИБОК ==========
 function updateWrongHighlights() {
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
-            const cellDiv = cellElements[i][j]?.parentElement;
+            const cellDiv = cellElements[i]?.[j]?.parentElement;
             if (!cellDiv) continue;
             const value = gridData[i][j];
             const correct = correctCharMap.get(`${i},${j}`);
@@ -467,6 +471,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     
     if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
         showToast("Этот кроссворд заблокирован. Купите его за очки.", "error");
+        // Ищем первый разблокированный
         for (let i = 0; i < puzzles.length; i++) {
             if (isPuzzleUnlocked(levelId, i)) {
                 currentPuzzleIndex = i;
@@ -591,7 +596,7 @@ function getDisplayValue(row, col) {
 }
 
 function updateCellUI(row, col) {
-    if (cellElements[row][col]) {
+    if (cellElements[row] && cellElements[row][col]) {
         cellElements[row][col].value = getDisplayValue(row, col);
     }
 }
@@ -648,7 +653,7 @@ function setActiveWord(wordId){
 function applyHighlight(){
     for(let i=0;i<gridHeight;i++){
         for(let j=0;j<gridWidth;j++){
-            const cellDiv = cellElements[i][j]?.parentElement;
+            const cellDiv = cellElements[i]?.[j]?.parentElement;
             if(cellDiv) cellDiv.classList.remove("highlight", "active-word", "wrong");
         }
     }
@@ -656,7 +661,7 @@ function applyHighlight(){
         const activeWord = wordsList.find(w => w.id === activeWordId);
         if(activeWord){
             for(let cell of activeWord.cells){
-                const cellDiv = cellElements[cell.row][cell.col]?.parentElement;
+                const cellDiv = cellElements[cell.row]?.[cell.col]?.parentElement;
                 if(cellDiv) cellDiv.classList.add("active-word");
             }
         }
@@ -1037,6 +1042,7 @@ function updateClueCompletion() {
 
 function renderClues() {
     const container = document.getElementById("cluesContainer");
+    if (!container) return;
     container.innerHTML = `
         <div class="clue-block">
             <h3>По горизонтали</h3>
