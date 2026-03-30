@@ -5,26 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Кроссворд по японскому языку (JLPT)</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6fa5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JLPT Crosswords">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 </head>
 <body>
 <div class="crossword-container">
     <div class="grid-section">
-        <div class="level-selector">
-            <span>Уровень JLPT:</span>
-            <select id="levelSelect">
-                <option value="n5">N5</option>
-                <option value="n4">N4</option>
-                <option value="n3">N3</option>
-                <option value="n2">N2</option>
-                <option value="n1">N1</option>
-            </select>
-            <span>Кроссворд:</span>
-            <select id="puzzleSelect"></select>
-            <button id="resetBtn">Сбросить кроссворд</button>
-            <button id="hintBtn">Подсказка</button>
-            <button id="themeToggle">🌓 Тема</button>
-            <button id="resetProgressBtn">Сбросить весь прогресс</button>
-            <button id="helpBtn">❓ Помощь</button>
+        <div class="controls-container">
+            <div class="level-selector">
+                <span>Уровень JLPT:</span>
+                <select id="levelSelect">
+                    <option value="n5">N5 (начальный)</option>
+                    <option value="n4">N4 (базовый)</option>
+                    <option value="n3">N3 (средний)</option>
+                    <option value="n2">N2 (выше среднего)</option>
+                    <option value="n1">N1 (продвинутый)</option>
+                </select>
+                <span>Кроссворд:</span>
+                <select id="puzzleSelect"></select>
+                <button id="buyPuzzleBtn" class="buy-btn">💰 Купить</button>
+                <button id="resetBtn">Сбросить</button>
+                <button id="hintBtn">Подсказка</button>
+                <button id="themeToggle">🌓 Тема</button>
+                <button id="resetProgressBtn">🗑️ Сбросить всё</button>
+                <button id="helpBtn">❓ Помощь</button>
+            </div>
         </div>
         <div id="gridContainer" class="crossword-grid"></div>
         <div class="status" id="statusMsg"></div>
@@ -43,6 +52,7 @@
 </div>
 <div id="toast" class="toast"></div>
 
+<!-- Кастомное модальное окно подтверждения -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">
         <p id="confirmMessage" class="modal-message"></p>
@@ -53,9 +63,21 @@
     </div>
 </div>
 
+<!-- Модальное окно покупки кроссворда -->
+<div id="buyModal" class="modal">
+    <div class="modal-content">
+        <p id="buyModalMessage" class="modal-message"></p>
+        <div class="modal-buttons">
+            <button id="buyModalConfirm" class="modal-btn modal-yes">Купить</button>
+            <button id="buyModalCancel" class="modal-btn modal-no">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно туториала -->
 <div id="tutorialModal" class="modal">
-    <div class="modal-content" style="max-width:500px;">
-        <p id="tutorialMessage" class="modal-message"></p>
+    <div class="modal-content" style="max-width: 500px;">
+        <p class="modal-message" id="tutorialMessage"></p>
         <div class="modal-buttons">
             <button id="tutorialNext" class="modal-btn modal-yes">Далее</button>
             <button id="tutorialClose" class="modal-btn modal-no">Закрыть</button>
@@ -65,16 +87,12 @@
 
 <script src="crosswords.js"></script>
 <script src="script.js"></script>
-
-    <!-- Модальное окно покупки кроссворда -->
-<div id="buyModal" class="modal">
-    <div class="modal-content">
-        <p id="buyMessage" class="modal-message"></p>
-        <div class="modal-buttons">
-            <button id="buyConfirm" class="modal-btn modal-yes">Купить</button>
-            <button id="buyCancel" class="modal-btn modal-no">Отмена</button>
-        </div>
-    </div>
-</div>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registered', reg))
+            .catch(err => console.log('SW registration failed', err));
+    }
+</script>
 </body>
 </html>
