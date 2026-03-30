@@ -20,8 +20,7 @@
             </select>
             <span>Кроссворд:</span>
             <select id="puzzleSelect"></select>
-            <button id="buyPuzzleBtn" style="display:none;">💰 Купить</button>
-            <button id="resetBtn">Сбросить</button>
+            <button id="resetBtn">Сбросить кроссворд</button>
             <button id="hintBtn">Подсказка</button>
             <button id="themeToggle">🌓 Тема</button>
             <button id="resetProgressBtn">Сбросить весь прогресс</button>
@@ -66,5 +65,16 @@
 
 <script src="crosswords.js"></script>
 <script src="script.js"></script>
+
+    <!-- Модальное окно покупки кроссворда -->
+<div id="buyModal" class="modal">
+    <div class="modal-content">
+        <p id="buyMessage" class="modal-message"></p>
+        <div class="modal-buttons">
+            <button id="buyConfirm" class="modal-btn modal-yes">Купить</button>
+            <button id="buyCancel" class="modal-btn modal-no">Отмена</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
