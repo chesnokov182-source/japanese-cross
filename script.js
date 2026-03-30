@@ -58,7 +58,7 @@ let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
 let hintUsed = false;
-let correctCharMap = new Map(); // для подсветки ошибок
+let correctCharMap = new Map();
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -69,7 +69,6 @@ const resetProgressBtn = document.getElementById("resetProgressBtn");
 const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
 
-// ========== КАСТОМНОЕ УВЕДОМЛЕНИЕ ==========
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -81,7 +80,6 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// ========== КАСТОМНОЕ ПОДТВЕРЖДЕНИЕ ==========
 let confirmResolve = null;
 const confirmModal = document.getElementById('confirmModal');
 const confirmMessage = document.getElementById('confirmMessage');
@@ -162,7 +160,6 @@ function decrementWordsCompleted() {
     updateScoreUI();
 }
 
-// Достижения
 const achievementsList = [
     { id: "first_word", name: "Первое слово", condition: () => gameStats.wordsCompleted >= 1, reward: 20 },
     { id: "first_crossword", name: "Первый решённый кроссворд", condition: () => getCompletedCrosswords().length >= 1, reward: 50 },
@@ -242,7 +239,6 @@ function updateWrongHighlights() {
     }
 }
 
-// Построить карту правильных символов
 function buildCorrectCharMap() {
     correctCharMap.clear();
     for (let w of wordsList) {
@@ -258,7 +254,7 @@ function buildCorrectCharMap() {
 const STORAGE_PROGRESS_KEY = "crosswordProgress";
 const STORAGE_COMPLETED_KEY = "completedCrosswords";
 const STORAGE_UNLOCKED_KEY = "unlockedCrosswords";
-const STORAGE_EARNED_KEY = "earnedPoints"; // хранит информацию о начисленных очках за слова и завершение кроссворда
+const STORAGE_EARNED_KEY = "earnedPoints";
 
 function saveCurrentProgress() {
     const progress = getStoredProgress();
@@ -275,7 +271,6 @@ function getStoredProgress() {
     return saved ? JSON.parse(saved) : {};
 }
 
-// Получить список разблокированных кроссвордов
 function getUnlockedCrosswords() {
     const saved = localStorage.getItem(STORAGE_UNLOCKED_KEY);
     return saved ? JSON.parse(saved) : {};
@@ -288,7 +283,6 @@ function saveUnlockedCrosswords(unlocked) {
 function isPuzzleUnlocked(level, puzzleIdx) {
     const unlocked = getUnlockedCrosswords();
     const key = `${level}_${puzzleIdx}`;
-    // Первый кроссворд каждого уровня разблокирован по умолчанию
     if (puzzleIdx === 0 && !unlocked[key]) {
         unlocked[key] = true;
         saveUnlockedCrosswords(unlocked);
@@ -314,7 +308,6 @@ function unlockPuzzle(level, puzzleIdx, price) {
     }
 }
 
-// Получить информацию о начисленных очках за текущий кроссворд
 function getEarnedPointsForCurrent() {
     const earned = localStorage.getItem(STORAGE_EARNED_KEY);
     const data = earned ? JSON.parse(earned) : {};
@@ -354,14 +347,12 @@ function revertPointsForCurrentPuzzle() {
     const earned = getEarnedPointsForCurrent();
     let pointsToSubtract = 0;
     let wordsToSubtract = 0;
-    // Слова
     for (let wordId in earned.words) {
         if (earned.words[wordId]) {
             pointsToSubtract += 10;
             wordsToSubtract++;
         }
     }
-    // Завершение кроссворда
     if (earned.completed) {
         pointsToSubtract += 50;
     }
@@ -372,7 +363,6 @@ function revertPointsForCurrentPuzzle() {
         updateScoreUI();
         showToast(`Сброшено ${pointsToSubtract} очков и ${wordsToSubtract} слов`, "info");
     }
-    // Удаляем запись о начисленных очках
     const earnedAll = localStorage.getItem(STORAGE_EARNED_KEY);
     if (earnedAll) {
         const data = JSON.parse(earnedAll);
@@ -381,7 +371,11 @@ function revertPointsForCurrentPuzzle() {
     }
 }
 
-// ========== РАБОТА С РЕШЁННЫМИ КРОССВОРДАМИ ==========
+function getCompletedCrosswords() {
+    const saved = localStorage.getItem(STORAGE_COMPLETED_KEY);
+    return saved ? JSON.parse(saved) : [];
+}
+
 function markAsCompleted() {
     const completed = getCompletedCrosswords();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
@@ -391,14 +385,9 @@ function markAsCompleted() {
         updatePuzzleSelect();
         updateLevelProgress();
         checkAchievements();
-        markCrosswordCompletedEarned(); // начисляем очки за полное решение
+        markCrosswordCompletedEarned();
         showToast(`Кроссворд решён! +50 очков`, "success");
     }
-}
-
-function getCompletedCrosswords() {
-    const saved = localStorage.getItem(STORAGE_COMPLETED_KEY);
-    return saved ? JSON.parse(saved) : [];
 }
 
 function isCrosswordCompleted(level, puzzleIdx) {
@@ -476,10 +465,8 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
     const puzzle = puzzles[puzzleIdx];
     
-    // Проверка, разблокирован ли кроссворд
     if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
         showToast("Этот кроссворд заблокирован. Купите его за очки.", "error");
-        // Возвращаемся к первому разблокированному кроссворду
         for (let i = 0; i < puzzles.length; i++) {
             if (isPuzzleUnlocked(levelId, i)) {
                 currentPuzzleIndex = i;
@@ -1042,7 +1029,6 @@ function updateClueCompletion() {
             if (isComplete) clueLi.classList.add("completed");
             else clueLi.classList.remove("completed");
         }
-        // Начисление очков за слово, если оно стало правильным и ещё не начислено
         if (isComplete) {
             markWordPointsEarned(w.id);
         }
@@ -1095,10 +1081,8 @@ function renderClues() {
 
 // ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
 function resetCrossword() {
-    // Сначала откатываем очки, начисленные за этот кроссворд
     revertPointsForCurrentPuzzle();
     
-    // Удаляем сохранённый прогресс
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     if (progress[key]) {
@@ -1106,7 +1090,6 @@ function resetCrossword() {
         localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
     }
     
-    // Удаляем из списка решённых, если он там был
     const completed = getCompletedCrosswords();
     const completedKey = `${currentLevel}_${currentPuzzleIndex}`;
     const index = completed.indexOf(completedKey);
@@ -1117,7 +1100,6 @@ function resetCrossword() {
         updateLevelProgress();
     }
     
-    // Загружаем кроссворд заново, без сохранённого прогресса
     loadCrossword(currentLevel, currentPuzzleIndex, false);
     showToast("Кроссворд сброшен. Все ячейки очищены.", "success");
 }
@@ -1147,7 +1129,6 @@ function updatePuzzleSelect() {
     }
     puzzleSelect.value = currentPuzzleIndex;
     
-    // Показать/скрыть кнопку покупки
     const currentPuzzle = puzzles[currentPuzzleIndex];
     const currentUnlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
     const currentPrice = currentPuzzle.price !== undefined ? currentPuzzle.price : 0;
@@ -1164,9 +1145,9 @@ function buyCurrentPuzzle() {
     const puzzle = puzzles[currentPuzzleIndex];
     const price = puzzle.price !== undefined ? puzzle.price : 0;
     if (price > 0 && !isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
-        unlockPuzzle(currentLevel, currentPuzzleIndex, price);
-        // После покупки перезагружаем кроссворд
-        loadCrossword(currentLevel, currentPuzzleIndex, true);
+        if (unlockPuzzle(currentLevel, currentPuzzleIndex, price)) {
+            loadCrossword(currentLevel, currentPuzzleIndex, true);
+        }
     } else {
         showToast("Этот кроссворд уже разблокирован!", "info");
     }
@@ -1174,7 +1155,6 @@ function buyCurrentPuzzle() {
 
 levelSelect.addEventListener("change", (e) => {
     currentLevel = e.target.value;
-    // Ищем первый разблокированный кроссворд
     const puzzles = window.crosswordsData[currentLevel].puzzles;
     let firstUnlocked = 0;
     for (let i = 0; i < puzzles.length; i++) {
@@ -1190,13 +1170,11 @@ levelSelect.addEventListener("change", (e) => {
 
 puzzleSelect.addEventListener("change", (e) => {
     const newIndex = parseInt(e.target.value, 10);
-    const puzzles = window.crosswordsData[currentLevel].puzzles;
     if (isPuzzleUnlocked(currentLevel, newIndex)) {
         currentPuzzleIndex = newIndex;
         loadCrossword(currentLevel, currentPuzzleIndex);
     } else {
         showToast("Этот кроссворд заблокирован. Купите его за очки.", "error");
-        // Восстанавливаем предыдущий выбор
         puzzleSelect.value = currentPuzzleIndex;
     }
 });
@@ -1214,8 +1192,6 @@ resetProgressBtn.addEventListener("click", async () => {
         localStorage.removeItem(STORAGE_EARNED_KEY);
         localStorage.removeItem(STORAGE_GAME_KEY);
         loadGameStats();
-        // Сброс разблокировок: первый кроссворд каждого уровня будет разблокирован автоматически
-        // Просто перезагружаем
         currentPuzzleIndex = 0;
         updatePuzzleSelect();
         loadCrossword(currentLevel, 0, false);
