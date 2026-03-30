@@ -28,13 +28,10 @@
     --shadow-dark: rgba(0,0,0,0.3);
 }
 
-* {
-    user-select: none;
-    box-sizing: border-box;
-}
+* { user-select: none; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background: var(--bg-body-light);
     display: flex;
     justify-content: center;
@@ -82,14 +79,12 @@ body.dark .crossword-container {
     background: var(--bg-clues-light);
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: background 0.3s;
     font-size: 16px;
 }
 
 body.dark .clues-section {
     background: var(--bg-clues-dark);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .level-selector {
@@ -108,7 +103,7 @@ select, button {
     background: white;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s, color 0.2s, border 0.2s;
+    transition: background 0.2s;
 }
 
 body.dark select, body.dark button {
@@ -125,10 +120,6 @@ button {
 
 button:hover {
     background: var(--btn-hover-light);
-}
-
-body.dark button {
-    background: var(--btn-bg-dark);
 }
 
 body.dark button:hover {
@@ -368,42 +359,20 @@ body.dark .progress-fill {
     opacity: 0;
     pointer-events: none;
     max-width: 300px;
-    word-break: break-word;
 }
 
 body.dark .toast {
     background: var(--bg-container-dark);
     color: var(--text-dark);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .toast.show {
     opacity: 1;
 }
 
-.toast.info {
-    border-left: 4px solid #4a6fa5;
-}
-
-.toast.success {
-    border-left: 4px solid #2c6e2c;
-}
-
-.toast.error {
-    border-left: 4px solid #c94f4f;
-}
-
-body.dark .toast.info {
-    border-left-color: #6c8fb5;
-}
-
-body.dark .toast.success {
-    border-left-color: #8bc34a;
-}
-
-body.dark .toast.error {
-    border-left-color: #ff6b6b;
-}
+.toast.info { border-left: 4px solid #4a6fa5; }
+.toast.success { border-left: 4px solid #2c6e2c; }
+.toast.error { border-left: 4px solid #c94f4f; }
 
 .modal {
     display: none;
@@ -428,7 +397,6 @@ body.dark .toast.error {
     max-width: 400px;
     width: 90%;
     text-align: center;
-    transition: background 0.3s, color 0.3s;
 }
 
 body.dark .modal-content {
@@ -456,7 +424,6 @@ body.dark .modal-content {
     border: none;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s;
 }
 
 .modal-yes {
@@ -472,10 +439,6 @@ body.dark .modal-yes {
     background: var(--btn-hover-light);
 }
 
-body.dark .modal-yes:hover {
-    background: var(--btn-hover-dark);
-}
-
 .modal-no {
     background: #e0e0e0;
     color: #333;
@@ -484,14 +447,6 @@ body.dark .modal-yes:hover {
 body.dark .modal-no {
     background: #4a4a5a;
     color: #e0e0e0;
-}
-
-.modal-no:hover {
-    background: #c0c0c0;
-}
-
-body.dark .modal-no:hover {
-    background: #5a5a6a;
 }
 
 @media (max-width: 800px) {
