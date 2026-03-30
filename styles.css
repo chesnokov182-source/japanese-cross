@@ -28,7 +28,10 @@
     --shadow-dark: rgba(0,0,0,0.3);
 }
 
-* { user-select: none; box-sizing: border-box; }
+* {
+    user-select: none;
+    box-sizing: border-box;
+}
 
 body {
     font-family: 'Segoe UI', sans-serif;
@@ -124,6 +127,11 @@ button:hover {
 
 body.dark button:hover {
     background: var(--btn-hover-dark);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .crossword-grid {
@@ -294,11 +302,15 @@ body.dark .clue-num {
 .status {
     margin-top: 24px;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
+    padding: 12px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 12px;
     color: #2c6e2c;
 }
 
 body.dark .status {
+    background: rgba(255,255,255,0.05);
     color: #8bc34a;
 }
 
@@ -350,15 +362,15 @@ body.dark .progress-fill {
     right: 20px;
     background: var(--bg-container-light);
     color: var(--text-light);
-    padding: 12px 20px;
+    padding: 15px 25px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    font-size: 14px;
+    font-size: 16px;
     z-index: 1000;
     transition: opacity 0.3s;
     opacity: 0;
     pointer-events: none;
-    max-width: 300px;
+    max-width: 350px;
 }
 
 body.dark .toast {
@@ -391,10 +403,10 @@ body.dark .toast {
 .modal-content {
     background: var(--bg-container-light);
     color: var(--text-light);
-    padding: 24px 32px;
-    border-radius: 16px;
+    padding: 32px;
+    border-radius: 20px;
     box-shadow: 0 10px 30px var(--shadow-light);
-    max-width: 400px;
+    max-width: 450px;
     width: 90%;
     text-align: center;
 }
@@ -406,9 +418,9 @@ body.dark .modal-content {
 }
 
 .modal-message {
-    font-size: 18px;
-    margin-bottom: 24px;
-    line-height: 1.4;
+    font-size: 20px;
+    margin-bottom: 28px;
+    line-height: 1.5;
 }
 
 .modal-buttons {
@@ -418,8 +430,8 @@ body.dark .modal-content {
 }
 
 .modal-btn {
-    padding: 10px 24px;
-    font-size: 16px;
+    padding: 12px 28px;
+    font-size: 18px;
     border-radius: 30px;
     border: none;
     cursor: pointer;
@@ -439,6 +451,10 @@ body.dark .modal-yes {
     background: var(--btn-hover-light);
 }
 
+body.dark .modal-yes:hover {
+    background: var(--btn-hover-dark);
+}
+
 .modal-no {
     background: #e0e0e0;
     color: #333;
@@ -454,24 +470,6 @@ body.dark .modal-no {
     .cell input { font-size: 24px; }
     .cell-number { font-size: 11px; }
     .clue-list li { font-size: 14px; }
-}
-
-/* Увеличенный шрифт в модальных окнах и тостах */
-.modal-message {
-    font-size: 20px;
-    line-height: 1.5;
-}
-
-.toast {
-    font-size: 16px;
-    padding: 15px 25px;
-}
-
-.modal-btn {
-    font-size: 18px;
-    padding: 12px 28px;
-}
-
-#confirmMessage, #buyModalMessage, #tutorialMessage {
-    font-size: 18px;
+    .modal-message { font-size: 18px; }
+    .modal-btn { font-size: 16px; padding: 10px 24px; }
 }
