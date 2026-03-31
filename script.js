@@ -57,8 +57,9 @@ let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
+let hintUsed = false;
 let correctCharMap = new Map();
-let hintCount = 0; // количество использованных подсказок в текущем кроссворде
+let hintCount = 0;
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -318,6 +319,7 @@ function saveCurrentProgress() {
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     progress[key] = {
         gridData: gridData.map(row => row.map(cell => cell)),
+        hintUsed: hintUsed,
         hintCount: hintCount
     };
     localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
@@ -535,6 +537,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         wordsList = [];
         cellElements = [];
         activeWordId = null;
+        hintUsed = false;
         hintCount = 0;
         updatePuzzleSelect();
         return;
@@ -581,9 +584,11 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     
     if (savedData) {
         gridData = savedData.gridData.map(row => [...row]);
+        hintUsed = savedData.hintUsed;
         hintCount = savedData.hintCount !== undefined ? savedData.hintCount : 0;
     } else {
         gridData = freshGrid;
+        hintUsed = false;
         hintCount = 0;
     }
     
@@ -600,16 +605,24 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     romajiBuffers.clear();
     
     // Обновляем кнопку подсказки
-    if (hintCount >= 2) {
+    updateHintButtonState();
+    
+    updateLevelProgress();
+    updatePuzzleSelect();
+}
+
+function updateHintButtonState() {
+    const completed = isCrosswordCompleted(currentLevel, currentPuzzleIndex);
+    if (completed) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Кроссворд решён";
+    } else if (hintCount >= 2) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Подсказки закончились";
     } else {
         hintBtn.disabled = false;
         hintBtn.textContent = "Подсказка (20 очков)";
     }
-    
-    updateLevelProgress();
-    updatePuzzleSelect();
 }
 
 // ========== ОТРИСОВКА СЕТКИ ==========
@@ -1067,6 +1080,8 @@ function checkCompletion() {
         if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             markAsCompleted();
         }
+        // Обновляем кнопку подсказки, так как кроссворд решён
+        updateHintButtonState();
     } else {
         if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
             statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
@@ -1081,6 +1096,7 @@ function checkCompletion() {
                 localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
                 updatePuzzleSelect();
                 updateLevelProgress();
+                updateHintButtonState();
             }
         }
     }
@@ -1153,15 +1169,33 @@ function renderClues() {
 
 // ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
 function resetCrossword() {
-    revertPointsForCurrentPuzzle();
-    
+    // Получаем hintCount из сохранённого прогресса, чтобы вернуть очки за подсказки
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
+    let savedHintCount = 0;
+    if (progress[key] && progress[key].hintCount !== undefined) {
+        savedHintCount = progress[key].hintCount;
+    }
+    
+    // Возвращаем очки, потраченные на подсказки
+    if (savedHintCount > 0) {
+        const refund = savedHintCount * 20;
+        gameStats.score += refund;
+        saveGameStats();
+        updateScoreUI();
+        showToast(`Возвращено ${refund} очков за подсказки`, "info");
+    }
+    
+    // Откатываем очки за слова и завершение
+    revertPointsForCurrentPuzzle();
+    
+    // Удаляем прогресс
     if (progress[key]) {
         delete progress[key];
         localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
     }
     
+    // Удаляем из списка решённых
     const completed = getCompletedCrosswords();
     const completedKey = `${currentLevel}_${currentPuzzleIndex}`;
     const index = completed.indexOf(completedKey);
@@ -1283,7 +1317,6 @@ resetProgressBtn.addEventListener("click", async () => {
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
         localStorage.removeItem(STORAGE_UNLOCKED_KEY);
         localStorage.removeItem(STORAGE_EARNED_KEY);
-        // Сохраняем lastBonusDate
         const lastBonus = gameStats.lastBonusDate;
         localStorage.removeItem(STORAGE_GAME_KEY);
         gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: lastBonus };
@@ -1298,15 +1331,20 @@ resetProgressBtn.addEventListener("click", async () => {
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
-// ========== ПОДСКАЗКА (исправлена) ==========
+// ========== ПОДСКАЗКА ==========
 function giveHint() {
-    // Проверяем, не превышен ли лимит подсказок
+    // Запрещаем подсказку, если кроссворд уже решён
+    if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
+        showToast("Кроссворд уже решён! Подсказки не нужны.", "error");
+        return;
+    }
+    
     if (hintCount >= 2) {
         showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
         return;
     }
     
-    // Ищем пустые ячейки в незавершённых словах
+    // Проверяем, есть ли пустые ячейки в незавершённых словах
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
@@ -1340,9 +1378,8 @@ function giveHint() {
         return;
     }
     
-    // Списываем очки
     if (!subtractPoints(20)) {
-        return; // недостаточно очков
+        return;
     }
     
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
@@ -1364,14 +1401,8 @@ function giveHint() {
     saveCurrentProgress();
     
     hintCount++;
-    if (hintCount >= 2) {
-        hintBtn.disabled = true;
-        hintBtn.textContent = "Подсказки закончились";
-    } else {
-        hintBtn.disabled = false;
-        hintBtn.textContent = "Подсказка (20 очков)";
-    }
     saveCurrentProgress();
+    updateHintButtonState();
 }
 
 hintBtn.addEventListener("click", giveHint);
