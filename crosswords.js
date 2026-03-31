@@ -144,11 +144,16 @@ window.crosswordsData = {
                     { word: "ウドン", row: 0, col: 4, dir: "down", clue: "Длинная продолговатая белая лапша изготовляемая из пшеничной муки", number: 5},
                 ]
             },
+            ]
+    },
+    n4: {
+        name: "JLPT N4",
+        puzzles: [
             {
-                name: "Кроссворд 12",
+                name: "Кроссворд 1",
                 width: 4,
                 height: 4,
-                price: 10,
+                price: 0,
                 words: [
                     { word: "カナヅチ", row: 0, col: 0, dir: "across", clue: "Молоток", number: 1},
                     { word: "カイ", row: 0, col: 0, dir: "down", clue: "Раковина, моллюск", number: 1.1},
@@ -160,25 +165,22 @@ window.crosswordsData = {
                     { word: "チリトリ", row: 0, col: 3, dir: "down", clue: "Совок", number: 7},
                 ]
             },
-            ]
-    },
-    n4: {
-        name: "JLPT N4",
-        puzzles: [
-            {
-                name: "Кроссворд 1",
-                width: 8,
-                height: 8,
-                price: 0,
+                        {
+                name: "Кроссворд 2",
+                width: 4,
+                height: 4,
+                price: 60,
                 words: [
-                    { word: "デンシャ", row: 0, col: 1, dir: "across", clue: "Электричка, поезд" },
-                    { word: "ヨミカタ", row: 3, col: 0, dir: "across", clue: "Способ чтения (как читается)" },
-                    { word: "ハナシ", row: 5, col: 2, dir: "across", clue: "Разговор, история" },
-                    { word: "テンプラ", row: 1, col: 4, dir: "down", clue: "Блюдо во фритюре" },
-                    { word: "マチ", row: 2, col: 6, dir: "down", clue: "Город" },
-                    { word: "アメ", row: 4, col: 1, dir: "down", clue: "Дождь / конфета" }
+                    { word: "ホウソウ", row: 0, col: 0, dir: "across", clue: "Способ, метод", number: 1},
+                    { word: "ホホエム", row: 0, col: 0, dir: "down", clue: "Улыбаться", number: 1.1},
+                    { word: "ホドウ", row: 1, col: 0, dir: "across", clue: "Тротуар", number: 2},
+                    { word: "ウドン", row: 0, col: 1, dir: "down", clue: "Вид лапши из пшеничной муки, характерный для японской кухни", number: 3},
+                    { word: "エンソク", row: 2, col: 0, dir: "across", clue: "Экскурсия", number: 4},
+                    { word: "ウマ", row: 3, col: 2, dir: "across", clue: "Лошадь", number: 5},
+                    { word: "クマ", row: 2, col: 3, dir: "down", clue: "Медведь", number: 6},
+                    { word: "ホウソウ", row: 0, col: 2, dir: "down", clue: "Трансляция, вещание", number: 7},
                 ]
-            }
+            },
         ]
     },
     n3: {
