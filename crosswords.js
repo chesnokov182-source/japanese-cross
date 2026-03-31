@@ -148,7 +148,7 @@ window.crosswordsData = {
                 name: "Кроссворд 12",
                 width: 4,
                 height: 4,
-                price: 0,
+                price: 10,
                 words: [
                     { word: "カナヅチ", row: 0, col: 0, dir: "across", clue: "Молоток", number: 1},
                     { word: "カイ", row: 0, col: 0, dir: "down", clue: "Раковина, моллюск", number: 1.1},
