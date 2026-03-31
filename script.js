@@ -105,12 +105,11 @@ function closeConfirmDialog(result) {
 confirmYes.addEventListener('click', () => closeConfirmDialog(true));
 confirmNo.addEventListener('click', () => closeConfirmDialog(false));
 
-// ========== ГЕЙМИФИКАЦИЯ ==========
+// ========== ГЕЙМИФИКАЦИЯ (только очки и слова) ==========
 const STORAGE_GAME_KEY = "gameStats";
 let gameStats = {
     score: 0,
-    wordsCompleted: 0,
-    achievements: []
+    wordsCompleted: 0
 };
 
 function loadGameStats() {
@@ -118,7 +117,7 @@ function loadGameStats() {
     if (saved) {
         gameStats = JSON.parse(saved);
     } else {
-        gameStats = { score: 0, wordsCompleted: 0, achievements: [] };
+        gameStats = { score: 0, wordsCompleted: 0 };
         saveGameStats();
     }
     updateScoreUI();
@@ -153,61 +152,12 @@ function incrementWordsCompleted() {
     gameStats.wordsCompleted++;
     saveGameStats();
     updateScoreUI();
-    checkAchievements();
 }
 
 function decrementWordsCompleted() {
     gameStats.wordsCompleted = Math.max(0, gameStats.wordsCompleted - 1);
     saveGameStats();
     updateScoreUI();
-}
-
-const achievementsList = [
-    { id: "first_word", name: "Первое слово", condition: () => gameStats.wordsCompleted >= 1, reward: 20 },
-    { id: "first_crossword", name: "Первый решённый кроссворд", condition: () => getCompletedCrosswords().length >= 1, reward: 50 },
-    { id: "n5_master", name: "Мастер N5", condition: () => {
-        const total = window.crosswordsData.n5.puzzles.length;
-        const completed = getCompletedCrosswords().filter(k => k.startsWith("n5_")).length;
-        return completed === total && total > 0;
-    }, reward: 100 },
-    { id: "n4_master", name: "Мастер N4", condition: () => {
-        const total = window.crosswordsData.n4.puzzles.length;
-        const completed = getCompletedCrosswords().filter(k => k.startsWith("n4_")).length;
-        return completed === total && total > 0;
-    }, reward: 100 },
-    { id: "n3_master", name: "Мастер N3", condition: () => {
-        const total = window.crosswordsData.n3.puzzles.length;
-        const completed = getCompletedCrosswords().filter(k => k.startsWith("n3_")).length;
-        return completed === total && total > 0;
-    }, reward: 100 },
-    { id: "n2_master", name: "Мастер N2", condition: () => {
-        const total = window.crosswordsData.n2.puzzles.length;
-        const completed = getCompletedCrosswords().filter(k => k.startsWith("n2_")).length;
-        return completed === total && total > 0;
-    }, reward: 100 },
-    { id: "n1_master", name: "Мастер N1", condition: () => {
-        const total = window.crosswordsData.n1.puzzles.length;
-        const completed = getCompletedCrosswords().filter(k => k.startsWith("n1_")).length;
-        return completed === total && total > 0;
-    }, reward: 100 },
-    { id: "words_10", name: "10 слов", condition: () => gameStats.wordsCompleted >= 10, reward: 30 },
-    { id: "words_50", name: "50 слов", condition: () => gameStats.wordsCompleted >= 50, reward: 100 },
-    { id: "words_100", name: "100 слов", condition: () => gameStats.wordsCompleted >= 100, reward: 200 }
-];
-
-function checkAchievements() {
-    let newAchievements = [];
-    for (let ach of achievementsList) {
-        if (!gameStats.achievements.includes(ach.id) && ach.condition()) {
-            gameStats.achievements.push(ach.id);
-            newAchievements.push(ach);
-            addPoints(ach.reward);
-            showToast(`🏆 Достижение: ${ach.name}! +${ach.reward} очков`, "success");
-        }
-    }
-    if (newAchievements.length > 0) {
-        saveGameStats();
-    }
 }
 
 // ========== ПРОГРЕСС-БАР ==========
@@ -387,7 +337,6 @@ function markAsCompleted() {
         localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
         updatePuzzleSelect();
         updateLevelProgress();
-        checkAchievements();
         markCrosswordCompletedEarned();
         showToast(`Кроссворд решён! +50 очков`, "success");
     }
@@ -483,7 +432,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         cellElements = [];
         activeWordId = null;
         hintUsed = false;
-        // Обновляем состояние кнопки (на случай, если не вызвано ранее)
+        // Обновляем кнопку покупки
         updatePuzzleSelect();
         return;
     }
@@ -1010,7 +959,6 @@ function checkCompletion() {
             markAsCompleted();
         }
     } else {
-        // Если кроссворд разблокирован, показываем обычную подсказку
         if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
             statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
             statusDiv.style.color = "#666";
@@ -1210,7 +1158,7 @@ levelSelect.addEventListener("change", (e) => {
 puzzleSelect.addEventListener("change", (e) => {
     const newIndex = parseInt(e.target.value, 10);
     currentPuzzleIndex = newIndex;
-    updatePuzzleSelect(); // Сразу обновляем кнопку
+    updatePuzzleSelect(); // важно: обновить состояние кнопки ДО загрузки
     loadCrossword(currentLevel, currentPuzzleIndex);
 });
 
@@ -1312,7 +1260,7 @@ function showTutorial() {
         "Добро пожаловать в японские кроссворды JLPT! 🎌\n\nВ этом туториале вы узнаете основы работы.",
         "📝 Вводите слова английскими буквами (ромадзи).\nПример: 'su' → ス, 'shu' → シ+ユ, 'n' → ン.\nДефис '-' даёт длинную гласную ー.",
         "🔍 Используйте подсказку один раз на кроссворд. Кнопка 'Сбросить кроссворд' очистит все ячейки.",
-        "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков. Есть достижения!",
+        "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
         "💰 Очки можно тратить на разблокировку новых кроссвордов. Некоторые кроссворды требуют определённое количество очков.",
         "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
     ];
