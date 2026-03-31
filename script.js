@@ -59,7 +59,7 @@ let gridWidth, gridHeight;
 let romajiBuffers = new Map();
 let hintUsed = false;
 let correctCharMap = new Map();
-let hintCount = 0;          // количество использованных подсказок в текущем кроссворде
+let hintCount = 0;
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -96,7 +96,7 @@ function playBeep(frequency, duration, volume = 0.3) {
     }
 }
 function playPop() {
-    playBeep(880, 0.05, 0.2); // короткий высокий щелчок
+    playBeep(880, 0.05, 0.2);
 }
 function playSuccess() {
     playBeep(523, 0.2, 0.3);
@@ -358,7 +358,7 @@ function unlockPuzzle(level, puzzleIdx, price) {
         unlocked[key] = true;
         saveUnlockedCrosswords(unlocked);
         subtractPoints(price);
-        showConfetti();                 // конфетти при покупке
+        showConfetti();
         showToast(`Кроссворд разблокирован! -${price} очков`, "success");
         return true;
     } else {
@@ -390,7 +390,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
-        playPop(); // звук при правильном слове
+        playPop();
     }
 }
 
@@ -400,7 +400,7 @@ function markCrosswordCompletedEarned() {
         earned.completed = true;
         saveEarnedPointsForCurrent(earned);
         addPoints(50);
-        playSuccess(); // звук завершения кроссворда
+        playSuccess();
     }
 }
 
@@ -604,7 +604,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
-    // Обновляем состояние кнопки подсказки
     if (hintCount >= 2) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Подсказки закончились";
@@ -726,7 +725,8 @@ function applyHighlight(){
     for(let i=0;i<gridHeight;i++){
         for(let j=0;j<gridWidth;j++){
             const cellDiv = cellElements[i]?.[j]?.parentElement;
-            if(cellDiv) cellDiv.classList.remove("highlight", "active-word", "wrong");
+            if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
+            // Убираем только highlight и active-word, wrong не трогаем
         }
     }
     if(activeWordId !== null){
@@ -1286,22 +1286,27 @@ resetBtn.addEventListener("click", () => {
 resetProgressBtn.addEventListener("click", async () => {
     const confirmed = await showConfirmDialog("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.");
     if (confirmed) {
+        // Удаляем всё, кроме даты последнего бонуса
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
         localStorage.removeItem(STORAGE_UNLOCKED_KEY);
         localStorage.removeItem(STORAGE_EARNED_KEY);
+        // Сохраняем lastBonusDate
+        const lastBonus = gameStats.lastBonusDate;
         localStorage.removeItem(STORAGE_GAME_KEY);
-        loadGameStats();
+        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: lastBonus };
+        saveGameStats();
+        updateScoreUI();
         currentPuzzleIndex = 0;
         updatePuzzleSelect();
         loadCrossword(currentLevel, 0, false);
-        showToast("Весь прогресс удалён.", "success");
+        showToast("Весь прогресс удалён (кроме ежедневного бонуса).", "success");
     }
 });
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
-// ========== ПОДСКАЗКА (теперь стоит 20 очков, максимум 2 за кроссворд) ==========
+// ========== ПОДСКАЗКА ==========
 function giveHint() {
     if (hintCount >= 2) {
         showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
@@ -1312,12 +1317,10 @@ function giveHint() {
         return;
     }
     
-    // Проверяем хватает ли очков
     if (!subtractPoints(20)) {
-        return; // недостаточно очков
+        return;
     }
     
-    // Ищем пустые ячейки в незавершённых словах
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
@@ -1348,7 +1351,6 @@ function giveHint() {
     
     if (emptyCells.length === 0) {
         showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
-        // возвращаем очки, так как подсказка не была использована
         addPoints(20);
         return;
     }
@@ -1359,7 +1361,7 @@ function giveHint() {
     let correctChar = correctCharMap.get(`${row},${col}`);
     if (!correctChar) {
         showToast("Ошибка: не удалось определить правильную букву.", "error");
-        addPoints(20); // возвращаем очки
+        addPoints(20);
         return;
     }
     
@@ -1372,7 +1374,7 @@ function giveHint() {
     saveCurrentProgress();
     
     hintCount++;
-    hintUsed = true; // чтобы нельзя было использовать подсказку повторно (но у нас есть hintCount)
+    hintUsed = true;
     if (hintCount >= 2) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Подсказки закончились";
@@ -1444,6 +1446,6 @@ helpBtn.addEventListener("click", showTutorial);
 
 // Инициализация
 loadGameStats();
-checkDailyBonus();    // проверяем ежедневный бонус
+checkDailyBonus();
 updatePuzzleSelect();
 loadCrossword("n5", 0);
