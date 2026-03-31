@@ -57,9 +57,8 @@ let activeWordId = null;
 let cellElements = [];
 let gridWidth, gridHeight;
 let romajiBuffers = new Map();
-let hintUsed = false;
 let correctCharMap = new Map();
-let hintCount = 0;
+let hintCount = 0; // количество использованных подсказок в текущем кроссворде
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -319,7 +318,6 @@ function saveCurrentProgress() {
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     progress[key] = {
         gridData: gridData.map(row => row.map(cell => cell)),
-        hintUsed: hintUsed,
         hintCount: hintCount
     };
     localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
@@ -537,7 +535,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         wordsList = [];
         cellElements = [];
         activeWordId = null;
-        hintUsed = false;
         hintCount = 0;
         updatePuzzleSelect();
         return;
@@ -584,11 +581,9 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     
     if (savedData) {
         gridData = savedData.gridData.map(row => [...row]);
-        hintUsed = savedData.hintUsed;
         hintCount = savedData.hintCount !== undefined ? savedData.hintCount : 0;
     } else {
         gridData = freshGrid;
-        hintUsed = false;
         hintCount = 0;
     }
     
@@ -604,12 +599,10 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
+    // Обновляем кнопку подсказки
     if (hintCount >= 2) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Подсказки закончились";
-    } else if (hintUsed) {
-        hintBtn.disabled = true;
-        hintBtn.textContent = "Подсказка использована";
     } else {
         hintBtn.disabled = false;
         hintBtn.textContent = "Подсказка (20 очков)";
@@ -726,7 +719,6 @@ function applyHighlight(){
         for(let j=0;j<gridWidth;j++){
             const cellDiv = cellElements[i]?.[j]?.parentElement;
             if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
-            // Убираем только highlight и active-word, wrong не трогаем
         }
     }
     if(activeWordId !== null){
@@ -1306,21 +1298,15 @@ resetProgressBtn.addEventListener("click", async () => {
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
-// ========== ПОДСКАЗКА ==========
+// ========== ПОДСКАЗКА (исправлена) ==========
 function giveHint() {
+    // Проверяем, не превышен ли лимит подсказок
     if (hintCount >= 2) {
         showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
         return;
     }
-    if (hintUsed) {
-        showToast("Подсказка уже использована для этого кроссворда.", "error");
-        return;
-    }
     
-    if (!subtractPoints(20)) {
-        return;
-    }
-    
+    // Ищем пустые ячейки в незавершённых словах
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
@@ -1351,8 +1337,12 @@ function giveHint() {
     
     if (emptyCells.length === 0) {
         showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
-        addPoints(20);
         return;
+    }
+    
+    // Списываем очки
+    if (!subtractPoints(20)) {
+        return; // недостаточно очков
     }
     
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
@@ -1361,7 +1351,7 @@ function giveHint() {
     let correctChar = correctCharMap.get(`${row},${col}`);
     if (!correctChar) {
         showToast("Ошибка: не удалось определить правильную букву.", "error");
-        addPoints(20);
+        addPoints(20); // возвращаем очки
         return;
     }
     
@@ -1374,13 +1364,12 @@ function giveHint() {
     saveCurrentProgress();
     
     hintCount++;
-    hintUsed = true;
     if (hintCount >= 2) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Подсказки закончились";
     } else {
-        hintBtn.disabled = true;
-        hintBtn.textContent = "Подсказка использована";
+        hintBtn.disabled = false;
+        hintBtn.textContent = "Подсказка (20 очков)";
     }
     saveCurrentProgress();
 }
