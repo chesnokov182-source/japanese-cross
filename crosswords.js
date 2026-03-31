@@ -32,7 +32,7 @@ window.crosswordsData = {
                 name: "Кроссворд 3",
                 width: 6,
                 height: 6,
-                price: 100,
+                price: 50,
                 words: [
                     { word: "マイシユウ", row: 2, col: 1, dir: "across", clue: "Каждую неделю", number: 1},
                     { word: "キノウ", row: 4, col: 0, dir: "across", clue: "День перед сегодня", number: 2},
@@ -44,7 +44,7 @@ window.crosswordsData = {
                 name: "Кроссворд 4",
                 width: 8,
                 height: 6,
-                price: 150,
+                price: 50,
                 words: [
                     { word: "コンシユウ", row: 2, col: 3, dir: "across", clue: "Текущая неделя", number: 1},
                     { word: "キヨネン", row: 5, col: 0, dir: "across", clue: "Прошлый год", number: 2},
@@ -57,7 +57,7 @@ window.crosswordsData = {
                 name: "Кроссворд 5",
                 width: 7,
                 height: 6,
-                price: 200,
+                price: 50,
                 words: [
                     { word: "ハタラキマス", row: 1, col: 1, dir: "across", clue: "Работать", number: 1},
                     { word: "ハナシマス", row: 1, col: 1, dir: "down", clue: "Говорить, рассказывать", number: 1.1},
@@ -70,7 +70,7 @@ window.crosswordsData = {
                 name: "Кроссворд 6",
                 width: 8,
                 height: 6,
-                price: 250,
+                price: 100,
                 words: [
                     { word: "ベンキヨウシマス", row: 1, col: 0, dir: "across", clue: "Учиться", number: 1},
                     { word: "ナキマス", row: 5, col: 1, dir: "across", clue: "Плакать", number: 2},
@@ -83,7 +83,7 @@ window.crosswordsData = {
                 name: "Кроссворд 7",
                 width: 8,
                 height: 7,
-                price: 300,
+                price: 100,
                 words: [
                     { word: "ケシマス", row: 0, col: 1, dir: "across", clue: "Тушить, гасить; Выключать", number: 1},
                     { word: "ケツコンシマス", row: 0, col: 1, dir: "down", clue: "Жениться, Выходить замуж", number: 1.1},
@@ -96,7 +96,7 @@ window.crosswordsData = {
                 name: "Кроссворд 8",
                 width: 6,
                 height: 6,
-                price: 350,
+                price: 100,
                 words: [
                     { word: "ツカイマス", row: 0, col: 1, dir: "across", clue: "Использовать", number: 1},
                     { word: "オコリマス", row: 2, col: 0, dir: "across", clue: "Злиться", number: 2.1},
@@ -109,7 +109,7 @@ window.crosswordsData = {
                 name: "Кроссворд 9",
                 width: 7,
                 height: 4,
-                price: 400,
+                price: 100,
                 words: [
                     { word: "エンピツ", row: 2, col: 0, dir: "across", clue: "Используется для письма. Написанное можно стереть", number: 1},
                     { word: "ガクセイ", row: 1, col: 3, dir: "across", clue: "Учится в школе", number: 2},
@@ -122,7 +122,7 @@ window.crosswordsData = {
                 name: "Кроссворд Еда 1",
                 width: 8,
                 height: 5,
-                price: 450,
+                price: 100,
                 words: [
                     { word: "アイスクリーム", row: 0, col: 1, dir: "across", clue: "Холодная еда из смеси молока и яиц", number: 1},
                     { word: "パン", row: 4, col: 0, dir: "across", clue: "Выпекаемое мучное изделие", number: 2},
@@ -135,7 +135,7 @@ window.crosswordsData = {
                 name: "Кроссворд Еда 2",
                 width: 6,
                 height: 8,
-                price: 500,
+                price: 100,
                 words: [
                     { word: "ヒルゴハン", row: 2, col: 0, dir: "across", clue: "Рис на обед", number: 1},
                     { word: "バナナ", row: 4, col: 3, dir: "across", clue: "Длинный продолговатый фрукт", number: 2},
