@@ -119,7 +119,7 @@ window.crosswordsData = {
                 ]
             },
             {
-                name: "Кроссворд Еда 1",
+                name: "Кроссворд 10",
                 width: 8,
                 height: 5,
                 price: 100,
@@ -132,7 +132,7 @@ window.crosswordsData = {
                 ]
             },
             {
-                name: "Кроссворд Еда 2",
+                name: "Кроссворд 11",
                 width: 6,
                 height: 8,
                 price: 100,
@@ -142,6 +142,22 @@ window.crosswordsData = {
                     { word: "ラーメン", row: 7, col: 2, dir: "across", clue: "Китайская лапша. Очень популярна в Японии", number: 3},
                     { word: "ハンバーガー", row: 2, col: 3, dir: "down", clue: "Блюдо из котлеты между булками", number: 4},
                     { word: "ウドン", row: 0, col: 4, dir: "down", clue: "Длинная продолговатая белая лапша изготовляемая из пшеничной муки", number: 5},
+                ]
+            },
+            {
+                name: "Кроссворд 12",
+                width: 4,
+                height: 4,
+                price: 0,
+                words: [
+                    { word: "カナヅチ", row: 0, col: 0, dir: "across", clue: "Молоток", number: 1},
+                    { word: "カイ", row: 0, col: 0, dir: "down", clue: "Раковина, моллюск", number: 1.1},
+                    { word: "イワ", row: 1, col: 0, dir: "across", clue: "Скала, риф", number: 2},
+                    { word: "ナワトビ", row: 0, col: 1, dir: "down", clue: "Прыжки через скакалку", number: 3},
+                    { word: "トマト", row: 2, col: 1, dir: "across", clue: "Томат, помидор", number: 4},
+                    { word: "ユビキリ", row: 3, col: 0, dir: "across", clue: "Делают мизинцами в знак обещания", number: 5},
+                    { word: "マキ", row: 2, col: 2, dir: "down", clue: "Огуречный суши-ролл; Каппа-??", number: 6},
+                    { word: "チリトリ", row: 0, col: 3, dir: "down", clue: "Совок", number: 7},
                 ]
             },
             ]
