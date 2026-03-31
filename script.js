@@ -59,6 +59,7 @@ let gridWidth, gridHeight;
 let romajiBuffers = new Map();
 let hintUsed = false;
 let correctCharMap = new Map();
+let hintCount = 0;          // количество использованных подсказок в текущем кроссворде
 
 const levelSelect = document.getElementById("levelSelect");
 const puzzleSelect = document.getElementById("puzzleSelect");
@@ -69,6 +70,101 @@ const resetProgressBtn = document.getElementById("resetProgressBtn");
 const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
 
+// ========== ЗВУКИ ==========
+let audioContext = null;
+function initAudio() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+function playBeep(frequency, duration, volume = 0.3) {
+    try {
+        initAudio();
+        const now = audioContext.currentTime;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        oscillator.start();
+        oscillator.stop(now + duration);
+    } catch (e) {
+        console.warn("Audio not supported", e);
+    }
+}
+function playPop() {
+    playBeep(880, 0.05, 0.2); // короткий высокий щелчок
+}
+function playSuccess() {
+    playBeep(523, 0.2, 0.3);
+    setTimeout(() => playBeep(659, 0.2, 0.3), 200);
+}
+
+// ========== КОНФЕТТИ ==========
+function showConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9999';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
+    for (let i = 0; i < 150; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 6 + 2,
+            speedY: Math.random() * 8 + 5,
+            speedX: (Math.random() - 0.5) * 3,
+            color: `hsl(${Math.random() * 360}, 70%, 60%)`
+        });
+    }
+    let animationId = null;
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let allDone = true;
+        for (let p of particles) {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            if (p.y < canvas.height + p.size) allDone = false;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        }
+        if (!allDone) {
+            animationId = requestAnimationFrame(animate);
+        } else {
+            cancelAnimationFrame(animationId);
+            document.body.removeChild(canvas);
+        }
+    }
+    animate();
+    setTimeout(() => {
+        if (animationId) cancelAnimationFrame(animationId);
+        if (canvas.parentNode) document.body.removeChild(canvas);
+    }, 2000);
+}
+
+// ========== ЕЖЕДНЕВНЫЙ БОНУС ==========
+function checkDailyBonus() {
+    const today = new Date().toDateString();
+    if (gameStats.lastBonusDate !== today) {
+        addPoints(50);
+        gameStats.lastBonusDate = today;
+        saveGameStats();
+        showToast("🎁 Ежедневный бонус: +50 очков!", "success");
+    }
+}
+
+// ========== ТОСТ ==========
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -80,6 +176,7 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+// ========== ПОДТВЕРЖДЕНИЕ ==========
 let confirmResolve = null;
 const confirmModal = document.getElementById('confirmModal');
 const confirmMessage = document.getElementById('confirmMessage');
@@ -105,11 +202,12 @@ function closeConfirmDialog(result) {
 confirmYes.addEventListener('click', () => closeConfirmDialog(true));
 confirmNo.addEventListener('click', () => closeConfirmDialog(false));
 
-// ========== ГЕЙМИФИКАЦИЯ (только очки и слова) ==========
+// ========== ГЕЙМИФИКАЦИЯ (очки и слова) ==========
 const STORAGE_GAME_KEY = "gameStats";
 let gameStats = {
     score: 0,
-    wordsCompleted: 0
+    wordsCompleted: 0,
+    lastBonusDate: null
 };
 
 function loadGameStats() {
@@ -117,7 +215,7 @@ function loadGameStats() {
     if (saved) {
         gameStats = JSON.parse(saved);
     } else {
-        gameStats = { score: 0, wordsCompleted: 0 };
+        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: null };
         saveGameStats();
     }
     updateScoreUI();
@@ -142,10 +240,16 @@ function addPoints(points) {
 }
 
 function subtractPoints(points) {
-    gameStats.score = Math.max(0, gameStats.score - points);
-    saveGameStats();
-    updateScoreUI();
-    showToast(`-${points} очков`, "info");
+    if (gameStats.score >= points) {
+        gameStats.score -= points;
+        saveGameStats();
+        updateScoreUI();
+        showToast(`-${points} очков`, "info");
+        return true;
+    } else {
+        showToast(`Недостаточно очков! Нужно ${points} очков.`, "error");
+        return false;
+    }
 }
 
 function incrementWordsCompleted() {
@@ -215,7 +319,8 @@ function saveCurrentProgress() {
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     progress[key] = {
         gridData: gridData.map(row => row.map(cell => cell)),
-        hintUsed: hintUsed
+        hintUsed: hintUsed,
+        hintCount: hintCount
     };
     localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
 }
@@ -253,6 +358,7 @@ function unlockPuzzle(level, puzzleIdx, price) {
         unlocked[key] = true;
         saveUnlockedCrosswords(unlocked);
         subtractPoints(price);
+        showConfetti();                 // конфетти при покупке
         showToast(`Кроссворд разблокирован! -${price} очков`, "success");
         return true;
     } else {
@@ -284,6 +390,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
+        playPop(); // звук при правильном слове
     }
 }
 
@@ -293,6 +400,7 @@ function markCrosswordCompletedEarned() {
         earned.completed = true;
         saveEarnedPointsForCurrent(earned);
         addPoints(50);
+        playSuccess(); // звук завершения кроссворда
     }
 }
 
@@ -418,7 +526,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const puzzle = puzzles[puzzleIdx];
     
     if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
-        // Очищаем сетку и подсказки
         const gridContainer = document.getElementById("gridContainer");
         gridContainer.innerHTML = "";
         const cluesContainer = document.getElementById("cluesContainer");
@@ -426,13 +533,12 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         const statusDiv = document.getElementById("statusMsg");
         statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${puzzle.price || 0} очков. Нажмите "Купить", чтобы разблокировать.`;
         statusDiv.style.color = "#c94f4f";
-        // Сбрасываем внутренние переменные
         gridData = [];
         wordsList = [];
         cellElements = [];
         activeWordId = null;
         hintUsed = false;
-        // Обновляем кнопку покупки
+        hintCount = 0;
         updatePuzzleSelect();
         return;
     }
@@ -479,9 +585,11 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     if (savedData) {
         gridData = savedData.gridData.map(row => [...row]);
         hintUsed = savedData.hintUsed;
+        hintCount = savedData.hintCount !== undefined ? savedData.hintCount : 0;
     } else {
         gridData = freshGrid;
         hintUsed = false;
+        hintCount = 0;
     }
     
     generateNumbering();
@@ -496,8 +604,17 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
-    hintBtn.disabled = hintUsed;
-    hintBtn.textContent = hintUsed ? "Подсказка использована" : "Подсказка (1 раз)";
+    // Обновляем состояние кнопки подсказки
+    if (hintCount >= 2) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Подсказки закончились";
+    } else if (hintUsed) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Подсказка использована";
+    } else {
+        hintBtn.disabled = false;
+        hintBtn.textContent = "Подсказка (20 очков)";
+    }
     
     updateLevelProgress();
     updatePuzzleSelect();
@@ -1158,7 +1275,7 @@ levelSelect.addEventListener("change", (e) => {
 puzzleSelect.addEventListener("change", (e) => {
     const newIndex = parseInt(e.target.value, 10);
     currentPuzzleIndex = newIndex;
-    updatePuzzleSelect(); // важно: обновить состояние кнопки ДО загрузки
+    updatePuzzleSelect();
     loadCrossword(currentLevel, currentPuzzleIndex);
 });
 
@@ -1184,13 +1301,23 @@ resetProgressBtn.addEventListener("click", async () => {
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
-// ========== ПОДСКАЗКА ==========
+// ========== ПОДСКАЗКА (теперь стоит 20 очков, максимум 2 за кроссворд) ==========
 function giveHint() {
+    if (hintCount >= 2) {
+        showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
+        return;
+    }
     if (hintUsed) {
         showToast("Подсказка уже использована для этого кроссворда.", "error");
         return;
     }
     
+    // Проверяем хватает ли очков
+    if (!subtractPoints(20)) {
+        return; // недостаточно очков
+    }
+    
+    // Ищем пустые ячейки в незавершённых словах
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
@@ -1221,6 +1348,8 @@ function giveHint() {
     
     if (emptyCells.length === 0) {
         showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
+        // возвращаем очки, так как подсказка не была использована
+        addPoints(20);
         return;
     }
     
@@ -1230,6 +1359,7 @@ function giveHint() {
     let correctChar = correctCharMap.get(`${row},${col}`);
     if (!correctChar) {
         showToast("Ошибка: не удалось определить правильную букву.", "error");
+        addPoints(20); // возвращаем очки
         return;
     }
     
@@ -1241,9 +1371,15 @@ function giveHint() {
     updateWrongHighlights();
     saveCurrentProgress();
     
-    hintUsed = true;
-    hintBtn.disabled = true;
-    hintBtn.textContent = "Подсказка использована";
+    hintCount++;
+    hintUsed = true; // чтобы нельзя было использовать подсказку повторно (но у нас есть hintCount)
+    if (hintCount >= 2) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Подсказки закончились";
+    } else {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Подсказка использована";
+    }
     saveCurrentProgress();
 }
 
@@ -1259,9 +1395,9 @@ function showTutorial() {
     const steps = [
         "Добро пожаловать в японские кроссворды JLPT! 🎌\n\nВ этом туториале вы узнаете основы работы.",
         "📝 Вводите слова английскими буквами (ромадзи).\nПример: 'su' → ス, 'shu' → シ+ユ, 'n' → ン.\nДефис '-' даёт длинную гласную ー.",
-        "🔍 Используйте подсказку один раз на кроссворд. Кнопка 'Сбросить кроссворд' очистит все ячейки.",
         "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
-        "💰 Очки можно тратить на разблокировку новых кроссвордов. Некоторые кроссворды требуют определённое количество очков.",
+        "💰 Очки можно тратить на разблокировку новых кроссвордов и на подсказки (20 очков за подсказку, не более 2 подсказок на кроссворд).",
+        "🎁 Каждый день вы получаете 50 бонусных очков за вход.",
         "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
     ];
     
@@ -1308,5 +1444,6 @@ helpBtn.addEventListener("click", showTutorial);
 
 // Инициализация
 loadGameStats();
+checkDailyBonus();    // проверяем ежедневный бонус
 updatePuzzleSelect();
 loadCrossword("n5", 0);
