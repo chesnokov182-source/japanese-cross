@@ -171,7 +171,7 @@ window.crosswordsData = {
                 height: 4,
                 price: 60,
                 words: [
-                    { word: "ホウソウ", row: 0, col: 0, dir: "across", clue: "Способ, метод", number: 1},
+                    { word: "ホウホウ", row: 0, col: 0, dir: "across", clue: "Способ, метод", number: 1},
                     { word: "ホホエム", row: 0, col: 0, dir: "down", clue: "Улыбаться", number: 1.1},
                     { word: "ホドウ", row: 1, col: 0, dir: "across", clue: "Тротуар", number: 2},
                     { word: "ウドン", row: 0, col: 1, dir: "down", clue: "Вид лапши из пшеничной муки, характерный для японской кухни", number: 3},
