@@ -96,5 +96,19 @@ window.crosswordsData.n4 = {
                     { word: "ゾウキン", row: 3, col: 0, dir: "across", clue: "Тряпка", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 7",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ドラゴン", row: 0, col: 0, dir: "down", clue: "Дракон", number: 1},
+                    { word: "ドーナツ", row: 0, col: 0, dir: "across", clue: "Пончик", number: 1.1},
+                    { word: "ゴチソウ", row: 2, col: 0, dir: "across", clue: "Угощение, лакомство", number: 2},
+                    { word: "ウシ", row: 2, col: 3, dir: "down", clue: "Бык, корова", number: 3},
+                    { word: "デシ", row: 3, col: 2, dir: "across", clue: "Ученик; подмастерье", number: 4},
+                    { word: "ナガソデ", row: 0, col: 2, dir: "down", clue: "Длинные рукава", number: 5},
+                ]
+            },
         ]
     };
