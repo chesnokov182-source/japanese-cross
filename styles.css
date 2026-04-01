@@ -551,3 +551,50 @@ body.dark .skin-item {
     background: #999;
     cursor: not-allowed;
 }
+
+/* Оверлей для заблокированного кроссворда */
+.grid-section {
+    position: relative;
+}
+.crossword-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 10;
+    cursor: pointer;
+}
+.crossword-overlay-content {
+    background: var(--bg-container-light);
+    padding: 20px 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    max-width: 80%;
+}
+body.dark .crossword-overlay-content {
+    background: var(--bg-container-dark);
+}
+.crossword-overlay-content p {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+.crossword-overlay-content button {
+    background: var(--btn-bg-light);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+}
+body.dark .crossword-overlay-content button {
+    background: var(--btn-bg-dark);
+}
