@@ -110,5 +110,21 @@ window.crosswordsData.n4 = {
                     { word: "ナガソデ", row: 0, col: 2, dir: "down", clue: "Длинные рукава", number: 5},
                 ]
             },
+            {
+                name: "Кроссворд 8",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "アシガタ", row: 0, col: 0, dir: "across", clue: "Следы ног", number: 1},
+                    { word: "アサガオ", row: 0, col: 0, dir: "down", clue: "Ипомея японская («утренний лик»)", number: 1.1},
+                    { word: "サカ", row: 1, col: 0, dir: "across", clue: "Склон", number: 2},
+                    { word: "シカ", row: 0, col: 1, dir: "down", clue: "Олень", number: 3},
+                    { word: "オウサマ", row: 3, col: 0, dir: "across", clue: "Король", number: 4},
+                    { word: "サイ", row: 2, col: 2, dir: "across", clue: "Носорог", number: 5},
+                    { word: "ササ", row: 2, col: 2, dir: "down", clue: "Низкорослый бамбук, саза", number: 5.1},
+                    { word: "タダイマ", row: 0, col: 3, dir: "down", clue: "Говорят когда возвращаются домой", number: 6},
+                ]
+            },
         ]
     };
