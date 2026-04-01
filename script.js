@@ -330,7 +330,6 @@ function selectSkin(skinId) {
     selectedSkinId = skinId;
     saveSkinsData();
     showToast(`Скин "${availableSkins.find(s => s.id === skinId).name}" выбран!`, "success");
-    // Обновляем отображение всех заблокированных ячеек
     updateAllBlockedSkins();
     return true;
 }
@@ -340,7 +339,6 @@ function getSelectedSkinEmoji() {
     return skin ? skin.emoji : "";
 }
 
-// Обновляем скины только на заблокированных клетках
 function updateAllBlockedSkins() {
     if (!cellElements) return;
     for (let i = 0; i < gridHeight; i++) {
@@ -365,6 +363,34 @@ function updateBlockedSkin(row, col) {
     } else {
         skinSpan.style.display = "none";
     }
+}
+
+// ========== ОВЕРЛЕЙ ДЛЯ ЗАБЛОКИРОВАННЫХ КРОССВОРДОВ ==========
+function addLockOverlay(price) {
+    const gridSection = document.querySelector('.grid-section');
+    const existingOverlay = document.querySelector('.crossword-overlay');
+    if (existingOverlay) existingOverlay.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'crossword-overlay';
+    overlay.innerHTML = `
+        <div class="crossword-overlay-content">
+            <p>🔒 Кроссворд заблокирован</p>
+            <p>Цена: ${price} очков</p>
+            <button id="buyFromOverlayBtn">Купить</button>
+        </div>
+    `;
+    gridSection.style.position = 'relative';
+    gridSection.appendChild(overlay);
+    const buyBtn = overlay.querySelector('#buyFromOverlayBtn');
+    buyBtn.addEventListener('click', () => {
+        buyCurrentPuzzle();
+        overlay.remove();
+    });
+}
+
+function removeLockOverlay() {
+    const overlay = document.querySelector('.crossword-overlay');
+    if (overlay) overlay.remove();
 }
 
 // ========== ПРОГРЕСС-БАР ==========
@@ -628,24 +654,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
     const puzzle = puzzles[puzzleIdx];
     
-    if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
-        const gridContainer = document.getElementById("gridContainer");
-        gridContainer.innerHTML = "";
-        const cluesContainer = document.getElementById("cluesContainer");
-        cluesContainer.innerHTML = "";
-        const statusDiv = document.getElementById("statusMsg");
-        statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${puzzle.price || 0} очков. Нажмите "Купить", чтобы разблокировать.`;
-        statusDiv.style.color = "#c94f4f";
-        gridData = [];
-        wordsList = [];
-        cellElements = [];
-        activeWordId = null;
-        hintUsed = false;
-        hintCount = 0;
-        updatePuzzleSelect();
-        return;
-    }
-    
+    // Сначала загружаем данные, даже если кроссворд заблокирован
     gridWidth = puzzle.width;
     gridHeight = puzzle.height;
     wordsList = puzzle.words.map((w, idx) => ({
@@ -677,7 +686,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const freshGrid = emptyGrid.map(row => row.map(cell => (cell === null ? null : "")));
     
     let savedData = null;
-    if (preserveSaved) {
+    if (preserveSaved && isPuzzleUnlocked(levelId, puzzleIdx)) {
         const progress = getStoredProgress();
         const key = `${levelId}_${puzzleIdx}`;
         if (progress[key]) {
@@ -708,9 +717,16 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     romajiBuffers.clear();
     
     updateHintButtonState();
-    
     updateLevelProgress();
     updatePuzzleSelect();
+    
+    // Если кроссворд заблокирован, добавляем оверлей
+    if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
+        const price = puzzle.price !== undefined ? puzzle.price : 0;
+        addLockOverlay(price);
+    } else {
+        removeLockOverlay();
+    }
 }
 
 function updateHintButtonState() {
@@ -733,6 +749,7 @@ function renderGrid() {
     container.innerHTML = "";
     container.style.gridTemplateColumns = `repeat(${gridWidth}, minmax(70px, 1fr))`;
     cellElements = [];
+    const isLocked = !isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
     for(let i=0;i<gridHeight;i++){
         cellElements[i]=[];
         for(let j=0;j<gridWidth;j++){
@@ -757,8 +774,8 @@ function renderGrid() {
             input.type = "text";
             input.maxLength = 1;
             input.value = getDisplayValue(i, j);
-            input.disabled = isBlocked;
-            if(!isBlocked){
+            input.disabled = isBlocked || isLocked;
+            if(!isBlocked && !isLocked){
                 input.addEventListener("keydown", (e) => handleKeydown(e, i, j));
                 input.addEventListener("focus", () => onCellFocus(i,j));
                 input.addEventListener("blur", () => onCellBlur(i,j));
@@ -771,7 +788,7 @@ function renderGrid() {
     }
     applyHighlight();
     updateWrongHighlights();
-    updateAllBlockedSkins(); // показываем скины на заблокированных клетках
+    updateAllBlockedSkins();
 }
 
 function getDisplayValue(row, col) {
@@ -785,7 +802,6 @@ function updateCellUI(row, col) {
     if (cellElements[row] && cellElements[row][col]) {
         cellElements[row][col].value = getDisplayValue(row, col);
     }
-    // Если клетка не заблокирована, скин не трогаем (он всё равно не показывается)
 }
 
 function getWordNumberAt(row, col) {
@@ -798,6 +814,7 @@ function getWordNumberAt(row, col) {
 }
 
 function onCellFocus(row, col){
+    if (!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) return;
     let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
     if (containingWords.length === 0) return;
     if (activeWordId !== null) {
@@ -1252,10 +1269,12 @@ function renderClues() {
         li.setAttribute("data-word-id", clue.wordId);
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
-            setActiveWord(clue.wordId);
-            const word = wordsList.find(w => w.id === clue.wordId);
-            if(word && word.cells.length){
-                cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+            if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
+                setActiveWord(clue.wordId);
+                const word = wordsList.find(w => w.id === clue.wordId);
+                if(word && word.cells.length){
+                    cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+                }
             }
         });
         acrossUl.appendChild(li);
@@ -1265,10 +1284,12 @@ function renderClues() {
         li.setAttribute("data-word-id", clue.wordId);
         li.innerHTML = `<span class="clue-num">${Math.floor(clue.num)}.</span><span class="clue-text">${clue.clue}</span>`;
         li.addEventListener("click", () => {
-            setActiveWord(clue.wordId);
-            const word = wordsList.find(w => w.id === clue.wordId);
-            if(word && word.cells.length){
-                cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+            if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
+                setActiveWord(clue.wordId);
+                const word = wordsList.find(w => w.id === clue.wordId);
+                if(word && word.cells.length){
+                    cellElements[word.cells[0].row][word.cells[0].col]?.focus();
+                }
             }
         });
         downUl.appendChild(li);
