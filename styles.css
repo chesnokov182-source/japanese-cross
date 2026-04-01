@@ -595,7 +595,7 @@ body.dark .upgrade-desc {
 }
 body.dark .roulette-spin-area {
     text-shadow: 0 0 6px rgba(0,0,0,0.5);
-    color: #ffffff !important;
+    color: black;
 }
 .roulette-spin-area span {
     color: inherit;
