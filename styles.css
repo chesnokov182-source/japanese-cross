@@ -598,3 +598,87 @@ body.dark .crossword-overlay-content {
 body.dark .crossword-overlay-content button {
     background: var(--btn-bg-dark);
 }
+
+/* Табы в магазине */
+.shop-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+.shop-tab {
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-light);
+    border-radius: 20px 20px 0 0;
+    transition: all 0.2s;
+}
+.shop-tab.active {
+    background: var(--btn-bg-light);
+    color: white;
+}
+body.dark .shop-tab.active {
+    background: var(--btn-bg-dark);
+}
+.shop-tab:hover:not(.active) {
+    background: rgba(0,0,0,0.05);
+}
+.shop-section {
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.shop-section.active {
+    display: block;
+}
+.upgrade-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--bg-container-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+body.dark .upgrade-item {
+    background: var(--bg-container-dark);
+}
+.upgrade-info {
+    flex: 1;
+}
+.upgrade-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+.upgrade-desc {
+    font-size: 12px;
+    color: #666;
+}
+body.dark .upgrade-desc {
+    color: #aaa;
+}
+.upgrade-price {
+    font-size: 14px;
+    color: #4a6fa5;
+    margin-top: 4px;
+}
+.upgrade-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+.upgrade-btn.buy {
+    background: #4a6fa5;
+    color: white;
+}
+.upgrade-btn.disabled {
+    background: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
