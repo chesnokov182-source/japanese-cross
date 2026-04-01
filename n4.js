@@ -135,10 +135,24 @@ window.crosswordsData.n4 = {
                     { word: "イモウト", row: 0, col: 0, dir: "down", clue: "Младшая сестра", number: 1},
                     { word: "イゴ", row: 0, col: 0, dir: "across", clue: "Игра го", number: 1.1},
                     { word: "ゴリラ", row: 0, col: 1, dir: "down", clue: "Горилла", number: 2},
-                    { word: "ウラ", row: 2, col: 0, dir: "across", clue: "Обратная стороно", number: 3},
+                    { word: "ウラ", row: 2, col: 0, dir: "across", clue: "Обратная сторона", number: 3},
                     { word: "アニ", row: 3, col: 2, dir: "across", clue: "Старший брат", number: 4},
                     { word: "モリモリ", row: 1, col: 0, dir: "across", clue: "Жадно, много (есть)", number: 5},
                     { word: "ザリガニ", row: 0, col: 3, dir: "down", clue: "Японский речной рак", number: 6},
+                ]
+            },
+            {
+                name: "Кроссворд 10",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ベントウ", row: 0, col: 0, dir: "down", clue: "Бэнто", number: 1},
+                    { word: "ベランダ", row: 0, col: 0, dir: "across", clue: "Балкон; веранда;", number: 1.1},
+                    { word: "ダイコン", row: 0, col: 3, dir: "down", clue: "Японская редька, белый редис", number: 2},
+                    { word: "タコ", row: 2, col: 2, dir: "across", clue: "Осьминог", number: 3},
+                    { word: "タテ", row: 2, col: 2, dir: "down", clue: "Щит", number: 3.1},
+                    { word: "ウンテン", row: 3, col: 0, dir: "across", clue: "Вождение, управление", number: 4},
                 ]
             },
         ]
