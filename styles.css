@@ -306,21 +306,12 @@ body.dark .clue-num {
     padding: 12px;
     background: rgba(0,0,0,0.05);
     border-radius: 12px;
-    transition: all 0.3s;
+    color: #2c6e2c;
 }
 
 body.dark .status {
     background: rgba(255,255,255,0.05);
-}
-
-.status.completed {
-    color: #4caf50;
-    background: rgba(76, 175, 80, 0.1);
-}
-
-body.dark .status.completed {
-    color: #81c784;
-    background: rgba(129, 199, 132, 0.1);
+    color: #8bc34a;
 }
 
 .score-container {
@@ -562,16 +553,22 @@ body.dark .upgrade-desc {
     cursor: not-allowed;
     opacity: 0.6;
 }
-.roulette-canvas {
+.roulette-container {
+    text-align: center;
+    padding: 20px;
+}
+.roulette-spin-area {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 20px;
     background: var(--bg-container-light);
     border-radius: 16px;
     border: 2px solid var(--border-light);
-    margin: 20px 0;
-    width: 100%;
-    height: 80px;
-}
-body.dark .roulette-canvas {
-    background: var(--bg-container-dark);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
@@ -586,7 +583,16 @@ body.dark .roulette-canvas {
 .roulette-spin-btn:active {
     transform: scale(0.95);
 }
-
+.roulette-result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.roulette-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
 body.dark .roulette-info {
     color: #aaa;
 }
@@ -598,5 +604,5 @@ body.dark .roulette-info {
     .clue-list li { font-size: 14px; }
     .modal-message { font-size: 18px; }
     .modal-btn { font-size: 16px; padding: 10px 24px; }
-    .roulette-canvas { height: 60px; }
+    .roulette-spin-area { font-size: 32px; min-height: 100px; }
 }
