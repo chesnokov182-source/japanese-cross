@@ -79,6 +79,22 @@ window.crosswordsData.n4 = {
                     { word: "キン", row: 2, col: 3, dir: "down", clue: "День перед субботой", number: 5},
                     { word: "バイキン", row: 3, col: 0, dir: "across", clue: "Бактерия, микроб", number: 6},
                 ]
-            }
+            },
+            {
+                name: "Кроссворд 6",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ナノハナ", row: 0, col: 0, dir: "across", clue: "Цветы рапса", number: 1},
+                    { word: "ナゾナゾ", row: 0, col: 0, dir: "down", clue: "Загадка; тайна", number: 1.1},
+                    { word: "ノウ", row: 0, col: 1, dir: "down", clue: "Находится внутри головы", number: 2},
+                    { word: "ゾウ", row: 1, col: 0, dir: "across", clue: "Слон", number: 3},
+                    { word: "クモ", row: 2, col: 2, dir: "across", clue: "Облако", number: 4},
+                    { word: "クキ", row: 2, col: 2, dir: "down", clue: "Хризантема", number: 4.1},
+                    { word: "ナンモン", row: 0, col: 3, dir: "down", clue: "Трудный вопрос", number: 5},
+                    { word: "ゾウキン", row: 3, col: 0, dir: "across", clue: "Тряпка", number: 6},
+                ]
+            },
         ]
     };
