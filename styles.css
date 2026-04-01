@@ -562,10 +562,6 @@ body.dark .upgrade-desc {
     cursor: not-allowed;
     opacity: 0.6;
 }
-.roulette-container {
-    text-align: center;
-    padding: 10px;
-}
 .roulette-canvas {
     background: var(--bg-container-light);
     border-radius: 16px;
@@ -590,16 +586,7 @@ body.dark .roulette-canvas {
 .roulette-spin-btn:active {
     transform: scale(0.95);
 }
-.roulette-result {
-    margin-top: 15px;
-    font-size: 18px;
-    font-weight: bold;
-}
-.roulette-info {
-    font-size: 14px;
-    color: #666;
-    margin-top: 15px;
-}
+
 body.dark .roulette-info {
     color: #aaa;
 }
