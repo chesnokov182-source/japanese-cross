@@ -155,5 +155,21 @@ window.crosswordsData.n4 = {
                     { word: "ウンテン", row: 3, col: 0, dir: "across", clue: "Вождение, управление", number: 4},
                 ]
             },
+            {
+                name: "Кроссворд 11",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ブドウ", row: 0, col: 0, dir: "across", clue: "Виноград", number: 1},
+                    { word: "ブランコ", row: 0, col: 0, dir: "down", clue: "Качели;", number: 1.1},
+                    { word: "コマ", row: 3, col: 0, dir: "across", clue: "Волчок, юла", number: 2},
+                    { word: "イカ", row: 2, col: 2, dir: "across", clue: "Кальмар", number: 3},
+                    { word: "キカイ", row: 1, col: 3, dir: "down", clue: "Телевизор, автомобиль, кондиционер и т.п.", number: 4},
+                    { word: "ドク", row: 0, col: 1, dir: "down", clue: "Яд", number: 5},
+                    { word: "ラクガキ", row: 1, col: 0, dir: "across", clue: "Рисунок, надпись", number: 6},
+                    { word: "ウガイ", row: 0, col: 2, dir: "down", clue: "Полоскание рта", number: 7},
+                ]
+            },
         ]
     };
