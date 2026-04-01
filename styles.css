@@ -13,19 +13,19 @@
     --btn-hover-light: #3a5a8c;
     --shadow-light: rgba(0,0,0,0.1);
 
-    --bg-body-dark: #1e1e2f;
-    --bg-container-dark: #2c2c3a;
-    --bg-clues-dark: #252530;
-    --text-dark: #e0e0e0;
-    --border-dark: #444;
-    --cell-bg-dark: #3a3a4a;
-    --cell-blocked-dark: #4a4a5a;
+    --bg-body-dark: #1a1a2e;          /* более насыщенный тёмный */
+    --bg-container-dark: #23233a;
+    --bg-clues-dark: #1e1e30;
+    --text-dark: #eaeef2;
+    --border-dark: #4a4a6a;
+    --cell-bg-dark: #2d2d44;
+    --cell-blocked-dark: #393956;
     --highlight-dark: #6b4e2e;
     --active-word-dark: #3a7ca5;
     --wrong-dark: #c94f4f;
     --btn-bg-dark: #6c8fb5;
     --btn-hover-dark: #5a7a9e;
-    --shadow-dark: rgba(0,0,0,0.3);
+    --shadow-dark: rgba(0,0,0,0.5);
 }
 
 * {
@@ -719,5 +719,49 @@ body.dark .upgrade-desc {
     margin-top: 15px;
 }
 body.dark .roulette-stats {
+    color: #aaa;
+}
+
+.roulette-container {
+    text-align: center;
+    padding: 20px;
+}
+.roulette-spin-area {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-container-light);
+    border-radius: 16px;
+    border: 2px solid var(--border-light);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.roulette-spin-btn {
+    background: var(--btn-bg-light);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.roulette-spin-btn:active {
+    transform: scale(0.95);
+}
+.roulette-result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.roulette-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
+body.dark .roulette-info {
     color: #aaa;
 }
