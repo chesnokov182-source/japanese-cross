@@ -281,17 +281,18 @@ function decrementWordsCompleted() {
     updateScoreUI();
 }
 
-// ========== СКИНЫ ==========
+// ========== СКИНЫ (японские атрибуты) ==========
 const STORAGE_SKINS_KEY = "skins";
 const availableSkins = [
     { id: "default", name: "Без скина", emoji: "", price: 0, default: true },
-    { id: "dog", name: "Собачка", emoji: "🐶", price: 100 },
-    { id: "cat", name: "Котик", emoji: "🐱", price: 150 },
-    { id: "mouse", name: "Мышка", emoji: "🐭", price: 200 },
-    { id: "hamster", name: "Хомячок", emoji: "🐹", price: 250 },
-    { id: "rabbit", name: "Зайчик", emoji: "🐰", price: 300 },
-    { id: "fox", name: "Лисичка", emoji: "🦊", price: 350 },
-    { id: "panda", name: "Панда", emoji: "🐼", price: 400 }
+    { id: "japan_flag", name: "Флаг Японии", emoji: "🎌", price: 100 },
+    { id: "katana", name: "Катана", emoji: "🗡️", price: 150 },
+    { id: "sakura", name: "Цветок сакуры", emoji: "🌸", price: 200 },
+    { id: "fan", name: "Веер", emoji: "🎐", price: 250 },
+    { id: "sushi", name: "Суши", emoji: "🍣", price: 300 },
+    { id: "geisha", name: "Гейша", emoji: "👘", price: 350 },
+    { id: "tempura", name: "Тэмпура", emoji: "🍤", price: 400 },
+    { id: "dragon", name: "Дракон", emoji: "🐉", price: 500 }
 ];
 
 let purchasedSkins = [];
@@ -420,7 +421,6 @@ function spinRoulette() {
         }
     }
 
-    // Простая анимация: быстрая смена чисел
     rouletteAnimating = true;
     const rouletteDisplay = document.getElementById('rouletteDisplay');
     const rouletteResult = document.getElementById('rouletteResult');
@@ -1373,12 +1373,15 @@ function renderClues() {
     updateClueCompletion();
 }
 
-// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
-function resetCrossword() {
+// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА (с подтверждением) ==========
+async function resetCrossword() {
     if (!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
         showToast("Кроссворд заблокирован. Сброс невозможен.", "error");
         return;
     }
+    const confirmed = await showConfirmDialog("Вы уверены, что хотите сбросить этот кроссворд? Все ячейки будут очищены, а очки за слова и подсказки будут возвращены.");
+    if (!confirmed) return;
+    
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     let savedHintCount = 0;
@@ -1537,6 +1540,11 @@ let currentShopTab = localStorage.getItem('shopActiveTab') || 'skins';
 function openShopModal() {
     const modal = document.getElementById("shopModal");
     const modalContent = modal.querySelector('.modal-content');
+    
+    // Удаляем старый заголовок, если был
+    const oldTitle = modalContent.querySelector('h3');
+    if (oldTitle) oldTitle.remove();
+    
     let tabsContainer = modalContent.querySelector('.shop-tabs');
     if (!tabsContainer) {
         tabsContainer = document.createElement('div');
