@@ -592,7 +592,7 @@ body.dark .upgrade-desc {
 }
 body.dark .roulette-spin-area {
     text-shadow: 0 0 6px rgba(255,255,255,0.5);
-    color: #fff;
+    color: white; /* явно белый в тёмной теме */
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
