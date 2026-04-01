@@ -1,7 +1,6 @@
 // Кроссворды уровня N5
 window.crosswordsData = window.crosswordsData || {};
 window.crosswordsData.n5 = {
-  n5: {
         name: "JLPT N5",
         puzzles: [
             {
