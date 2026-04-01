@@ -105,7 +105,18 @@ function playCorrectInput() {
 function playErrorInput() {
     playBeep(200, 0.12, 0.2, 'sawtooth');
 }
-// Удалён playSuccess – больше не используется
+function playRouletteSpin() {
+    playBeep(800, 0.02, 0.15);
+}
+function playRouletteWin(prize) {
+    if (prize > 0) {
+        playBeep(523, 0.15, 0.3);
+        setTimeout(() => playBeep(659, 0.15, 0.3), 150);
+        setTimeout(() => playBeep(784, 0.2, 0.3), 300);
+    } else {
+        playBeep(300, 0.3, 0.2, 'sawtooth');
+    }
+}
 
 // ========== КОНФЕТТИ ==========
 function showConfetti() {
@@ -391,14 +402,13 @@ function upgradeMaxHints(newLimit, price) {
 
 // ========== РУЛЕТКА ==========
 const roulettePrizes = [0, 10, 20, 50, 100, 200];
-const rouletteProbabilities = [25, 20, 20, 15, 10, 10]; // в процентах, сумма 100
+const rouletteProbabilities = [25, 20, 20, 15, 10, 10];
 let rouletteAnimating = false;
 
 function spinRoulette() {
     if (rouletteAnimating) return;
     if (!subtractPoints(20)) return;
 
-    // Выбор приза
     const rand = Math.random() * 100;
     let cumulative = 0;
     let selectedPrize = 0;
@@ -410,17 +420,16 @@ function spinRoulette() {
         }
     }
 
+    // Простая анимация: быстрая смена чисел
+    rouletteAnimating = true;
     const rouletteDisplay = document.getElementById('rouletteDisplay');
     const rouletteResult = document.getElementById('rouletteResult');
-    if (!rouletteDisplay) return;
-
-    // Анимация: быстро меняем числа
-    rouletteAnimating = true;
     let spins = 0;
     const totalSpins = 20;
     const interval = setInterval(() => {
         const randomTemp = roulettePrizes[Math.floor(Math.random() * roulettePrizes.length)];
         rouletteDisplay.textContent = randomTemp;
+        playRouletteSpin();
         spins++;
         if (spins >= totalSpins) {
             clearInterval(interval);
@@ -429,8 +438,10 @@ function spinRoulette() {
                 addPoints(selectedPrize);
                 rouletteResult.innerHTML = `🎉 Вы выиграли ${selectedPrize} очков! 🎉`;
                 if (selectedPrize >= 100) showConfetti();
+                playRouletteWin(selectedPrize);
             } else {
                 rouletteResult.innerHTML = `😞 Вам выпало 0 очков. Повезёт в следующий раз!`;
+                playRouletteWin(0);
             }
             rouletteAnimating = false;
         }
@@ -563,7 +574,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
-        playPop(); // звук при правильном слове
+        playPop();
     }
 }
 
@@ -573,7 +584,6 @@ function markCrosswordCompletedEarned() {
         earned.completed = true;
         saveEarnedPointsForCurrent(earned);
         addPoints(50);
-        // playSuccess удалён – больше не играем
     }
 }
 
@@ -817,7 +827,6 @@ function renderGrid() {
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
-            // Скин (только для заблокированных)
             const skinSpan = document.createElement("span");
             skinSpan.className = "cell-skin";
             skinSpan.style.display = "none";
@@ -958,7 +967,6 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateWrongHighlights();
         saveCurrentProgress();
         
-        // Звуковая обратная связь
         const correctChar = correctCharMap.get(`${row},${col}`);
         if (char === correctChar) {
             playCorrectInput();
