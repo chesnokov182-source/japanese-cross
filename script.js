@@ -99,24 +99,13 @@ function playBeep(frequency, duration, volume = 0.3, type = 'sine') {
 function playPop() {
     playBeep(880, 0.05, 0.2);
 }
-function playSuccess() {
-    playBeep(523, 0.2, 0.3);
-    setTimeout(() => playBeep(659, 0.2, 0.3), 200);
-}
 function playCorrectInput() {
     playBeep(1200, 0.04, 0.25);
 }
 function playErrorInput() {
     playBeep(200, 0.12, 0.2, 'sawtooth');
 }
-function playCoin() {
-    playBeep(880, 0.08, 0.25);
-}
-function playJackpot() {
-    playBeep(523, 0.15, 0.4);
-    setTimeout(() => playBeep(659, 0.15, 0.4), 150);
-    setTimeout(() => playBeep(784, 0.15, 0.4), 300);
-}
+// Удалён playSuccess – больше не используется
 
 // ========== КОНФЕТТИ ==========
 function showConfetti() {
@@ -223,7 +212,7 @@ let gameStats = {
     score: 0,
     wordsCompleted: 0,
     lastBonusDate: null,
-    maxHints: 2       // по умолчанию 2 подсказки на кроссворд
+    maxHints: 2
 };
 
 function loadGameStats() {
@@ -401,42 +390,51 @@ function upgradeMaxHints(newLimit, price) {
 }
 
 // ========== РУЛЕТКА ==========
-const rouletteOptions = [
-    { value: 0, weight: 10 },    // 10% шанс на 0
-    { value: 10, weight: 25 },   // 25% на 10
-    { value: 20, weight: 25 },   // 25% на 20
-    { value: 50, weight: 20 },   // 20% на 50
-    { value: 100, weight: 12 },  // 12% на 100
-    { value: 200, weight: 8 }    // 8% на 200
-];
+const roulettePrizes = [0, 10, 20, 50, 100, 200];
+const rouletteProbabilities = [25, 20, 20, 15, 10, 10]; // в процентах, сумма 100
+let rouletteAnimating = false;
+
 function spinRoulette() {
+    if (rouletteAnimating) return;
     if (!subtractPoints(20)) return;
-    // Вычисляем общий вес
-    let totalWeight = rouletteOptions.reduce((sum, opt) => sum + opt.weight, 0);
-    let random = Math.random() * totalWeight;
-    let accumulated = 0;
-    let result = 0;
-    for (let opt of rouletteOptions) {
-        accumulated += opt.weight;
-        if (random <= accumulated) {
-            result = opt.value;
+
+    // Выбор приза
+    const rand = Math.random() * 100;
+    let cumulative = 0;
+    let selectedPrize = 0;
+    for (let i = 0; i < roulettePrizes.length; i++) {
+        cumulative += rouletteProbabilities[i];
+        if (rand < cumulative) {
+            selectedPrize = roulettePrizes[i];
             break;
         }
     }
-    if (result > 0) {
-        addPoints(result);
-        if (result >= 100) {
-            playJackpot();
-            showConfetti();
-        } else {
-            playCoin();
+
+    const rouletteDisplay = document.getElementById('rouletteDisplay');
+    const rouletteResult = document.getElementById('rouletteResult');
+    if (!rouletteDisplay) return;
+
+    // Анимация: быстро меняем числа
+    rouletteAnimating = true;
+    let spins = 0;
+    const totalSpins = 20;
+    const interval = setInterval(() => {
+        const randomTemp = roulettePrizes[Math.floor(Math.random() * roulettePrizes.length)];
+        rouletteDisplay.textContent = randomTemp;
+        spins++;
+        if (spins >= totalSpins) {
+            clearInterval(interval);
+            rouletteDisplay.textContent = selectedPrize;
+            if (selectedPrize > 0) {
+                addPoints(selectedPrize);
+                rouletteResult.innerHTML = `🎉 Вы выиграли ${selectedPrize} очков! 🎉`;
+                if (selectedPrize >= 100) showConfetti();
+            } else {
+                rouletteResult.innerHTML = `😞 Вам выпало 0 очков. Повезёт в следующий раз!`;
+            }
+            rouletteAnimating = false;
         }
-        showToast(`🎲 Рулетка: вы выиграли ${result} очков!`, "success");
-    } else {
-        playErrorInput();
-        showToast(`😞 Рулетка: вам выпало 0 очков. Попробуйте ещё!`, "info");
-    }
-    // Обновляем интерфейс рулетки, если модалка открыта (вызовется при следующем открытии)
+    }, 50);
 }
 
 // ========== ПРОГРЕСС-БАР ==========
@@ -565,7 +563,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
-        playPop();
+        playPop(); // звук при правильном слове
     }
 }
 
@@ -575,7 +573,7 @@ function markCrosswordCompletedEarned() {
         earned.completed = true;
         saveEarnedPointsForCurrent(earned);
         addPoints(50);
-        playSuccess();
+        // playSuccess удалён – больше не играем
     }
 }
 
@@ -819,6 +817,7 @@ function renderGrid() {
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
+            // Скин (только для заблокированных)
             const skinSpan = document.createElement("span");
             skinSpan.className = "cell-skin";
             skinSpan.style.display = "none";
@@ -959,6 +958,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateWrongHighlights();
         saveCurrentProgress();
         
+        // Звуковая обратная связь
         const correctChar = correctCharMap.get(`${row},${col}`);
         if (char === correctChar) {
             playCorrectInput();
@@ -1524,42 +1524,37 @@ resetProgressBtn.addEventListener("click", async () => {
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
 // ========== МАГАЗИН (скины + улучшения + рулетка) ==========
-const SHOP_TAB_STORAGE_KEY = "shopActiveTab";
-let currentShopTab = "skins"; // по умолчанию
+let currentShopTab = localStorage.getItem('shopActiveTab') || 'skins';
 
 function openShopModal() {
     const modal = document.getElementById("shopModal");
     const modalContent = modal.querySelector('.modal-content');
-    // Удаляем старые табы и секции, чтобы пересоздать с актуальным состоянием
-    const oldTabs = modalContent.querySelector('.shop-tabs');
-    if (oldTabs) oldTabs.remove();
-    const oldSkins = modalContent.querySelector('.shop-section.skins');
-    if (oldSkins) oldSkins.remove();
-    const oldUpgrades = modalContent.querySelector('.shop-section.upgrades');
-    if (oldUpgrades) oldUpgrades.remove();
-    const oldRoulette = modalContent.querySelector('.shop-section.roulette');
-    if (oldRoulette) oldRoulette.remove();
-    
-    // Создаём табы
-    const tabsContainer = document.createElement('div');
-    tabsContainer.className = 'shop-tabs';
+    let tabsContainer = modalContent.querySelector('.shop-tabs');
+    if (!tabsContainer) {
+        tabsContainer = document.createElement('div');
+        tabsContainer.className = 'shop-tabs';
+        modalContent.insertBefore(tabsContainer, modalContent.firstChild);
+    }
     tabsContainer.innerHTML = `
         <button class="shop-tab" data-tab="skins">🎨 Скины</button>
         <button class="shop-tab" data-tab="upgrades">⚡ Улучшения</button>
         <button class="shop-tab" data-tab="roulette">🎲 Рулетка</button>
     `;
-    modalContent.insertBefore(tabsContainer, modalContent.firstChild);
     
-    // Секции
-    const skinsSection = document.createElement('div');
-    skinsSection.className = 'shop-section skins';
-    const upgradesSection = document.createElement('div');
-    upgradesSection.className = 'shop-section upgrades';
-    const rouletteSection = document.createElement('div');
-    rouletteSection.className = 'shop-section roulette';
-    modalContent.appendChild(skinsSection);
-    modalContent.appendChild(upgradesSection);
-    modalContent.appendChild(rouletteSection);
+    let skinsSection = modalContent.querySelector('.shop-section.skins');
+    let upgradesSection = modalContent.querySelector('.shop-section.upgrades');
+    let rouletteSection = modalContent.querySelector('.shop-section.roulette');
+    if (!skinsSection) {
+        skinsSection = document.createElement('div');
+        skinsSection.className = 'shop-section skins';
+        modalContent.appendChild(skinsSection);
+        upgradesSection = document.createElement('div');
+        upgradesSection.className = 'shop-section upgrades';
+        modalContent.appendChild(upgradesSection);
+        rouletteSection = document.createElement('div');
+        rouletteSection.className = 'shop-section roulette';
+        modalContent.appendChild(rouletteSection);
+    }
     
     // Заполняем скины
     skinsSection.innerHTML = '';
@@ -1612,13 +1607,24 @@ function openShopModal() {
     // Заполняем рулетку
     rouletteSection.innerHTML = `
         <div class="roulette-container">
-            <div class="roulette-result" id="rouletteResult">🎲 Нажмите крутить</div>
-            <button class="roulette-spin-btn" id="spinRouletteBtn">Крутить (20 очков)</button>
-            <div class="roulette-stats">
-                Шансы: 0 (10%), 10 (25%), 20 (25%), 50 (20%), 100 (12%), 200 (8%)
+            <div class="roulette-spin-area">
+                <span id="rouletteDisplay">🎰</span>
+            </div>
+            <button id="rouletteSpinBtn" class="roulette-spin-btn">Крутить (20 очков)</button>
+            <div id="rouletteResult" class="roulette-result"></div>
+            <div class="roulette-info">
+                Шансы выигрыша:<br>
+                0 очков – 25%<br>
+                10 очков – 20%<br>
+                20 очков – 20%<br>
+                50 очков – 15%<br>
+                100 очков – 10%<br>
+                200 очков – 10%
             </div>
         </div>
     `;
+    const spinBtn = document.getElementById('rouletteSpinBtn');
+    if (spinBtn) spinBtn.addEventListener('click', spinRoulette);
     
     // Обработчики для скинов
     skinsSection.querySelectorAll('.skin-btn.buy').forEach(btn => {
@@ -1626,7 +1632,7 @@ function openShopModal() {
             const id = btn.dataset.id;
             const price = parseInt(btn.dataset.price);
             if (purchaseSkin(id, price)) {
-                openShopModal();
+                openShopModal(); // обновляем
             }
         });
     });
@@ -1634,7 +1640,7 @@ function openShopModal() {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             selectSkin(id);
-            openShopModal();
+            openShopModal(); // обновляем
         });
     });
     
@@ -1644,79 +1650,38 @@ function openShopModal() {
             const newLimit = parseInt(btn.dataset.upgrade);
             const price = parseInt(btn.dataset.price);
             if (upgradeMaxHints(newLimit, price)) {
-                openShopModal();
+                openShopModal(); // обновляем
                 updateButtonStates();
             }
         });
     });
     
-    // Обработчик рулетки
-    const spinBtn = rouletteSection.querySelector('#spinRouletteBtn');
-    const resultDiv = rouletteSection.querySelector('#rouletteResult');
-    spinBtn.addEventListener('click', () => {
-        if (!subtractPoints(20)) return;
-        // Вычисляем результат
-        const options = [
-            { value: 0, weight: 10 },
-            { value: 10, weight: 25 },
-            { value: 20, weight: 25 },
-            { value: 50, weight: 20 },
-            { value: 100, weight: 12 },
-            { value: 200, weight: 8 }
-        ];
-        let totalWeight = options.reduce((s, o) => s + o.weight, 0);
-        let rand = Math.random() * totalWeight;
-        let acc = 0;
-        let result = 0;
-        for (let opt of options) {
-            acc += opt.weight;
-            if (rand <= acc) {
-                result = opt.value;
-                break;
-            }
-        }
-        if (result > 0) {
-            addPoints(result);
-            if (result >= 100) {
-                playJackpot();
-                showConfetti();
-                resultDiv.innerHTML = `🎉 Поздравляем! Вы выиграли ${result} очков! 🎉`;
-            } else {
-                playCoin();
-                resultDiv.innerHTML = `✨ Вы выиграли ${result} очков! ✨`;
-            }
-        } else {
-            playErrorInput();
-            resultDiv.innerHTML = `😞 Вам выпало 0 очков. Попробуйте ещё раз!`;
-        }
-        // Обновляем отображение очков в модалке (они обновляются через addPoints)
-    });
-    
-    // Восстанавливаем активную вкладку
-    const savedTab = localStorage.getItem(SHOP_TAB_STORAGE_KEY);
-    let activeTab = (savedTab && ['skins', 'upgrades', 'roulette'].includes(savedTab)) ? savedTab : "skins";
-    currentShopTab = activeTab;
+    // Переключение табов с сохранением
     const tabs = tabsContainer.querySelectorAll('.shop-tab');
     tabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tab === activeTab);
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentShopTab = tab.dataset.tab;
+            localStorage.setItem('shopActiveTab', currentShopTab);
+            skinsSection.classList.toggle('active', currentShopTab === 'skins');
+            upgradesSection.classList.toggle('active', currentShopTab === 'upgrades');
+            rouletteSection.classList.toggle('active', currentShopTab === 'roulette');
+        });
+    });
+    
+    // Активируем сохранённую вкладку
+    const activeTab = currentShopTab;
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === activeTab) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
     });
     skinsSection.classList.toggle('active', activeTab === 'skins');
     upgradesSection.classList.toggle('active', activeTab === 'upgrades');
     rouletteSection.classList.toggle('active', activeTab === 'roulette');
-    
-    // Переключение табов
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const target = tab.dataset.tab;
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            skinsSection.classList.toggle('active', target === 'skins');
-            upgradesSection.classList.toggle('active', target === 'upgrades');
-            rouletteSection.classList.toggle('active', target === 'roulette');
-            currentShopTab = target;
-            localStorage.setItem(SHOP_TAB_STORAGE_KEY, target);
-        });
-    });
     
     modal.style.display = "flex";
 }
@@ -1807,9 +1772,8 @@ function showTutorial() {
         "Добро пожаловать в японские кроссворды JLPT! 🎌\n\nВ этом туториале вы узнаете основы работы.",
         "📝 Вводите слова английскими буквами (ромадзи).\nПример: 'su' → ス, 'shu' → シ+ユ, 'n' → ン.\nДефис '-' даёт длинную гласную ー.",
         "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
-        "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, лимит можно увеличить в магазине) и на скины в магазине.",
+        "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, лимит можно увеличить в магазине), на скины и в рулетке.",
         "🎁 Каждый день вы получаете 50 бонусных очков за вход.",
-        "🎲 В магазине есть рулетка: за 20 очков можно выиграть от 0 до 200 очков!",
         "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
     ];
     function updateTutorial() {
