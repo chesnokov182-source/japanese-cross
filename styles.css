@@ -179,6 +179,8 @@ body.dark .cell input {
     outline: none;
     text-transform: uppercase;
     color: inherit;
+    position: relative;
+    z-index: 2;
 }
 
 .cell.blocked {
@@ -221,10 +223,26 @@ body.dark .cell.wrong {
     font-weight: normal;
     color: #666;
     pointer-events: none;
+    z-index: 1;
 }
 
 body.dark .cell-number {
     color: #aaa;
+}
+
+.cell-skin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    pointer-events: none;
+    z-index: 1;
+    background: transparent;
 }
 
 .clue-block {
@@ -569,6 +587,12 @@ body.dark .upgrade-desc {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--text-light);
+    text-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+body.dark .roulette-spin-area {
+    text-shadow: 0 0 6px rgba(255,255,255,0.5);
+    color: #fff;
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
