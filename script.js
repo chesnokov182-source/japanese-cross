@@ -78,7 +78,7 @@ function initAudio() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
-function playBeep(frequency, duration, volume = 0.3) {
+function playBeep(frequency, duration, volume = 0.3, type = 'sine') {
     try {
         initAudio();
         const now = audioContext.currentTime;
@@ -86,7 +86,7 @@ function playBeep(frequency, duration, volume = 0.3) {
         const gain = audioContext.createGain();
         oscillator.connect(gain);
         gain.connect(audioContext.destination);
-        oscillator.type = 'sine';
+        oscillator.type = type;
         oscillator.frequency.value = frequency;
         gain.gain.setValueAtTime(volume, now);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
@@ -102,6 +102,12 @@ function playPop() {
 function playSuccess() {
     playBeep(523, 0.2, 0.3);
     setTimeout(() => playBeep(659, 0.2, 0.3), 200);
+}
+function playCorrectInput() {
+    playBeep(1200, 0.04, 0.25);
+}
+function playErrorInput() {
+    playBeep(200, 0.12, 0.2, 'sawtooth');
 }
 
 // ========== КОНФЕТТИ ==========
@@ -203,20 +209,23 @@ function closeConfirmDialog(result) {
 confirmYes.addEventListener('click', () => closeConfirmDialog(true));
 confirmNo.addEventListener('click', () => closeConfirmDialog(false));
 
-// ========== ГЕЙМИФИКАЦИЯ (очки и слова) ==========
+// ========== ГЕЙМИФИКАЦИЯ (очки, слова, лимит подсказок) ==========
 const STORAGE_GAME_KEY = "gameStats";
 let gameStats = {
     score: 0,
     wordsCompleted: 0,
-    lastBonusDate: null
+    lastBonusDate: null,
+    maxHints: 2       // по умолчанию 2 подсказки на кроссворд
 };
 
 function loadGameStats() {
     const saved = localStorage.getItem(STORAGE_GAME_KEY);
     if (saved) {
         gameStats = JSON.parse(saved);
+        // Если maxHints отсутствует в старых данных, устанавливаем 2
+        if (gameStats.maxHints === undefined) gameStats.maxHints = 2;
     } else {
-        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: null };
+        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: null, maxHints: 2 };
         saveGameStats();
     }
     updateScoreUI();
@@ -365,6 +374,25 @@ function updateBlockedSkin(row, col) {
     }
 }
 
+// ========== УЛУЧШЕНИЯ (лимит подсказок) ==========
+function upgradeMaxHints(newLimit, price) {
+    if (newLimit <= gameStats.maxHints) {
+        showToast("Это улучшение уже куплено!", "error");
+        return false;
+    }
+    if (gameStats.score >= price) {
+        subtractPoints(price);
+        gameStats.maxHints = newLimit;
+        saveGameStats();
+        showToast(`Лимит подсказок увеличен до ${newLimit}!`, "success");
+        updateButtonStates(); // обновить состояние кнопки подсказки
+        return true;
+    } else {
+        showToast(`Недостаточно очков! Нужно ${price} очков.`, "error");
+        return false;
+    }
+}
+
 // ========== ПРОГРЕСС-БАР ==========
 function updateLevelProgress() {
     const puzzles = window.crosswordsData[currentLevel].puzzles;
@@ -491,7 +519,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
-        playPop();
+        playPop(); // звук при правильном слове
     }
 }
 
@@ -630,12 +658,12 @@ function updateButtonStates() {
         if (completed) {
             hintBtn.disabled = true;
             hintBtn.textContent = "Кроссворд решён";
-        } else if (hintCount >= 2) {
+        } else if (hintCount >= gameStats.maxHints) {
             hintBtn.disabled = true;
-            hintBtn.textContent = "Подсказки закончились";
+            hintBtn.textContent = `Подсказки закончились (${hintCount}/${gameStats.maxHints})`;
         } else {
             hintBtn.disabled = false;
-            hintBtn.textContent = "Подсказка (20 очков)";
+            hintBtn.textContent = `Подсказка (20 очков) (${hintCount}/${gameStats.maxHints})`;
         }
     }
 }
@@ -709,7 +737,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
-    // Устанавливаем сообщение в статус, если кроссворд заблокирован
     const unlocked = isPuzzleUnlocked(levelId, puzzleIdx);
     const statusDiv = document.getElementById("statusMsg");
     if (!unlocked) {
@@ -717,7 +744,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${price} очков. Нажмите «Купить», чтобы разблокировать.`;
         statusDiv.style.color = "#c94f4f";
     } else if (statusDiv) {
-        // Статус будет установлен в checkCompletion
+        // статус обновится в checkCompletion
     }
     
     updateButtonStates();
@@ -874,7 +901,7 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     return null;
 }
 
-// ========== ВСТАВКА СИМВОЛОВ ==========
+// ========== ВСТАВКА СИМВОЛОВ (с проверкой правильности и звуками) ==========
 function insertKatakanaArray(row, col, katakanaArray, startIndex) {
     if (startIndex >= katakanaArray.length) return;
     const char = katakanaArray[startIndex];
@@ -886,6 +913,14 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateClueCompletion();
         updateWrongHighlights();
         saveCurrentProgress();
+        
+        // Звуковая обратная связь
+        const correctChar = correctCharMap.get(`${row},${col}`);
+        if (char === correctChar) {
+            playCorrectInput();
+        } else {
+            playErrorInput();
+        }
 
         if (katakanaArray.length > 1) {
             if (activeWordId !== null) {
@@ -917,6 +952,13 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateClueCompletion();
         updateWrongHighlights();
         saveCurrentProgress();
+        
+        const correctChar = correctCharMap.get(`${row},${col}`);
+        if (char === correctChar) {
+            playCorrectInput();
+        } else {
+            playErrorInput();
+        }
 
         if (startIndex + 1 < katakanaArray.length) {
             if (activeWordId !== null) {
@@ -1425,7 +1467,7 @@ resetProgressBtn.addEventListener("click", async () => {
         localStorage.removeItem(STORAGE_EARNED_KEY);
         const lastBonus = gameStats.lastBonusDate;
         localStorage.removeItem(STORAGE_GAME_KEY);
-        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: lastBonus };
+        gameStats = { score: 0, wordsCompleted: 0, lastBonusDate: lastBonus, maxHints: 2 };
         saveGameStats();
         updateScoreUI();
         currentPuzzleIndex = 0;
@@ -1437,12 +1479,35 @@ resetProgressBtn.addEventListener("click", async () => {
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
-// ========== МАГАЗИН СКИНОВ ==========
+// ========== МАГАЗИН (скины + улучшения) ==========
 function openShopModal() {
     const modal = document.getElementById("shopModal");
-    const skinsList = document.getElementById("skinsList");
-    skinsList.innerHTML = "";
+    const modalContent = modal.querySelector('.modal-content');
+    // Если табы уже есть, не добавляем повторно, иначе пересоздадим
+    let tabsContainer = modalContent.querySelector('.shop-tabs');
+    if (!tabsContainer) {
+        tabsContainer = document.createElement('div');
+        tabsContainer.className = 'shop-tabs';
+        modalContent.insertBefore(tabsContainer, modalContent.firstChild);
+    }
+    tabsContainer.innerHTML = `
+        <button class="shop-tab active" data-tab="skins">🎨 Скины</button>
+        <button class="shop-tab" data-tab="upgrades">⚡ Улучшения</button>
+    `;
     
+    let skinsSection = modalContent.querySelector('.shop-section.skins');
+    let upgradesSection = modalContent.querySelector('.shop-section.upgrades');
+    if (!skinsSection) {
+        skinsSection = document.createElement('div');
+        skinsSection.className = 'shop-section skins active';
+        modalContent.appendChild(skinsSection);
+        upgradesSection = document.createElement('div');
+        upgradesSection.className = 'shop-section upgrades';
+        modalContent.appendChild(upgradesSection);
+    }
+    
+    // Заполняем скины
+    skinsSection.innerHTML = '';
     for (let skin of availableSkins) {
         const purchased = isSkinPurchased(skin.id);
         const selected = (selectedSkinId === skin.id);
@@ -1462,23 +1527,72 @@ function openShopModal() {
                    `<button class="skin-btn select" data-id="${skin.id}">Выбрать</button>`)}
             </div>
         `;
-        skinsList.appendChild(skinDiv);
+        skinsSection.appendChild(skinDiv);
     }
     
-    document.querySelectorAll('.skin-btn.buy').forEach(btn => {
+    // Заполняем улучшения
+    upgradesSection.innerHTML = `
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <div class="upgrade-name">📈 Лимит подсказок: 3</div>
+                <div class="upgrade-desc">Максимум 3 подсказки на кроссворд</div>
+                <div class="upgrade-price">500 очков</div>
+            </div>
+            <div>
+                ${gameStats.maxHints >= 3 ? '<button class="upgrade-btn disabled" disabled>Куплено</button>' : '<button class="upgrade-btn buy" data-upgrade="3" data-price="500">Купить</button>'}
+            </div>
+        </div>
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <div class="upgrade-name">📈 Лимит подсказок: 4</div>
+                <div class="upgrade-desc">Максимум 4 подсказки на кроссворд</div>
+                <div class="upgrade-price">750 очков</div>
+            </div>
+            <div>
+                ${gameStats.maxHints >= 4 ? '<button class="upgrade-btn disabled" disabled>Куплено</button>' : (gameStats.maxHints >= 3 ? '<button class="upgrade-btn buy" data-upgrade="4" data-price="750">Купить</button>' : '<button class="upgrade-btn disabled" disabled>Сначала купите лимит 3</button>')}
+            </div>
+        </div>
+    `;
+    
+    // Обработчики для скинов
+    skinsSection.querySelectorAll('.skin-btn.buy').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             const price = parseInt(btn.dataset.price);
             if (purchaseSkin(id, price)) {
-                openShopModal();
+                openShopModal(); // обновляем
             }
         });
     });
-    document.querySelectorAll('.skin-btn.select').forEach(btn => {
+    skinsSection.querySelectorAll('.skin-btn.select').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             selectSkin(id);
-            openShopModal();
+            openShopModal(); // обновляем
+        });
+    });
+    
+    // Обработчики для улучшений
+    upgradesSection.querySelectorAll('.upgrade-btn.buy').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const newLimit = parseInt(btn.dataset.upgrade);
+            const price = parseInt(btn.dataset.price);
+            if (upgradeMaxHints(newLimit, price)) {
+                openShopModal(); // обновляем
+                updateButtonStates(); // обновить кнопку подсказки
+            }
+        });
+    });
+    
+    // Переключение табов
+    const tabs = tabsContainer.querySelectorAll('.shop-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.dataset.tab;
+            skinsSection.classList.toggle('active', target === 'skins');
+            upgradesSection.classList.toggle('active', target === 'upgrades');
         });
     });
     
@@ -1500,8 +1614,8 @@ function giveHint() {
         showToast("Кроссворд уже решён! Подсказки не нужны.", "error");
         return;
     }
-    if (hintCount >= 2) {
-        showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
+    if (hintCount >= gameStats.maxHints) {
+        showToast(`Вы уже использовали все ${gameStats.maxHints} подсказки для этого кроссворда.`, "error");
         return;
     }
     let emptyCells = [];
@@ -1571,7 +1685,7 @@ function showTutorial() {
         "Добро пожаловать в японские кроссворды JLPT! 🎌\n\nВ этом туториале вы узнаете основы работы.",
         "📝 Вводите слова английскими буквами (ромадзи).\nПример: 'su' → ス, 'shu' → シ+ユ, 'n' → ン.\nДефис '-' даёт длинную гласную ー.",
         "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
-        "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, не более 2 подсказок на кроссворд) и на скины в магазине.",
+        "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, лимит можно увеличить в магазине) и на скины в магазине.",
         "🎁 Каждый день вы получаете 50 бонусных очков за вход.",
         "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
     ];
