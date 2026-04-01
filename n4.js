@@ -126,5 +126,20 @@ window.crosswordsData.n4 = {
                     { word: "タダイマ", row: 0, col: 3, dir: "down", clue: "Говорят когда возвращаются домой", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 9",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "イモウト", row: 0, col: 0, dir: "down", clue: "Младшая сестра", number: 1},
+                    { word: "イゴ", row: 0, col: 0, dir: "across", clue: "Игра го", number: 1.1},
+                    { word: "ゴリラ", row: 0, col: 1, dir: "down", clue: "Горилла", number: 2},
+                    { word: "ウラ", row: 2, col: 0, dir: "across", clue: "Обратная стороно", number: 3},
+                    { word: "アニ", row: 3, col: 2, dir: "across", clue: "Старший брат", number: 4},
+                    { word: "モリモリ", row: 1, col: 0, dir: "across", clue: "Жадно, много (есть)", number: 5},
+                    { word: "ザリガニ", row: 0, col: 3, dir: "down", clue: "Японский речной рак", number: 6},
+                ]
+            },
         ]
     };
