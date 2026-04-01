@@ -365,34 +365,6 @@ function updateBlockedSkin(row, col) {
     }
 }
 
-// ========== ОВЕРЛЕЙ ДЛЯ ЗАБЛОКИРОВАННЫХ КРОССВОРДОВ ==========
-function addLockOverlay(price) {
-    const gridSection = document.querySelector('.grid-section');
-    const existingOverlay = document.querySelector('.crossword-overlay');
-    if (existingOverlay) existingOverlay.remove();
-    const overlay = document.createElement('div');
-    overlay.className = 'crossword-overlay';
-    overlay.innerHTML = `
-        <div class="crossword-overlay-content">
-            <p>🔒 Кроссворд заблокирован</p>
-            <p>Цена: ${price} очков</p>
-            <button id="buyFromOverlayBtn">Купить</button>
-        </div>
-    `;
-    gridSection.style.position = 'relative';
-    gridSection.appendChild(overlay);
-    const buyBtn = overlay.querySelector('#buyFromOverlayBtn');
-    buyBtn.addEventListener('click', () => {
-        buyCurrentPuzzle();
-        overlay.remove();
-    });
-}
-
-function removeLockOverlay() {
-    const overlay = document.querySelector('.crossword-overlay');
-    if (overlay) overlay.remove();
-}
-
 // ========== ПРОГРЕСС-БАР ==========
 function updateLevelProgress() {
     const puzzles = window.crosswordsData[currentLevel].puzzles;
@@ -649,9 +621,7 @@ function generateNumbering() {
 // ========== УПРАВЛЕНИЕ СОСТОЯНИЕМ КНОПОК ==========
 function updateButtonStates() {
     const unlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
-    // Кнопка сброса: активна только если кроссворд разблокирован
     resetBtn.disabled = !unlocked;
-    // Кнопка подсказки: активна только если кроссворд разблокирован и не решён и не исчерпаны подсказки
     if (!unlocked) {
         hintBtn.disabled = true;
         hintBtn.textContent = "Кроссворд заблокирован";
@@ -678,7 +648,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
     const puzzle = puzzles[puzzleIdx];
     
-    // Сначала загружаем данные, даже если кроссворд заблокирован
     gridWidth = puzzle.width;
     gridHeight = puzzle.height;
     wordsList = puzzle.words.map((w, idx) => ({
@@ -740,17 +709,20 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
+    // Устанавливаем сообщение в статус, если кроссворд заблокирован
+    const unlocked = isPuzzleUnlocked(levelId, puzzleIdx);
+    const statusDiv = document.getElementById("statusMsg");
+    if (!unlocked) {
+        const price = puzzle.price !== undefined ? puzzle.price : 0;
+        statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${price} очков. Нажмите «Купить», чтобы разблокировать.`;
+        statusDiv.style.color = "#c94f4f";
+    } else if (statusDiv) {
+        // Статус будет установлен в checkCompletion
+    }
+    
     updateButtonStates();
     updateLevelProgress();
     updatePuzzleSelect();
-    
-    // Если кроссворд заблокирован, добавляем оверлей
-    if (!isPuzzleUnlocked(levelId, puzzleIdx)) {
-        const price = puzzle.price !== undefined ? puzzle.price : 0;
-        addLockOverlay(price);
-    } else {
-        removeLockOverlay();
-    }
 }
 
 // ========== ОТРИСОВКА СЕТКИ ==========
@@ -1211,18 +1183,17 @@ function checkCompletion() {
         }
     }
     const statusDiv = document.getElementById("statusMsg");
-    if (allFilled) {
+    const unlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
+    if (allFilled && unlocked) {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
         statusDiv.style.color = "#2c6e2c";
         if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             markAsCompleted();
         }
         updateButtonStates();
-    } else {
-        if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
-            statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
-            statusDiv.style.color = "#666";
-        }
+    } else if (unlocked) {
+        statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
+        statusDiv.style.color = "#666";
         if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             const completed = getCompletedCrosswords();
             const key = `${currentLevel}_${currentPuzzleIndex}`;
@@ -1236,6 +1207,7 @@ function checkCompletion() {
             }
         }
     }
+    // Если кроссворд заблокирован, сообщение уже установлено в loadCrossword
 }
 
 function updateClueCompletion() {
