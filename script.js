@@ -646,6 +646,30 @@ function generateNumbering() {
     cluesDown.sort((a,b) => a.num - b.num);
 }
 
+// ========== УПРАВЛЕНИЕ СОСТОЯНИЕМ КНОПОК ==========
+function updateButtonStates() {
+    const unlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
+    // Кнопка сброса: активна только если кроссворд разблокирован
+    resetBtn.disabled = !unlocked;
+    // Кнопка подсказки: активна только если кроссворд разблокирован и не решён и не исчерпаны подсказки
+    if (!unlocked) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Кроссворд заблокирован";
+    } else {
+        const completed = isCrosswordCompleted(currentLevel, currentPuzzleIndex);
+        if (completed) {
+            hintBtn.disabled = true;
+            hintBtn.textContent = "Кроссворд решён";
+        } else if (hintCount >= 2) {
+            hintBtn.disabled = true;
+            hintBtn.textContent = "Подсказки закончились";
+        } else {
+            hintBtn.disabled = false;
+            hintBtn.textContent = "Подсказка (20 очков)";
+        }
+    }
+}
+
 // ========== ЗАГРУЗКА КРОССВОРДА ==========
 function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const levelData = window.crosswordsData[levelId];
@@ -716,7 +740,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
-    updateHintButtonState();
+    updateButtonStates();
     updateLevelProgress();
     updatePuzzleSelect();
     
@@ -726,20 +750,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         addLockOverlay(price);
     } else {
         removeLockOverlay();
-    }
-}
-
-function updateHintButtonState() {
-    const completed = isCrosswordCompleted(currentLevel, currentPuzzleIndex);
-    if (completed) {
-        hintBtn.disabled = true;
-        hintBtn.textContent = "Кроссворд решён";
-    } else if (hintCount >= 2) {
-        hintBtn.disabled = true;
-        hintBtn.textContent = "Подсказки закончились";
-    } else {
-        hintBtn.disabled = false;
-        hintBtn.textContent = "Подсказка (20 очков)";
     }
 }
 
@@ -1207,7 +1217,7 @@ function checkCompletion() {
         if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             markAsCompleted();
         }
-        updateHintButtonState();
+        updateButtonStates();
     } else {
         if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
             statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
@@ -1222,7 +1232,7 @@ function checkCompletion() {
                 localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
                 updatePuzzleSelect();
                 updateLevelProgress();
-                updateHintButtonState();
+                updateButtonStates();
             }
         }
     }
@@ -1299,6 +1309,10 @@ function renderClues() {
 
 // ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
 function resetCrossword() {
+    if (!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
+        showToast("Кроссворд заблокирован. Сброс невозможен.", "error");
+        return;
+    }
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     let savedHintCount = 0;
@@ -1386,6 +1400,7 @@ function buyCurrentPuzzle() {
             if (unlockPuzzle(currentLevel, currentPuzzleIndex, price)) {
                 loadCrossword(currentLevel, currentPuzzleIndex, true);
                 updatePuzzleSelect();
+                updateButtonStates();
             }
             modal.style.display = "none";
             confirmBtn.removeEventListener("click", handleConfirm);
@@ -1505,6 +1520,10 @@ shopBtn.addEventListener("click", openShopModal);
 
 // ========== ПОДСКАЗКА ==========
 function giveHint() {
+    if (!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
+        showToast("Кроссворд заблокирован. Подсказки недоступны.", "error");
+        return;
+    }
     if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
         showToast("Кроссворд уже решён! Подсказки не нужны.", "error");
         return;
@@ -1564,7 +1583,7 @@ function giveHint() {
     saveCurrentProgress();
     hintCount++;
     saveCurrentProgress();
-    updateHintButtonState();
+    updateButtonStates();
 }
 
 hintBtn.addEventListener("click", giveHint);
