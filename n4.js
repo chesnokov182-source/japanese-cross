@@ -1,6 +1,5 @@
 window.crosswordsData = window.crosswordsData || {};
 window.crosswordsData.n4 = {
-  n4: {
         name: "JLPT N4",
         puzzles: [
             {
