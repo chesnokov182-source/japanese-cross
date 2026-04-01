@@ -49,6 +49,21 @@ window.crosswordsData.n4 = {
                     { word: "シロ", row: 0, col: 3, dir: "down", clue: "Белый цвет", number: 6},
                     { word: "ケシキ", row: 3, col: 1, dir: "across", clue: "Пейзаж, вид", number: 7},
                 ]
+            },
+            {
+                name: "Кроссворд 4",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "タレ", row: 0, col: 0, dir: "across", clue: "Густой соевый соус, включающий мирин, уксус и даси", number: 1},
+                    { word: "タマネギ", row: 0, col: 0, dir: "down", clue: "Репчатый лук", number: 1.1},
+                    { word: "ネコ", row: 2, col: 0, dir: "across", clue: "Кошка", number: 2},
+                    { word: "ギンコウ", row: 3, col: 0, dir: "across", clue: "Банк", number: 3},
+                    { word: "フウトウ", row: 0, col: 3, dir: "down", clue: "Конверт", number: 4},
+                    { word: "レンコン", row: 0, col: 1, dir: "down", clue: "Корневище лотоса", number: 5},
+                    { word: "マンボウ", row: 1, col: 0, dir: "across", clue: "Луна-рыба", number: 6},
+                ]
             }
         ]
     };
