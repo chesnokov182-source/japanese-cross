@@ -71,7 +71,7 @@ window.crosswordsData.n4 = {
                 height: 4,
                 price: 60,
                 words: [
-                    { word: "タヤキソバ", row: 0, col: 0, dir: "down", clue: "Жареная лапша", number: 1},
+                    { word: "ヤキソバ", row: 0, col: 0, dir: "down", clue: "Жареная лапша", number: 1},
                     { word: "キリン", row: 1, col: 0, dir: "across", clue: "Жираф", number: 2},
                     { word: "イヌ", row: 0, col: 2, dir: "across", clue: "Собака", number: 3},
                     { word: "インセキ", row: 0, col: 2, dir: "down", clue: "Метеорит", number: 3.1},
