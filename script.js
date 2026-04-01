@@ -69,6 +69,7 @@ const themeToggle = document.getElementById("themeToggle");
 const resetProgressBtn = document.getElementById("resetProgressBtn");
 const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
+const shopBtn = document.getElementById("shopBtn");
 
 // ========== ЗВУКИ ==========
 let audioContext = null;
@@ -262,6 +263,108 @@ function decrementWordsCompleted() {
     gameStats.wordsCompleted = Math.max(0, gameStats.wordsCompleted - 1);
     saveGameStats();
     updateScoreUI();
+}
+
+// ========== СКИНЫ ==========
+const STORAGE_SKINS_KEY = "skins";
+const availableSkins = [
+    { id: "default", name: "Без скина", emoji: "", price: 0, default: true },
+    { id: "dog", name: "Собачка", emoji: "🐶", price: 100 },
+    { id: "cat", name: "Котик", emoji: "🐱", price: 150 },
+    { id: "mouse", name: "Мышка", emoji: "🐭", price: 200 },
+    { id: "hamster", name: "Хомячок", emoji: "🐹", price: 250 },
+    { id: "rabbit", name: "Зайчик", emoji: "🐰", price: 300 },
+    { id: "fox", name: "Лисичка", emoji: "🦊", price: 350 },
+    { id: "panda", name: "Панда", emoji: "🐼", price: 400 }
+];
+
+let purchasedSkins = [];
+let selectedSkinId = "default";
+
+function loadSkinsData() {
+    const saved = localStorage.getItem(STORAGE_SKINS_KEY);
+    if (saved) {
+        const data = JSON.parse(saved);
+        purchasedSkins = data.purchasedSkins || [];
+        selectedSkinId = data.selectedSkinId || "default";
+    } else {
+        purchasedSkins = ["default"];
+        selectedSkinId = "default";
+        saveSkinsData();
+    }
+}
+
+function saveSkinsData() {
+    localStorage.setItem(STORAGE_SKINS_KEY, JSON.stringify({
+        purchasedSkins: purchasedSkins,
+        selectedSkinId: selectedSkinId
+    }));
+}
+
+function isSkinPurchased(skinId) {
+    return purchasedSkins.includes(skinId);
+}
+
+function purchaseSkin(skinId, price) {
+    if (isSkinPurchased(skinId)) {
+        showToast("Этот скин уже куплен!", "error");
+        return false;
+    }
+    if (gameStats.score >= price) {
+        subtractPoints(price);
+        purchasedSkins.push(skinId);
+        saveSkinsData();
+        showToast(`Скин "${availableSkins.find(s => s.id === skinId).name}" куплен!`, "success");
+        return true;
+    } else {
+        showToast(`Недостаточно очков! Нужно ${price} очков.`, "error");
+        return false;
+    }
+}
+
+function selectSkin(skinId) {
+    if (!isSkinPurchased(skinId)) {
+        showToast("Сначала купите этот скин!", "error");
+        return false;
+    }
+    selectedSkinId = skinId;
+    saveSkinsData();
+    showToast(`Скин "${availableSkins.find(s => s.id === skinId).name}" выбран!`, "success");
+    // Обновляем отображение всех ячеек
+    updateAllSkinVisibility();
+    return true;
+}
+
+function getSelectedSkinEmoji() {
+    const skin = availableSkins.find(s => s.id === selectedSkinId);
+    return skin ? skin.emoji : "";
+}
+
+function updateAllSkinVisibility() {
+    if (!cellElements) return;
+    for (let i = 0; i < gridHeight; i++) {
+        for (let j = 0; j < gridWidth; j++) {
+            updateSkinVisibility(i, j);
+        }
+    }
+}
+
+function updateSkinVisibility(row, col) {
+    const cellDiv = cellElements[row]?.[col]?.parentElement;
+    if (!cellDiv) return;
+    const skinSpan = cellDiv.querySelector('.cell-skin');
+    if (!skinSpan) return;
+    const value = gridData[row][col];
+    const buffer = romajiBuffers.get(`${row},${col}`);
+    // Показываем скин, если ячейка не заблокирована, пустая, нет буфера и выбран скин (не default)
+    const isEmpty = (value === "" || value === null);
+    const showSkin = !gridData[row][col] === null && isEmpty && !buffer && selectedSkinId !== "default";
+    if (showSkin) {
+        skinSpan.style.display = "flex";
+        skinSpan.textContent = getSelectedSkinEmoji();
+    } else {
+        skinSpan.style.display = "none";
+    }
 }
 
 // ========== ПРОГРЕСС-БАР ==========
@@ -645,6 +748,12 @@ function renderGrid() {
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
+            // Скин (изображение для пустой ячейки)
+            const skinSpan = document.createElement("span");
+            skinSpan.className = "cell-skin";
+            skinSpan.style.display = "none";
+            cellDiv.appendChild(skinSpan);
+            
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 1;
@@ -663,6 +772,7 @@ function renderGrid() {
     }
     applyHighlight();
     updateWrongHighlights();
+    updateAllSkinVisibility();
 }
 
 function getDisplayValue(row, col) {
@@ -676,6 +786,7 @@ function updateCellUI(row, col) {
     if (cellElements[row] && cellElements[row][col]) {
         cellElements[row][col].value = getDisplayValue(row, col);
     }
+    updateSkinVisibility(row, col);
 }
 
 function getWordNumberAt(row, col) {
@@ -1080,7 +1191,6 @@ function checkCompletion() {
         if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             markAsCompleted();
         }
-        // Обновляем кнопку подсказки, так как кроссворд решён
         updateHintButtonState();
     } else {
         if (isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
@@ -1169,15 +1279,12 @@ function renderClues() {
 
 // ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
 function resetCrossword() {
-    // Получаем hintCount из сохранённого прогресса, чтобы вернуть очки за подсказки
     const progress = getStoredProgress();
     const key = `${currentLevel}_${currentPuzzleIndex}`;
     let savedHintCount = 0;
     if (progress[key] && progress[key].hintCount !== undefined) {
         savedHintCount = progress[key].hintCount;
     }
-    
-    // Возвращаем очки, потраченные на подсказки
     if (savedHintCount > 0) {
         const refund = savedHintCount * 20;
         gameStats.score += refund;
@@ -1185,17 +1292,11 @@ function resetCrossword() {
         updateScoreUI();
         showToast(`Возвращено ${refund} очков за подсказки`, "info");
     }
-    
-    // Откатываем очки за слова и завершение
     revertPointsForCurrentPuzzle();
-    
-    // Удаляем прогресс
     if (progress[key]) {
         delete progress[key];
         localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
     }
-    
-    // Удаляем из списка решённых
     const completed = getCompletedCrosswords();
     const completedKey = `${currentLevel}_${currentPuzzleIndex}`;
     const index = completed.indexOf(completedKey);
@@ -1205,7 +1306,6 @@ function resetCrossword() {
         updatePuzzleSelect();
         updateLevelProgress();
     }
-    
     loadCrossword(currentLevel, currentPuzzleIndex, false);
     showToast("Кроссворд сброшен. Все ячейки очищены.", "success");
 }
@@ -1312,7 +1412,6 @@ resetBtn.addEventListener("click", () => {
 resetProgressBtn.addEventListener("click", async () => {
     const confirmed = await showConfirmDialog("Вы уверены, что хотите удалить весь сохранённый прогресс? Это действие нельзя отменить.");
     if (confirmed) {
-        // Удаляем всё, кроме даты последнего бонуса
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.removeItem(STORAGE_COMPLETED_KEY);
         localStorage.removeItem(STORAGE_UNLOCKED_KEY);
@@ -1331,20 +1430,71 @@ resetProgressBtn.addEventListener("click", async () => {
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
 
+// ========== МАГАЗИН СКИНОВ ==========
+function openShopModal() {
+    const modal = document.getElementById("shopModal");
+    const skinsList = document.getElementById("skinsList");
+    skinsList.innerHTML = "";
+    
+    for (let skin of availableSkins) {
+        const purchased = isSkinPurchased(skin.id);
+        const selected = (selectedSkinId === skin.id);
+        const skinDiv = document.createElement("div");
+        skinDiv.className = "skin-item";
+        skinDiv.innerHTML = `
+            <div class="skin-info">
+                <span style="font-size: 32px;">${skin.emoji || "🖼️"}</span>
+                <div>
+                    <div class="skin-name">${skin.name}</div>
+                    <div class="skin-price">${skin.price > 0 ? `${skin.price} очков` : "бесплатно"}</div>
+                </div>
+            </div>
+            <div>
+                ${!purchased ? `<button class="skin-btn buy" data-id="${skin.id}" data-price="${skin.price}">Купить</button>` :
+                  (selected ? `<button class="skin-btn selected" disabled>Выбран</button>` :
+                   `<button class="skin-btn select" data-id="${skin.id}">Выбрать</button>`)}
+            </div>
+        `;
+        skinsList.appendChild(skinDiv);
+    }
+    
+    // Обработчики
+    document.querySelectorAll('.skin-btn.buy').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            const price = parseInt(btn.dataset.price);
+            const skin = availableSkins.find(s => s.id === id);
+            if (purchaseSkin(id, price)) {
+                openShopModal(); // обновляем модалку
+            }
+        });
+    });
+    document.querySelectorAll('.skin-btn.select').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            selectSkin(id);
+            openShopModal(); // обновляем
+        });
+    });
+    
+    modal.style.display = "flex";
+}
+
+document.getElementById("closeShopBtn").addEventListener("click", () => {
+    document.getElementById("shopModal").style.display = "none";
+});
+shopBtn.addEventListener("click", openShopModal);
+
 // ========== ПОДСКАЗКА ==========
 function giveHint() {
-    // Запрещаем подсказку, если кроссворд уже решён
     if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
         showToast("Кроссворд уже решён! Подсказки не нужны.", "error");
         return;
     }
-    
     if (hintCount >= 2) {
         showToast("Вы уже использовали обе подсказки для этого кроссворда.", "error");
         return;
     }
-    
-    // Проверяем, есть ли пустые ячейки в незавершённых словах
     let emptyCells = [];
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
@@ -1372,26 +1522,21 @@ function giveHint() {
             }
         }
     }
-    
     if (emptyCells.length === 0) {
         showToast("Нет пустых ячеек для подсказки! (Возможно, всё уже заполнено или остались только ошибки?)", "error");
         return;
     }
-    
     if (!subtractPoints(20)) {
         return;
     }
-    
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const { row, col } = emptyCells[randomIndex];
-    
     let correctChar = correctCharMap.get(`${row},${col}`);
     if (!correctChar) {
         showToast("Ошибка: не удалось определить правильную букву.", "error");
-        addPoints(20); // возвращаем очки
+        addPoints(20);
         return;
     }
-    
     gridData[row][col] = correctChar;
     updateCellUI(row, col);
     syncWordFromGrid();
@@ -1399,7 +1544,6 @@ function giveHint() {
     updateClueCompletion();
     updateWrongHighlights();
     saveCurrentProgress();
-    
     hintCount++;
     saveCurrentProgress();
     updateHintButtonState();
@@ -1418,11 +1562,10 @@ function showTutorial() {
         "Добро пожаловать в японские кроссворды JLPT! 🎌\n\nВ этом туториале вы узнаете основы работы.",
         "📝 Вводите слова английскими буквами (ромадзи).\nПример: 'su' → ス, 'shu' → シ+ユ, 'n' → ン.\nДефис '-' даёт длинную гласную ー.",
         "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
-        "💰 Очки можно тратить на разблокировку новых кроссвордов и на подсказки (20 очков за подсказку, не более 2 подсказок на кроссворд).",
+        "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, не более 2 подсказок на кроссворд) и на скины в магазине.",
         "🎁 Каждый день вы получаете 50 бонусных очков за вход.",
         "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
     ];
-    
     function updateTutorial() {
         tutorialMessage.innerText = steps[step];
         if (step === steps.length - 1) {
@@ -1431,7 +1574,6 @@ function showTutorial() {
             tutorialNext.innerText = "Далее";
         }
     }
-    
     function nextStep() {
         step++;
         if (step < steps.length) {
@@ -1440,17 +1582,14 @@ function showTutorial() {
             closeTutorial();
         }
     }
-    
     function closeTutorial() {
         tutorialModal.style.display = "none";
         tutorialNext.removeEventListener("click", nextStep);
         tutorialClose.removeEventListener("click", closeTutorial);
         localStorage.setItem("tutorialShown", "true");
     }
-    
     tutorialNext.addEventListener("click", nextStep);
     tutorialClose.addEventListener("click", closeTutorial);
-    
     step = 0;
     updateTutorial();
     tutorialModal.style.display = "flex";
@@ -1467,5 +1606,6 @@ helpBtn.addEventListener("click", showTutorial);
 // Инициализация
 loadGameStats();
 checkDailyBonus();
+loadSkinsData();
 updatePuzzleSelect();
 loadCrossword("n5", 0);
