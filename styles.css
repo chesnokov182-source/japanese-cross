@@ -473,3 +473,81 @@ body.dark .modal-no {
     .modal-message { font-size: 18px; }
     .modal-btn { font-size: 16px; padding: 10px 24px; }
 }
+
+/* Стили для скинов (картинка в пустой ячейке) */
+.cell {
+    position: relative;
+}
+.cell-skin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    pointer-events: none;
+    z-index: 1;
+}
+.cell input {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+}
+.cell input:focus {
+    z-index: 3;
+}
+/* Стили для магазина */
+.skin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--bg-container-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+body.dark .skin-item {
+    background: var(--bg-container-dark);
+}
+.skin-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 24px;
+}
+.skin-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+.skin-price {
+    font-size: 14px;
+    color: #4a6fa5;
+}
+.skin-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+.skin-btn.buy {
+    background: #4a6fa5;
+    color: white;
+}
+.skin-btn.select {
+    background: #2c6e2c;
+    color: white;
+}
+.skin-btn.selected {
+    background: #6c8fb5;
+    cursor: default;
+    opacity: 0.6;
+}
+.skin-btn.disabled {
+    background: #999;
+    cursor: not-allowed;
+}
