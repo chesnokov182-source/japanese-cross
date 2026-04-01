@@ -526,6 +526,7 @@ body.dark .shop-tab.active {
     background: var(--bg-container-light);
     border-radius: 12px;
     border: 1px solid var(--border-light);
+    gap: 15px;
 }
 body.dark .skin-item, body.dark .upgrade-item {
     background: var(--bg-container-dark);
@@ -536,23 +537,11 @@ body.dark .skin-item, body.dark .upgrade-item {
     gap: 15px;
     flex: 1;
 }
-.skin-info {
-    min-width: 180px; /* фиксируем минимальную ширину, чтобы кнопки не прыгали */
-}
-.skin-emoji {
-    font-size: 32px;
-    width: 48px;
-    text-align: center;
-}
-.skin-details {
-    flex: 1;
-    text-align: left;
-}
-.skin-name {
+.skin-name, .upgrade-name {
     font-weight: bold;
     font-size: 16px;
 }
-.skin-price {
+.skin-price, .upgrade-price {
     font-size: 14px;
     color: #4a6fa5;
 }
@@ -569,7 +558,8 @@ body.dark .upgrade-desc {
     font-size: 14px;
     cursor: pointer;
     border: none;
-    white-space: nowrap;
+    min-width: 80px;
+    text-align: center;
 }
 .skin-btn.buy, .upgrade-btn.buy {
     background: #4a6fa5;
@@ -604,8 +594,11 @@ body.dark .upgrade-desc {
     text-shadow: 0 0 4px rgba(0,0,0,0.3);
 }
 body.dark .roulette-spin-area {
-    color: #ffffff; /* ярко-белый */
-    text-shadow: 0 0 8px rgba(255,255,255,0.8);
+    text-shadow: 0 0 6px rgba(0,0,0,0.5);
+    color: #ffffff !important;
+}
+.roulette-spin-area span {
+    color: inherit;
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
@@ -642,5 +635,5 @@ body.dark .roulette-info {
     .modal-message { font-size: 18px; }
     .modal-btn { font-size: 16px; padding: 10px 24px; }
     .roulette-spin-area { font-size: 32px; min-height: 100px; }
-    .skin-info { min-width: 140px; }
+    .skin-btn, .upgrade-btn { min-width: 70px; font-size: 12px; }
 }
