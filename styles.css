@@ -13,7 +13,7 @@
     --btn-hover-light: #3a5a8c;
     --shadow-light: rgba(0,0,0,0.1);
 
-    --bg-body-dark: #1a1a2e;          /* более насыщенный тёмный */
+    --bg-body-dark: #1a1a2e;
     --bg-container-dark: #23233a;
     --bg-clues-dark: #1e1e30;
     --text-dark: #eaeef2;
@@ -306,12 +306,21 @@ body.dark .clue-num {
     padding: 12px;
     background: rgba(0,0,0,0.05);
     border-radius: 12px;
-    color: #2c6e2c;
+    transition: all 0.3s;
 }
 
 body.dark .status {
     background: rgba(255,255,255,0.05);
-    color: #8bc34a;
+}
+
+.status.completed {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+body.dark .status.completed {
+    color: #81c784;
+    background: rgba(129, 199, 132, 0.1);
 }
 
 .score-container {
@@ -406,7 +415,7 @@ body.dark .toast {
     padding: 32px;
     border-radius: 20px;
     box-shadow: 0 10px 30px var(--shadow-light);
-    max-width: 450px;
+    max-width: 500px;
     width: 90%;
     text-align: center;
 }
@@ -465,141 +474,6 @@ body.dark .modal-no {
     color: #e0e0e0;
 }
 
-@media (max-width: 800px) {
-    .cell { width: 50px; height: 50px; font-size: 24px; }
-    .cell input { font-size: 24px; }
-    .cell-number { font-size: 11px; }
-    .clue-list li { font-size: 14px; }
-    .modal-message { font-size: 18px; }
-    .modal-btn { font-size: 16px; padding: 10px 24px; }
-}
-
-/* Стили для скинов (картинка в пустой ячейке) */
-.cell {
-    position: relative;
-}
-.cell-skin {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    pointer-events: none;
-    z-index: 1;
-}
-.cell input {
-    position: relative;
-    z-index: 2;
-    background: transparent;
-}
-.cell input:focus {
-    z-index: 3;
-}
-/* Стили для магазина */
-.skin-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    margin: 8px 0;
-    background: var(--bg-container-light);
-    border-radius: 12px;
-    border: 1px solid var(--border-light);
-}
-body.dark .skin-item {
-    background: var(--bg-container-dark);
-}
-.skin-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 24px;
-}
-.skin-name {
-    font-size: 16px;
-    font-weight: bold;
-}
-.skin-price {
-    font-size: 14px;
-    color: #4a6fa5;
-}
-.skin-btn {
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-}
-.skin-btn.buy {
-    background: #4a6fa5;
-    color: white;
-}
-.skin-btn.select {
-    background: #2c6e2c;
-    color: white;
-}
-.skin-btn.selected {
-    background: #6c8fb5;
-    cursor: default;
-    opacity: 0.6;
-}
-.skin-btn.disabled {
-    background: #999;
-    cursor: not-allowed;
-}
-
-/* Оверлей для заблокированного кроссворда */
-.grid-section {
-    position: relative;
-}
-.crossword-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    z-index: 10;
-    cursor: pointer;
-}
-.crossword-overlay-content {
-    background: var(--bg-container-light);
-    padding: 20px 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    max-width: 80%;
-}
-body.dark .crossword-overlay-content {
-    background: var(--bg-container-dark);
-}
-.crossword-overlay-content p {
-    margin: 0 0 15px 0;
-    font-size: 18px;
-}
-.crossword-overlay-content button {
-    background: var(--btn-bg-light);
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 16px;
-}
-body.dark .crossword-overlay-content button {
-    background: var(--btn-bg-dark);
-}
-
-/* Табы в магазине */
 .shop-tabs {
     display: flex;
     gap: 10px;
@@ -634,7 +508,7 @@ body.dark .shop-tab.active {
 .shop-section.active {
     display: block;
 }
-.upgrade-item {
+.skin-item, .upgrade-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -644,15 +518,22 @@ body.dark .shop-tab.active {
     border-radius: 12px;
     border: 1px solid var(--border-light);
 }
-body.dark .upgrade-item {
+body.dark .skin-item, body.dark .upgrade-item {
     background: var(--bg-container-dark);
 }
-.upgrade-info {
+.skin-info, .upgrade-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     flex: 1;
 }
-.upgrade-name {
+.skin-name, .upgrade-name {
     font-weight: bold;
     font-size: 16px;
+}
+.skin-price, .upgrade-price {
+    font-size: 14px;
+    color: #4a6fa5;
 }
 .upgrade-desc {
     font-size: 12px;
@@ -661,83 +542,40 @@ body.dark .upgrade-item {
 body.dark .upgrade-desc {
     color: #aaa;
 }
-.upgrade-price {
-    font-size: 14px;
-    color: #4a6fa5;
-    margin-top: 4px;
-}
-.upgrade-btn {
+.skin-btn, .upgrade-btn {
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 14px;
     cursor: pointer;
     border: none;
 }
-.upgrade-btn.buy {
+.skin-btn.buy, .upgrade-btn.buy {
     background: #4a6fa5;
     color: white;
 }
-.upgrade-btn.disabled {
+.skin-btn.select {
+    background: #2c6e2c;
+    color: white;
+}
+.skin-btn.selected, .upgrade-btn.disabled {
     background: #999;
     cursor: not-allowed;
     opacity: 0.6;
 }
-
-/* Рулетка */
 .roulette-container {
     text-align: center;
-    padding: 20px;
-}
-.roulette-result {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 15px 0;
     padding: 10px;
-    background: rgba(0,0,0,0.05);
-    border-radius: 12px;
 }
-.roulette-spin-btn {
-    background: #4a6fa5;
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 30px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-.roulette-spin-btn:active {
-    transform: scale(0.95);
-}
-.roulette-spin-btn:disabled {
-    background: #999;
-    cursor: not-allowed;
-}
-.roulette-stats {
-    font-size: 14px;
-    color: #666;
-    margin-top: 15px;
-}
-body.dark .roulette-stats {
-    color: #aaa;
-}
-
-.roulette-container {
-    text-align: center;
-    padding: 20px;
-}
-.roulette-spin-area {
-    font-size: 48px;
-    font-weight: bold;
-    margin: 20px 0;
-    padding: 20px;
+.roulette-canvas {
     background: var(--bg-container-light);
     border-radius: 16px;
     border: 2px solid var(--border-light);
-    min-height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 20px 0;
+    width: 100%;
+    height: 80px;
+}
+body.dark .roulette-canvas {
+    background: var(--bg-container-dark);
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
@@ -764,4 +602,14 @@ body.dark .roulette-stats {
 }
 body.dark .roulette-info {
     color: #aaa;
+}
+
+@media (max-width: 800px) {
+    .cell { width: 50px; height: 50px; font-size: 24px; }
+    .cell input { font-size: 24px; }
+    .cell-number { font-size: 11px; }
+    .clue-list li { font-size: 14px; }
+    .modal-message { font-size: 18px; }
+    .modal-btn { font-size: 16px; padding: 10px 24px; }
+    .roulette-canvas { height: 60px; }
 }
