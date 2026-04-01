@@ -682,3 +682,42 @@ body.dark .upgrade-desc {
     cursor: not-allowed;
     opacity: 0.6;
 }
+
+/* Рулетка */
+.roulette-container {
+    text-align: center;
+    padding: 20px;
+}
+.roulette-result {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 12px;
+}
+.roulette-spin-btn {
+    background: #4a6fa5;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.roulette-spin-btn:active {
+    transform: scale(0.95);
+}
+.roulette-spin-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+.roulette-stats {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
+body.dark .roulette-stats {
+    color: #aaa;
+}
