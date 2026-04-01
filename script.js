@@ -105,21 +105,7 @@ function playCorrectInput() {
 function playErrorInput() {
     playBeep(200, 0.12, 0.2, 'sawtooth');
 }
-function playRouletteTick() {
-    playBeep(800, 0.02, 0.15);
-}
-function playRouletteStop() {
-    playBeep(400, 0.1, 0.3, 'triangle');
-}
-function playRouletteWin(prize) {
-    if (prize > 0) {
-        playBeep(523, 0.15, 0.3);
-        setTimeout(() => playBeep(659, 0.15, 0.3), 150);
-        setTimeout(() => playBeep(784, 0.2, 0.3), 300);
-    } else {
-        playBeep(300, 0.3, 0.2, 'sawtooth');
-    }
-}
+// Удалён playSuccess – больше не используется
 
 // ========== КОНФЕТТИ ==========
 function showConfetti() {
@@ -403,123 +389,52 @@ function upgradeMaxHints(newLimit, price) {
     }
 }
 
-// ========== РУЛЕТКА (горизонтальная прокрутка) ==========
+// ========== РУЛЕТКА ==========
 const roulettePrizes = [0, 10, 20, 50, 100, 200];
-const rouletteProbabilities = [25, 20, 20, 15, 10, 10]; // проценты, сумма 100
+const rouletteProbabilities = [25, 20, 20, 15, 10, 10]; // в процентах, сумма 100
 let rouletteAnimating = false;
-let rouletteCanvas, rouletteCtx;
-let rouletteOffset = 0;
-let rouletteSpeed = 0;
-let rouletteAnimationId = null;
-const prizeSymbols = roulettePrizes.map(p => p === 0 ? "0" : p.toString());
 
-function initRouletteCanvas() {
-    const container = document.querySelector('.roulette-container');
-    if (!container) return;
-    let canvas = container.querySelector('.roulette-canvas');
-    if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.className = 'roulette-canvas';
-        canvas.width = 400;
-        canvas.height = 80;
-        container.insertBefore(canvas, container.querySelector('.roulette-spin-btn'));
-    }
-    rouletteCanvas = canvas;
-    rouletteCtx = canvas.getContext('2d');
-    drawRoulette();
-}
-
-function drawRoulette() {
-    if (!rouletteCtx) return;
-    const w = rouletteCanvas.width;
-    const h = rouletteCanvas.height;
-    rouletteCtx.clearRect(0, 0, w, h);
-    rouletteCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--cell-bg-light');
-    rouletteCtx.fillRect(0, 0, w, h);
-    rouletteCtx.font = `bold ${h * 0.5}px monospace`;
-    rouletteCtx.textAlign = "center";
-    rouletteCtx.textBaseline = "middle";
-    const step = 80;
-    const startX = (rouletteOffset % step);
-    for (let i = -2; i < w / step + 2; i++) {
-        const x = startX + i * step;
-        const idx = Math.floor((rouletteOffset / step + i) % prizeSymbols.length);
-        const symbol = prizeSymbols[Math.abs(idx) % prizeSymbols.length];
-        rouletteCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-light');
-        rouletteCtx.fillText(symbol, x, h/2);
-    }
-    // Рисуем рамку
-    rouletteCtx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border-light');
-    rouletteCtx.lineWidth = 2;
-    rouletteCtx.strokeRect(0, 0, w, h);
-}
-
-function startRouletteAnimation() {
+function spinRoulette() {
     if (rouletteAnimating) return;
-    const random = Math.random() * 100;
+    if (!subtractPoints(20)) return;
+
+    // Выбор приза
+    const rand = Math.random() * 100;
     let cumulative = 0;
     let selectedPrize = 0;
     for (let i = 0; i < roulettePrizes.length; i++) {
         cumulative += rouletteProbabilities[i];
-        if (random < cumulative) {
+        if (rand < cumulative) {
             selectedPrize = roulettePrizes[i];
             break;
         }
     }
-    // Находим индекс в массиве символов
-    const targetIndex = prizeSymbols.indexOf(selectedPrize.toString());
-    if (targetIndex === -1) return;
 
-    // Снимаем очки до анимации
-    if (!subtractPoints(20)) return;
+    const rouletteDisplay = document.getElementById('rouletteDisplay');
+    const rouletteResult = document.getElementById('rouletteResult');
+    if (!rouletteDisplay) return;
 
+    // Анимация: быстро меняем числа
     rouletteAnimating = true;
-    let currentOffset = rouletteOffset;
-    // Определяем, сколько нужно прокрутить до целевого символа
-    const step = 80;
-    const currentSymbolIndex = Math.floor(currentOffset / step) % prizeSymbols.length;
-    let distance = (targetIndex - currentSymbolIndex + prizeSymbols.length) % prizeSymbols.length;
-    if (distance === 0) distance = prizeSymbols.length; // делаем минимум полный оборот
-    const targetOffset = currentOffset + distance * step + Math.random() * step * 2; // случайный доворот
-    const startTime = performance.now();
-    const duration = 2000; // 2 секунды анимации
-    const startOffset = currentOffset;
-    let tickInterval = setInterval(() => {
-        playRouletteTick();
-    }, 50);
-
-    function animateRoulette(now) {
-        const elapsed = now - startTime;
-        let t = Math.min(1, elapsed / duration);
-        // easeOutCubic для плавного замедления
-        const easeOut = 1 - Math.pow(1 - t, 3);
-        rouletteOffset = startOffset + (targetOffset - startOffset) * easeOut;
-        drawRoulette();
-        if (t < 1) {
-            rouletteAnimationId = requestAnimationFrame(animateRoulette);
-        } else {
-            // Завершение
-            cancelAnimationFrame(rouletteAnimationId);
-            clearInterval(tickInterval);
-            playRouletteStop();
-            const finalIndex = Math.floor(rouletteOffset / step) % prizeSymbols.length;
-            const finalPrize = parseInt(prizeSymbols[finalIndex]);
-            if (finalPrize > 0) {
-                addPoints(finalPrize);
-                document.getElementById('rouletteResult').innerHTML = `🎉 Вы выиграли ${finalPrize} очков! 🎉`;
-                if (finalPrize >= 100) showConfetti();
-                playRouletteWin(finalPrize);
+    let spins = 0;
+    const totalSpins = 20;
+    const interval = setInterval(() => {
+        const randomTemp = roulettePrizes[Math.floor(Math.random() * roulettePrizes.length)];
+        rouletteDisplay.textContent = randomTemp;
+        spins++;
+        if (spins >= totalSpins) {
+            clearInterval(interval);
+            rouletteDisplay.textContent = selectedPrize;
+            if (selectedPrize > 0) {
+                addPoints(selectedPrize);
+                rouletteResult.innerHTML = `🎉 Вы выиграли ${selectedPrize} очков! 🎉`;
+                if (selectedPrize >= 100) showConfetti();
             } else {
-                document.getElementById('rouletteResult').innerHTML = `😞 Вам выпало 0 очков. Повезёт в следующий раз!`;
-                playRouletteWin(0);
+                rouletteResult.innerHTML = `😞 Вам выпало 0 очков. Повезёт в следующий раз!`;
             }
             rouletteAnimating = false;
-            // Синхронизируем offset, чтобы остановка была точной
-            rouletteOffset = finalIndex * step;
-            drawRoulette();
         }
-    }
-    rouletteAnimationId = requestAnimationFrame(animateRoulette);
+    }, 50);
 }
 
 // ========== ПРОГРЕСС-БАР ==========
@@ -648,7 +563,7 @@ function markWordPointsEarned(wordId) {
         saveEarnedPointsForCurrent(earned);
         addPoints(10);
         incrementWordsCompleted();
-        playPop();
+        playPop(); // звук при правильном слове
     }
 }
 
@@ -658,6 +573,7 @@ function markCrosswordCompletedEarned() {
         earned.completed = true;
         saveEarnedPointsForCurrent(earned);
         addPoints(50);
+        // playSuccess удалён – больше не играем
     }
 }
 
@@ -704,9 +620,6 @@ function markAsCompleted() {
         updateLevelProgress();
         markCrosswordCompletedEarned();
         showToast(`Кроссворд решён! +50 очков`, "success");
-        // Добавляем класс completed для изменения цвета
-        const statusDiv = document.getElementById("statusMsg");
-        if (statusDiv) statusDiv.classList.add('completed');
     }
 }
 
@@ -732,8 +645,6 @@ function toggleTheme() {
         document.body.classList.add('dark');
         localStorage.setItem('theme', 'dark');
     }
-    // перерисовываем рулетку при смене темы
-    if (rouletteCtx) drawRoulette();
 }
 themeToggle.addEventListener('click', toggleTheme);
 initTheme();
@@ -876,7 +787,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         const price = puzzle.price !== undefined ? puzzle.price : 0;
         statusDiv.innerHTML = `🔒 Кроссворд заблокирован. Цена: ${price} очков. Нажмите «Купить», чтобы разблокировать.`;
         statusDiv.style.color = "#c94f4f";
-        statusDiv.classList.remove('completed');
     } else if (statusDiv) {
         // статус обновится в checkCompletion
     }
@@ -907,6 +817,7 @@ function renderGrid() {
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
+            // Скин (только для заблокированных)
             const skinSpan = document.createElement("span");
             skinSpan.className = "cell-skin";
             skinSpan.style.display = "none";
@@ -1047,6 +958,7 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         updateWrongHighlights();
         saveCurrentProgress();
         
+        // Звуковая обратная связь
         const correctChar = correctCharMap.get(`${row},${col}`);
         if (char === correctChar) {
             playCorrectInput();
@@ -1360,14 +1272,14 @@ function checkCompletion() {
     const unlocked = isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
     if (allFilled && unlocked) {
         statusDiv.innerHTML = "🎉 Поздравляем! Кроссворд полностью разгадан! 🎉";
-        statusDiv.classList.add('completed');
+        statusDiv.style.color = "#2c6e2c";
         if (!isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             markAsCompleted();
         }
         updateButtonStates();
     } else if (unlocked) {
         statusDiv.innerHTML = "Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора. Например: su → ス, shu → シ+ユ, a → ア, n+s → ン+s, - → ー.";
-        statusDiv.classList.remove('completed');
+        statusDiv.style.color = "#666";
         if (isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
             const completed = getCompletedCrosswords();
             const key = `${currentLevel}_${currentPuzzleIndex}`;
@@ -1381,6 +1293,7 @@ function checkCompletion() {
             }
         }
     }
+    // Если кроссворд заблокирован, сообщение уже установлено в loadCrossword
 }
 
 function updateClueCompletion() {
@@ -1694,7 +1607,9 @@ function openShopModal() {
     // Заполняем рулетку
     rouletteSection.innerHTML = `
         <div class="roulette-container">
-            <canvas class="roulette-canvas" width="400" height="80"></canvas>
+            <div class="roulette-spin-area">
+                <span id="rouletteDisplay">🎰</span>
+            </div>
             <button id="rouletteSpinBtn" class="roulette-spin-btn">Крутить (20 очков)</button>
             <div id="rouletteResult" class="roulette-result"></div>
             <div class="roulette-info">
@@ -1708,10 +1623,8 @@ function openShopModal() {
             </div>
         </div>
     `;
-    // Инициализируем canvas для рулетки
-    initRouletteCanvas();
     const spinBtn = document.getElementById('rouletteSpinBtn');
-    if (spinBtn) spinBtn.addEventListener('click', startRouletteAnimation);
+    if (spinBtn) spinBtn.addEventListener('click', spinRoulette);
     
     // Обработчики для скинов
     skinsSection.querySelectorAll('.skin-btn.buy').forEach(btn => {
