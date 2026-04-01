@@ -330,8 +330,8 @@ function selectSkin(skinId) {
     selectedSkinId = skinId;
     saveSkinsData();
     showToast(`Скин "${availableSkins.find(s => s.id === skinId).name}" выбран!`, "success");
-    // Обновляем отображение всех ячеек
-    updateAllSkinVisibility();
+    // Обновляем отображение всех заблокированных ячеек
+    updateAllBlockedSkins();
     return true;
 }
 
@@ -340,25 +340,25 @@ function getSelectedSkinEmoji() {
     return skin ? skin.emoji : "";
 }
 
-function updateAllSkinVisibility() {
+// Обновляем скины только на заблокированных клетках
+function updateAllBlockedSkins() {
     if (!cellElements) return;
     for (let i = 0; i < gridHeight; i++) {
         for (let j = 0; j < gridWidth; j++) {
-            updateSkinVisibility(i, j);
+            if (gridData[i][j] === null) {
+                updateBlockedSkin(i, j);
+            }
         }
     }
 }
 
-function updateSkinVisibility(row, col) {
+function updateBlockedSkin(row, col) {
     const cellDiv = cellElements[row]?.[col]?.parentElement;
     if (!cellDiv) return;
     const skinSpan = cellDiv.querySelector('.cell-skin');
     if (!skinSpan) return;
-    const value = gridData[row][col];
-    const buffer = romajiBuffers.get(`${row},${col}`);
-    // Показываем скин, если ячейка не заблокирована, пустая, нет буфера и выбран скин (не default)
-    const isEmpty = (value === "" || value === null);
-    const showSkin = !gridData[row][col] === null && isEmpty && !buffer && selectedSkinId !== "default";
+    const isBlocked = (gridData[row][col] === null);
+    const showSkin = isBlocked && selectedSkinId !== "default";
     if (showSkin) {
         skinSpan.style.display = "flex";
         skinSpan.textContent = getSelectedSkinEmoji();
@@ -707,7 +707,6 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateWrongHighlights();
     romajiBuffers.clear();
     
-    // Обновляем кнопку подсказки
     updateHintButtonState();
     
     updateLevelProgress();
@@ -748,7 +747,7 @@ function renderGrid() {
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
-            // Скин (изображение для пустой ячейки)
+            // Скин (только для заблокированных)
             const skinSpan = document.createElement("span");
             skinSpan.className = "cell-skin";
             skinSpan.style.display = "none";
@@ -772,7 +771,7 @@ function renderGrid() {
     }
     applyHighlight();
     updateWrongHighlights();
-    updateAllSkinVisibility();
+    updateAllBlockedSkins(); // показываем скины на заблокированных клетках
 }
 
 function getDisplayValue(row, col) {
@@ -786,7 +785,7 @@ function updateCellUI(row, col) {
     if (cellElements[row] && cellElements[row][col]) {
         cellElements[row][col].value = getDisplayValue(row, col);
     }
-    updateSkinVisibility(row, col);
+    // Если клетка не заблокирована, скин не трогаем (он всё равно не показывается)
 }
 
 function getWordNumberAt(row, col) {
@@ -1458,14 +1457,12 @@ function openShopModal() {
         skinsList.appendChild(skinDiv);
     }
     
-    // Обработчики
     document.querySelectorAll('.skin-btn.buy').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             const price = parseInt(btn.dataset.price);
-            const skin = availableSkins.find(s => s.id === id);
             if (purchaseSkin(id, price)) {
-                openShopModal(); // обновляем модалку
+                openShopModal();
             }
         });
     });
@@ -1473,7 +1470,7 @@ function openShopModal() {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             selectSkin(id);
-            openShopModal(); // обновляем
+            openShopModal();
         });
     });
     
