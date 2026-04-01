@@ -28,6 +28,7 @@
                 <span>Кроссворд:</span>
                 <select id="puzzleSelect"></select>
                 <button id="buyPuzzleBtn">💰 Купить</button>
+                <button id="shopBtn">🛒 Магазин</button>
                 <button id="resetBtn">Сбросить</button>
                 <button id="hintBtn">Подсказка</button>
                 <button id="themeToggle">🌓 Тема</button>
@@ -70,6 +71,17 @@
         <div class="modal-buttons">
             <button id="buyModalConfirm" class="modal-btn modal-yes">Купить</button>
             <button id="buyModalCancel" class="modal-btn modal-no">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно магазина скинов -->
+<div id="shopModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="margin-top:0;">Магазин скинов</h3>
+        <div id="skinsList" style="max-height: 400px; overflow-y: auto;"></div>
+        <div class="modal-buttons" style="margin-top: 20px;">
+            <button id="closeShopBtn" class="modal-btn modal-no">Закрыть</button>
         </div>
     </div>
 </div>
