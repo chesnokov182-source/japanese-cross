@@ -640,21 +640,43 @@ function isCrosswordCompleted(level, puzzleIdx) {
 
 // ========== ТЕМА ==========
 function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
+ const savedTheme = localStorage.getItem('theme') || 'light'; 
+    document.body.classList.remove('dark', 'sakura'); 
+    
     if (savedTheme === 'dark') {
         document.body.classList.add('dark');
-    } else {
-        document.body.classList.remove('dark');
+    } else if (savedTheme === 'sakura') {
+        document.body.classList.add('sakura');
     }
 }
 function toggleTheme() {
+  let currentTheme = 'light';
     if (document.body.classList.contains('dark')) {
-        document.body.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-    } else {
-        document.body.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
+        currentTheme = 'dark';
+    } else if (document.body.classList.contains('sakura')) {
+        currentTheme = 'sakura';
     }
+
+    // Цикл переключения: Light -> Dark -> Sakura -> Light
+    let nextTheme = '';
+    
+    if (currentTheme === 'light') {
+        nextTheme = 'dark';
+    } else if (currentTheme === 'dark') {
+        nextTheme = 'sakura';
+    } else {
+        nextTheme = 'light';
+    }
+
+    // Применяем новую тему
+    document.body.classList.remove('dark', 'sakura');
+    if (nextTheme === 'dark') {
+        document.body.classList.add('dark');
+    } else if (nextTheme === 'sakura') {
+        document.body.classList.add('sakura');
+    }
+    
+    localStorage.setItem('theme', nextTheme);
 }
 themeToggle.addEventListener('click', toggleTheme);
 initTheme();
