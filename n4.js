@@ -198,7 +198,7 @@ window.crosswordsData.n4 = {
                     { word: "バイバイ", row: 0, col: 2, dir: "down", clue: "Говорят при расставании с другом", number: 2.1},
                     { word: "トケイ", row: 1, col: 0, dir: "across", clue: "Часы", number: 3},
                     { word: "クロ", row: 2, col: 3, dir: "down", clue: "Черный цвет", number: 4},
-                    { word: "バク", row: 2, col: 2, dir: "down", clue: "Тапир", number: 5},
+                    { word: "バク", row: 2, col: 2, dir: "across", clue: "Тапир", number: 5},
                     { word: "イロイロ", row: 3, col: 0, dir: "across", clue: "Когда много разных видов", number: 6},
                 ]
             },
