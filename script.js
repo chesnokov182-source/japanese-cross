@@ -992,6 +992,14 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         const correctChar = correctCharMap.get(`${row},${col}`);
         if (char === correctChar) {
             playCorrectInput();
+            // Добавляем анимацию
+            const cellDiv = cellElements[row]?.[col]?.parentElement;
+            if (cellDiv) {
+                cellDiv.classList.add('correct-animation');
+                setTimeout(() => {
+                    cellDiv.classList.remove('correct-animation');
+                }, 300); // Удаляем класс после завершения анимации
+            }
         } else {
             playErrorInput();
         }
@@ -1030,6 +1038,14 @@ function insertKatakanaArray(row, col, katakanaArray, startIndex) {
         const correctChar = correctCharMap.get(`${row},${col}`);
         if (char === correctChar) {
             playCorrectInput();
+            // Добавляем анимацию
+            const cellDiv = cellElements[row]?.[col]?.parentElement;
+            if (cellDiv) {
+                cellDiv.classList.add('correct-animation');
+                setTimeout(() => {
+                    cellDiv.classList.remove('correct-animation');
+                }, 300); // Удаляем класс после завершения анимации
+            }
         } else {
             playErrorInput();
         }
