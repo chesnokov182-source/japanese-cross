@@ -755,6 +755,9 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const puzzles = levelData.puzzles;
     if (puzzleIdx < 0 || puzzleIdx >= puzzles.length) return;
     const puzzle = puzzles[puzzleIdx];
+
+    localStorage.setItem('lastPlayedLevel', levelId);
+    localStorage.setItem('lastPlayedPuzzle', puzzleIdx);
     
     gridWidth = puzzle.width;
     gridHeight = puzzle.height;
@@ -1908,4 +1911,30 @@ loadGameStats();
 checkDailyBonus();
 loadSkinsData();
 updatePuzzleSelect();
-loadCrossword("n5", 0);
+
+// Проверка последнего уровня
+let startLevel = localStorage.getItem('lastPlayedLevel') || "n5";
+let startPuzzle = parseInt(localStorage.getItem('lastPlayedPuzzle')) || 0;
+
+// Проверка, разблокирован ли этот пазл (если нет, сбрасываем на первый разблокированный)
+if (!isPuzzleUnlocked(startLevel, startPuzzle)) {
+    const puzzles = window.crosswordsData[startLevel].puzzles;
+    for (let i = 0; i < puzzles.length; i++) {
+        if (isPuzzleUnlocked(startLevel, i)) {
+            startPuzzle = i;
+            break;
+        }
+    }
+    // Если в этом уровне ничего не разблокировано, пробуем N5
+    if (!isPuzzleUnlocked(startLevel, startPuzzle) && startLevel !== "n5") {
+        startLevel = "n5";
+        startPuzzle = 0;
+    }
+}
+
+// Установка значений в селекторы перед загрузкой
+levelSelect.value = startLevel;
+currentLevel = startLevel;
+currentPuzzleIndex = startPuzzle;
+
+loadCrossword(startLevel, startPuzzle);
