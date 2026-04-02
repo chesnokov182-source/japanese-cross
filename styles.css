@@ -26,6 +26,20 @@
     --btn-bg-dark: #6c8fb5;
     --btn-hover-dark: #5a7a9e;
     --shadow-dark: rgba(0,0,0,0.5);
+
+    --bg-body-sakura: #fff0f5; 
+    --bg-container-sakura: #ffffff;
+    --bg-clues-sakura: #fff5f8;
+    --text-sakura: #5d4037;
+    --border-sakura: #f8bbd0;
+    --cell-bg-sakura: #fff;
+    --cell-blocked-sakura: #f8bbd0;
+    --highlight-sakura: #ffecf2;
+    --active-word-sakura: #ffc1e3; 
+    --wrong-sakura: #ef9a9a;
+    --btn-bg-sakura: #ec407a; 
+    --btn-hover-sakura: #d81b60;
+    --shadow-sakura: rgba(183, 28, 68, 0.15); 
 }
 
 * {
@@ -653,6 +667,147 @@ body.dark .roulette-spin-area {
 }
 body.dark .roulette-info {
     color: #aaa;
+}
+
+body.sakura {
+    background: var(--bg-body-sakura);
+    color: var(--text-sakura);
+}
+
+body.sakura .crossword-container {
+    background: var(--bg-container-sakura);
+    box-shadow: 0 10px 30px var(--shadow-sakura);
+}
+
+body.sakura .clues-section {
+    background: var(--bg-clues-sakura);
+}
+
+body.sakura select, 
+body.sakura button {
+    background: var(--bg-container-sakura);
+    color: var(--text-sakura);
+    border-color: var(--border-sakura);
+}
+
+body.sakura button {
+    background: var(--btn-bg-sakura);
+    color: white;
+}
+
+body.sakura button:hover {
+    background: var(--btn-hover-sakura);
+}
+
+body.sakura .cell {
+    background: var(--cell-bg-sakura);
+    color: var(--text-sakura);
+}
+
+body.sakura .cell input {
+    caret-color: var(--btn-bg-sakura);
+    color: var(--text-sakura);
+}
+
+body.sakura .cell.blocked {
+    background: var(--cell-blocked-sakura);
+}
+
+body.sakura .cell.highlight {
+    background: var(--highlight-sakura);
+}
+
+body.sakura .cell.active-word {
+    background: var(--active-word-sakura);
+}
+
+body.sakura .cell.wrong {
+    background: var(--wrong-sakura);
+}
+
+body.sakura .cell-number {
+    color: #ad1457;
+}
+
+body.sakura .clue-block h3 {
+    border-left-color: var(--btn-bg-sakura);
+}
+
+body.sakura .clue-list li:hover {
+    background: #fce4ec;
+}
+
+body.sakura .clue-list li.active-clue {
+    background: var(--active-word-sakura);
+    color: #880e4f;
+}
+
+body.sakura .clue-num {
+    color: var(--btn-bg-sakura);
+}
+
+body.sakura .status {
+    background: rgba(236, 64, 122, 0.05);
+    color: #c2185b;
+}
+
+body.sakura .score-container {
+    background: var(--bg-container-sakura);
+    border-color: var(--border-sakura);
+}
+
+body.sakura .progress-bar {
+    background: #fce4ec;
+}
+
+body.sakura .progress-fill {
+    background: var(--btn-bg-sakura);
+}
+
+body.sakura .toast {
+    background: var(--bg-container-sakura);
+    color: var(--text-sakura);
+    border-left: 4px solid var(--btn-bg-sakura);
+}
+
+body.sakura .modal-content {
+    background: var(--bg-container-sakura);
+    color: var(--text-sakura);
+    box-shadow: 0 10px 30px var(--shadow-sakura);
+}
+
+body.sakura .modal-no {
+    background: #f8bbd0;
+    color: #880e4f;
+}
+
+body.sakura .shop-tabs {
+    border-bottom-color: var(--border-sakura);
+}
+
+body.sakura .shop-tab.active {
+    background: var(--btn-bg-sakura);
+}
+
+body.sakura .skin-item, 
+body.sakura .upgrade-item {
+    background: var(--bg-container-sakura);
+    border-color: var(--border-sakura);
+}
+
+body.sakura .roulette-spin-area {
+    background: var(--bg-container-sakura);
+    border-color: var(--border-sakura);
+    color: var(--text-sakura);
+}
+
+body.sakura .skin-btn.buy, 
+body.sakura .upgrade-btn.buy {
+    background: var(--btn-bg-sakura);
+}
+
+body.sakura .skin-btn.select {
+    background: #2e7d32; /* Зеленый для выбора, чтобы отличался от розового */
 }
 
 @media (max-width: 800px) {
