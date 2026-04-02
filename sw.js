@@ -1,12 +1,11 @@
-const CACHE_NAME = 'jlpt-crosswords-v5'; // Убедитесь, что версия увеличена (v5, v6 и т.д.)
+const CACHE_NAME = 'jlpt-crosswords-v5';
 
-// Список файлов для статического кэширования
 const urlsToCache = [
     '/',
     '/index.html',
     '/styles.css',
     '/script.js',
-    '/n5.js', // Добавил ваши файлы данных, если они используются напрямую
+    '/n5.js', 
     '/n4.js',
     '/n3.js',
     '/n2.js',
