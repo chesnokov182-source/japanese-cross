@@ -117,6 +117,9 @@ function playRouletteWin(prize) {
         playBeep(300, 0.3, 0.2, 'sawtooth');
     }
 }
+function playClick() {
+    playBeep(600, 0.03, 0.1, 'sine');
+}
 
 // ========== КОНФЕТТИ ==========
 function showConfetti() {
@@ -1571,6 +1574,40 @@ resetProgressBtn.addEventListener("click", async () => {
 });
 
 buyPuzzleBtn.addEventListener("click", buyCurrentPuzzle);
+
+themeToggle.addEventListener('click', () => {
+    playClick();
+    toggleTheme();
+});
+
+resetBtn.addEventListener('click', () => {
+    playClick();
+    resetCrossword();
+});
+
+hintBtn.addEventListener('click', () => {
+    playClick();
+    giveHint();
+});
+
+shopBtn.addEventListener('click', () => {
+    playClick();
+    openShopModal();
+});
+
+buyPuzzleBtn.addEventListener('click', () => {
+    playClick();
+    buyCurrentPuzzle();
+});
+
+helpBtn.addEventListener('click', () => {
+    playClick();
+    showTutorial();
+});
+
+// Для селекторов уровней тоже можно добавить, но там onChange, а не click
+levelSelect.addEventListener('change', () => playClick());
+puzzleSelect.addEventListener('change', () => playClick());
 
 // ========== МАГАЗИН (скины + улучшения + рулетка) ==========
 let currentShopTab = localStorage.getItem('shopActiveTab') || 'skins';
