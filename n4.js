@@ -162,13 +162,29 @@ window.crosswordsData.n4 = {
                 price: 60,
                 words: [
                     { word: "ブドウ", row: 0, col: 0, dir: "across", clue: "Виноград", number: 1},
-                    { word: "ブランコ", row: 0, col: 0, dir: "down", clue: "Качели;", number: 1.1},
+                    { word: "ブランコ", row: 0, col: 0, dir: "down", clue: "Качели", number: 1.1},
                     { word: "コマ", row: 3, col: 0, dir: "across", clue: "Волчок, юла", number: 2},
                     { word: "イカ", row: 2, col: 2, dir: "across", clue: "Кальмар", number: 3},
                     { word: "キカイ", row: 1, col: 3, dir: "down", clue: "Телевизор, автомобиль, кондиционер и т.п.", number: 4},
                     { word: "ドク", row: 0, col: 1, dir: "down", clue: "Яд", number: 5},
                     { word: "ラクガキ", row: 1, col: 0, dir: "across", clue: "Рисунок, надпись", number: 6},
                     { word: "ウガイ", row: 0, col: 2, dir: "down", clue: "Полоскание рта", number: 7},
+                ]
+            },
+            {
+                name: "Кроссворд 12",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ウサギ", row: 0, col: 0, dir: "down", clue: "Заяц, кролик", number: 1},
+                    { word: "ウス", row: 0, col: 0, dir: "across", clue: "Ступка, ступа", number: 1.1},
+                    { word: "スシ", row: 0, col: 1, dir: "down", clue: "Суши", number: 2},
+                    { word: "シオ", row: 2, col: 2, dir: "across", clue: "Белая солёная", number: 3},
+                    { word: "カカト", row: 3, col: 1, dir: "across", clue: "Пятка", number: 4},
+                    { word: "アシカ", row: 1, col: 2, dir: "down", clue: "Морской лев", number: 5},
+                    { word: "アシオト", row: 0, col: 3, dir: "down", clue: "Звуки шагов", number: 6},
+                    { word: "サシアシ", row: 1, col: 0, dir: "across", clue: "Крадущимися шагами, крадучись", number: 7},
                 ]
             },
         ]
