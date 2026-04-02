@@ -1591,7 +1591,6 @@ resetBtn.addEventListener('click', () => {
 
 hintBtn.addEventListener('click', () => {
     playClick();
-    giveHint();
 });
 
 shopBtn.addEventListener('click', () => {
