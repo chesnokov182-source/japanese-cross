@@ -531,26 +531,34 @@ body.dark .shop-tab.active {
 body.dark .skin-item, body.dark .upgrade-item {
     background: var(--bg-container-dark);
 }
-.skin-info, .upgrade-info {
+.skin-info {
     display: flex;
     align-items: center;
     gap: 15px;
     flex: 1;
+    min-width: 0;
 }
-.skin-name, .upgrade-name {
+.skin-emoji {
+    font-size: 32px;
+    width: 48px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.skin-details {
+    flex: 1;
+    min-width: 0;
+}
+.skin-name {
     font-weight: bold;
     font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.skin-price, .upgrade-price {
+.skin-price {
     font-size: 14px;
     color: #4a6fa5;
-}
-.upgrade-desc {
-    font-size: 12px;
-    color: #666;
-}
-body.dark .upgrade-desc {
-    color: #aaa;
+    white-space: nowrap;
 }
 .skin-btn, .upgrade-btn {
     padding: 6px 16px;
@@ -560,6 +568,7 @@ body.dark .upgrade-desc {
     border: none;
     min-width: 80px;
     text-align: center;
+    flex-shrink: 0;
 }
 .skin-btn.buy, .upgrade-btn.buy {
     background: #4a6fa5;
@@ -573,6 +582,26 @@ body.dark .upgrade-desc {
     background: #999;
     cursor: not-allowed;
     opacity: 0.6;
+}
+.upgrade-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.upgrade-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+.upgrade-desc {
+    font-size: 12px;
+    color: #666;
+}
+body.dark .upgrade-desc {
+    color: #aaa;
+}
+.upgrade-price {
+    font-size: 14px;
+    color: #4a6fa5;
 }
 .roulette-container {
     text-align: center;
@@ -595,7 +624,7 @@ body.dark .upgrade-desc {
 }
 body.dark .roulette-spin-area {
     text-shadow: 0 0 6px rgba(0,0,0,0.5);
-    color: black;
+    color: #ffffff !important;
 }
 .roulette-spin-area span {
     color: inherit;
@@ -636,4 +665,5 @@ body.dark .roulette-info {
     .modal-btn { font-size: 16px; padding: 10px 24px; }
     .roulette-spin-area { font-size: 32px; min-height: 100px; }
     .skin-btn, .upgrade-btn { min-width: 70px; font-size: 12px; }
+    .skin-emoji { width: 36px; font-size: 24px; }
 }
