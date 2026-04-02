@@ -1541,7 +1541,6 @@ function openShopModal() {
     const modal = document.getElementById("shopModal");
     const modalContent = modal.querySelector('.modal-content');
     
-    // Удаляем старый заголовок, если был
     const oldTitle = modalContent.querySelector('h3');
     if (oldTitle) oldTitle.remove();
     
@@ -1572,7 +1571,7 @@ function openShopModal() {
         modalContent.appendChild(rouletteSection);
     }
     
-    // Заполняем скины
+    // Заполняем скины с новой структурой
     skinsSection.innerHTML = '';
     for (let skin of availableSkins) {
         const purchased = isSkinPurchased(skin.id);
@@ -1581,8 +1580,8 @@ function openShopModal() {
         skinDiv.className = "skin-item";
         skinDiv.innerHTML = `
             <div class="skin-info">
-                <span style="font-size: 32px;">${skin.emoji || "🖼️"}</span>
-                <div>
+                <div class="skin-emoji">${skin.emoji || "🖼️"}</div>
+                <div class="skin-details">
                     <div class="skin-name">${skin.name}</div>
                     <div class="skin-price">${skin.price > 0 ? `${skin.price} очков` : "бесплатно"}</div>
                 </div>
@@ -1648,7 +1647,7 @@ function openShopModal() {
             const id = btn.dataset.id;
             const price = parseInt(btn.dataset.price);
             if (purchaseSkin(id, price)) {
-                openShopModal(); // обновляем
+                openShopModal();
             }
         });
     });
@@ -1656,7 +1655,7 @@ function openShopModal() {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
             selectSkin(id);
-            openShopModal(); // обновляем
+            openShopModal();
         });
     });
     
@@ -1666,7 +1665,7 @@ function openShopModal() {
             const newLimit = parseInt(btn.dataset.upgrade);
             const price = parseInt(btn.dataset.price);
             if (upgradeMaxHints(newLimit, price)) {
-                openShopModal(); // обновляем
+                openShopModal();
                 updateButtonStates();
             }
         });
@@ -1686,7 +1685,6 @@ function openShopModal() {
         });
     });
     
-    // Активируем сохранённую вкладку
     const activeTab = currentShopTab;
     tabs.forEach(tab => {
         if (tab.dataset.tab === activeTab) {
