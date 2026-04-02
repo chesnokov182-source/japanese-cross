@@ -12,20 +12,7 @@
     --btn-bg-light: #4a6fa5;
     --btn-hover-light: #3a5a8c;
     --shadow-light: rgba(0,0,0,0.1);
-
-    --bg-body-dark: #1a1a2e;
-    --bg-container-dark: #23233a;
-    --bg-clues-dark: #1e1e30;
-    --text-dark: #eaeef2;
-    --border-dark: #4a4a6a;
-    --cell-bg-dark: #2d2d44;
-    --cell-blocked-dark: #393956;
-    --highlight-dark: #6b4e2e;
-    --active-word-dark: #3a7ca5;
-    --wrong-dark: #c94f4f;
-    --btn-bg-dark: #6c8fb5;
-    --btn-hover-dark: #5a7a9e;
-    --shadow-dark: rgba(0,0,0,0.5);
+    --success-glow: rgba(76, 175, 80, 0.3);
 }
 
 * {
@@ -47,8 +34,134 @@ body {
 }
 
 body.dark {
-    background: var(--bg-body-dark);
-    color: var(--text-dark);
+    --bg-body-dark: #1a1a2e;
+    --bg-container-dark: #23233a;
+    --bg-clues-dark: #1e1e30;
+    --text-dark: #eaeef2;
+    --border-dark: #4a4a6a;
+    --cell-bg-dark: #2d2d44;
+    --cell-blocked-dark: #393956;
+    --highlight-dark: #6b4e2e;
+    --active-word-dark: #3a7ca5;
+    --wrong-dark: #c94f4f;
+    --btn-bg-dark: #6c8fb5;
+    --btn-hover-dark: #5a7a9e;
+    --shadow-dark: rgba(0,0,0,0.5);
+    --success-glow: rgba(129, 199, 132, 0.4);
+}
+
+/* Тема Сакура */
+body.sakura {
+    --bg-body-light: #ffe4ec;
+    --bg-container-light: #fff0f5;
+    --bg-clues-light: #ffeef4;
+    --text-light: #a04060;
+    --border-light: #f0b8c8;
+    --cell-bg-light: #fff8fa;
+    --cell-blocked-light: #f0d0dc;
+    --highlight-light: #ffc0d0;
+    --active-word-light: #ffb0c0;
+    --btn-bg-light: #e080a0;
+    --btn-hover-light: #c06080;
+    --success-glow: rgba(255, 160, 180, 0.4);
+}
+body.sakura.dark {
+    --bg-body-dark: #2a1a22;
+    --bg-container-dark: #3a2530;
+    --bg-clues-dark: #2e1f28;
+    --text-dark: #f0c0d0;
+    --border-dark: #603040;
+    --cell-bg-dark: #4a2a38;
+    --cell-blocked-dark: #3a2230;
+    --highlight-dark: #804060;
+    --active-word-dark: #a05070;
+    --btn-bg-dark: #c07090;
+    --btn-hover-dark: #a05070;
+    --success-glow: rgba(192, 112, 144, 0.5);
+}
+
+/* Тема Самурай */
+body.samurai {
+    --bg-body-light: #e8d8c0;
+    --bg-container-light: #f0e8d8;
+    --bg-clues-light: #f4ece0;
+    --text-light: #4a2a1a;
+    --border-light: #b09070;
+    --cell-bg-light: #fff8f0;
+    --cell-blocked-light: #e0d0c0;
+    --highlight-light: #d4a070;
+    --active-word-light: #c08050;
+    --btn-bg-light: #8b4513;
+    --btn-hover-light: #6b3410;
+    --success-glow: rgba(139, 69, 19, 0.3);
+}
+body.samurai.dark {
+    --bg-body-dark: #1a1008;
+    --bg-container-dark: #2a1c10;
+    --bg-clues-dark: #221810;
+    --text-dark: #e0c8b0;
+    --border-dark: #5a3a20;
+    --cell-bg-dark: #3a2818;
+    --cell-blocked-dark: #2e2014;
+    --highlight-dark: #8a5a30;
+    --active-word-dark: #aa7040;
+    --btn-bg-dark: #b06030;
+    --btn-hover-dark: #904820;
+    --success-glow: rgba(160, 96, 48, 0.5);
+}
+
+/* Тема Футуризм */
+body.futurism {
+    --bg-body-light: #0a0a2a;
+    --bg-container-light: #0f0f3a;
+    --bg-clues-light: #12123f;
+    --text-light: #00e0ff;
+    --border-light: #2a6a8a;
+    --cell-bg-light: #1a1a4a;
+    --cell-blocked-light: #2a2a5a;
+    --highlight-light: #3a3a8a;
+    --active-word-light: #4a4aaa;
+    --btn-bg-light: #0a8aca;
+    --btn-hover-light: #0a6aaa;
+    --success-glow: rgba(0, 224, 255, 0.4);
+}
+body.futurism.dark {
+    --bg-body-dark: #050520;
+    --bg-container-dark: #0a0a30;
+    --bg-clues-dark: #0c0c35;
+    --text-dark: #80ffff;
+    --border-dark: #1a4a6a;
+    --cell-bg-dark: #151540;
+    --cell-blocked-dark: #202050;
+    --highlight-dark: #2a2a70;
+    --active-word-dark: #3a3a90;
+    --btn-bg-dark: #0a7aba;
+    --btn-hover-dark: #0a5a9a;
+    --success-glow: rgba(128, 255, 255, 0.4);
+}
+
+/* Анимация для решённого слова */
+@keyframes wordComplete {
+    0% { background-color: var(--success-glow); transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { background-color: var(--success-glow); transform: scale(1); }
+}
+.clue-list li.completed {
+    animation: wordComplete 0.4s ease;
+    text-decoration: line-through;
+    opacity: 0.8;
+    background-color: var(--success-glow);
+}
+.cell.word-complete-animation {
+    animation: cellComplete 0.3s ease;
+}
+@keyframes cellComplete {
+    0% { background-color: var(--success-glow); transform: scale(1); }
+    50% { transform: scale(1.05); background-color: var(--success-glow); }
+    100% { transform: scale(1); background-color: var(--cell-bg-light); }
+}
+body.dark .cell.word-complete-animation {
+    background-color: var(--success-glow);
 }
 
 .crossword-container {
