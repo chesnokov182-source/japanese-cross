@@ -28,90 +28,6 @@
     --shadow-dark: rgba(0,0,0,0.5);
 }
 
-/* Тема Сакура (розовая) */
-body.theme-sakura {
-    --bg-body-light: #fff0f5;
-    --bg-container-light: #ffe4ec;
-    --bg-clues-light: #ffd9e6;
-    --text-light: #8b3a62;
-    --border-light: #f0b8d0;
-    --cell-bg-light: #ffeef4;
-    --cell-blocked-light: #f0c0d8;
-    --highlight-light: #ffcce0;
-    --active-word-light: #ffb3c6;
-    --btn-bg-light: #d96c9e;
-    --btn-hover-light: #c2558a;
-}
-
-body.theme-sakura.dark {
-    --bg-body-dark: #2a1a2a;
-    --bg-container-dark: #3a2a3a;
-    --bg-clues-dark: #2d1f2d;
-    --text-dark: #f0c0d8;
-    --border-dark: #8b3a62;
-    --cell-bg-dark: #3a2a3a;
-    --cell-blocked-dark: #4a3a4a;
-    --active-word-dark: #d96c9e;
-    --btn-bg-dark: #c2558a;
-    --btn-hover-dark: #a83e70;
-}
-
-/* Тема Самурай (красно-чёрная) */
-body.theme-samurai {
-    --bg-body-light: #2c2c2c;
-    --bg-container-light: #3a3a3a;
-    --bg-clues-light: #333333;
-    --text-light: #e0e0e0;
-    --border-light: #8b0000;
-    --cell-bg-light: #4a4a4a;
-    --cell-blocked-light: #5a5a5a;
-    --highlight-light: #6b0000;
-    --active-word-light: #8b0000;
-    --btn-bg-light: #8b0000;
-    --btn-hover-light: #a00000;
-}
-
-body.theme-samurai.dark {
-    --bg-body-dark: #1a1a1a;
-    --bg-container-dark: #2a2a2a;
-    --bg-clues-dark: #252525;
-    --text-dark: #f0f0f0;
-    --border-dark: #6b0000;
-    --cell-bg-dark: #3a3a3a;
-    --cell-blocked-dark: #4a4a4a;
-    --active-word-dark: #8b0000;
-    --btn-bg-dark: #6b0000;
-    --btn-hover-dark: #8b0000;
-}
-
-/* Тема Футуризм (неоновая) */
-body.theme-futuristic {
-    --bg-body-light: #0a0a2a;
-    --bg-container-light: #0f0f3a;
-    --bg-clues-light: #0a0a2a;
-    --text-light: #00ffcc;
-    --border-light: #00ffcc;
-    --cell-bg-light: #151545;
-    --cell-blocked-light: #202055;
-    --highlight-light: #00ffaa33;
-    --active-word-light: #00ffcc44;
-    --btn-bg-light: #00ccaa;
-    --btn-hover-light: #00ffcc;
-}
-
-body.theme-futuristic.dark {
-    --bg-body-dark: #050520;
-    --bg-container-dark: #0a0a30;
-    --bg-clues-dark: #050520;
-    --text-dark: #00ffcc;
-    --border-dark: #00ffcc;
-    --cell-bg-dark: #101040;
-    --cell-blocked-dark: #151545;
-    --active-word-dark: #00ffcc44;
-    --btn-bg-dark: #00aa88;
-    --btn-hover-dark: #00ffcc;
-}
-
 * {
     user-select: none;
     box-sizing: border-box;
@@ -354,7 +270,7 @@ body.dark .clue-block h3 {
     margin: 6px 0;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.1s, opacity 0.3s, transform 0.2s;
+    transition: background 0.1s;
     font-size: 16px;
     display: flex;
     gap: 10px;
@@ -381,7 +297,6 @@ body.dark .clue-list li.active-clue {
     text-decoration: line-through;
     opacity: 0.7;
     background-color: #e0ffe0;
-    transition: all 0.3s ease;
 }
 
 body.dark .clue-list li.completed {
@@ -621,29 +536,29 @@ body.dark .skin-item, body.dark .upgrade-item {
     align-items: center;
     gap: 15px;
     flex: 1;
+    min-width: 0;
 }
 .skin-emoji {
     font-size: 32px;
-    min-width: 50px;
+    width: 48px;
     text-align: center;
+    flex-shrink: 0;
 }
 .skin-details {
     flex: 1;
+    min-width: 0;
 }
-.skin-name, .upgrade-name {
+.skin-name {
     font-weight: bold;
     font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.skin-price, .upgrade-price {
+.skin-price {
     font-size: 14px;
     color: #4a6fa5;
-}
-.upgrade-desc {
-    font-size: 12px;
-    color: #666;
-}
-body.dark .upgrade-desc {
-    color: #aaa;
+    white-space: nowrap;
 }
 .skin-btn, .upgrade-btn {
     padding: 6px 16px;
@@ -653,6 +568,7 @@ body.dark .upgrade-desc {
     border: none;
     min-width: 80px;
     text-align: center;
+    flex-shrink: 0;
 }
 .skin-btn.buy, .upgrade-btn.buy {
     background: #4a6fa5;
@@ -666,6 +582,26 @@ body.dark .upgrade-desc {
     background: #999;
     cursor: not-allowed;
     opacity: 0.6;
+}
+.upgrade-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.upgrade-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+.upgrade-desc {
+    font-size: 12px;
+    color: #666;
+}
+body.dark .upgrade-desc {
+    color: #aaa;
+}
+.upgrade-price {
+    font-size: 14px;
+    color: #4a6fa5;
 }
 .roulette-container {
     text-align: center;
@@ -689,6 +625,9 @@ body.dark .upgrade-desc {
 body.dark .roulette-spin-area {
     text-shadow: 0 0 6px rgba(0,0,0,0.5);
     color: #ffffff !important;
+}
+.roulette-spin-area span {
+    color: inherit;
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
@@ -717,15 +656,6 @@ body.dark .roulette-info {
     color: #aaa;
 }
 
-/* Кнопка переключения звука */
-.sound-toggle {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 5px 10px;
-}
-
 @media (max-width: 800px) {
     .cell { width: 50px; height: 50px; font-size: 24px; }
     .cell input { font-size: 24px; }
@@ -735,4 +665,5 @@ body.dark .roulette-info {
     .modal-btn { font-size: 16px; padding: 10px 24px; }
     .roulette-spin-area { font-size: 32px; min-height: 100px; }
     .skin-btn, .upgrade-btn { min-width: 70px; font-size: 12px; }
+    .skin-emoji { width: 36px; font-size: 24px; }
 }
