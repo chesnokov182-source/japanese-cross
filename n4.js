@@ -187,5 +187,20 @@ window.crosswordsData.n4 = {
                     { word: "サシアシ", row: 1, col: 0, dir: "across", clue: "Крадущимися шагами, крадучись", number: 7},
                 ]
             },
+            {
+                name: "Кроссворд 13",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "オトトイ", row: 0, col: 0, dir: "down", clue: "Позавчера", number: 1},
+                    { word: "バス", row: 0, col: 2, dir: "down", clue: "Автобус", number: 2},
+                    { word: "バイバイ", row: 0, col: 2, dir: "across", clue: "Говорят при расставании с другом", number: 2.1},
+                    { word: "トケイ", row: 1, col: 0, dir: "across", clue: "Часы", number: 3},
+                    { word: "クロ", row: 2, col: 3, dir: "down", clue: "Черный цвет", number: 4},
+                    { word: "バク", row: 2, col: 2, dir: "down", clue: "Тапир", number: 5},
+                    { word: "イロイロ", row: 3, col: 0, dir: "across", clue: "Когда много разных видов", number: 6},
+                ]
+            },
         ]
     };
