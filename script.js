@@ -71,16 +71,20 @@ const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
 const shopBtn = document.getElementById("shopBtn");
 
-// ========== ЗВУКИ ==========
+// ========== ЗВУКИ (с возможностью отключения) ==========
+let soundEnabled = true;
 let audioContext = null;
+
 function initAudio() {
-    if (!audioContext) {
+    if (!audioContext && soundEnabled) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
 function playBeep(frequency, duration, volume = 0.3, type = 'sine') {
+    if (!soundEnabled) return;
     try {
         initAudio();
+        if (!audioContext) return;
         const now = audioContext.currentTime;
         const oscillator = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -117,6 +121,35 @@ function playRouletteWin(prize) {
         playBeep(300, 0.3, 0.2, 'sawtooth');
     }
 }
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('soundEnabled', soundEnabled);
+    if (soundEnabled) {
+        initAudio();
+    } else if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+    }
+    updateSoundButton();
+    showToast(soundEnabled ? "🔊 Звук включён" : "🔇 Звук выключен", "info");
+}
+function updateSoundButton() {
+    const btn = document.getElementById('soundToggleBtn');
+    if (btn) {
+        btn.textContent = soundEnabled ? "🔊" : "🔇";
+    }
+}
+// Добавляем кнопку звука в интерфейс
+const soundBtn = document.createElement('button');
+soundBtn.id = 'soundToggleBtn';
+soundBtn.className = 'sound-toggle';
+soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
+soundBtn.addEventListener('click', toggleSound);
+document.querySelector('.level-selector').appendChild(soundBtn);
+// Загрузка настройки звука
+const savedSound = localStorage.getItem('soundEnabled');
+if (savedSound !== null) soundEnabled = savedSound === 'true';
+updateSoundButton();
 
 // ========== КОНФЕТТИ ==========
 function showConfetti() {
@@ -638,26 +671,30 @@ function isCrosswordCompleted(level, puzzleIdx) {
     return completed.includes(`${level}_${puzzleIdx}`);
 }
 
-// ========== ТЕМА ==========
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-    } else {
-        document.body.classList.remove('dark');
+// ========== ТЕМЫ (визуальные) ==========
+const themes = ['default', 'sakura', 'samurai', 'futuristic'];
+let currentTheme = localStorage.getItem('theme') || 'default';
+function applyTheme(theme) {
+    document.body.classList.remove(...themes.map(t => `theme-${t}`));
+    if (theme !== 'default') {
+        document.body.classList.add(`theme-${theme}`);
     }
+    currentTheme = theme;
+    localStorage.setItem('theme', theme);
 }
-function toggleTheme() {
-    if (document.body.classList.contains('dark')) {
-        document.body.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-    } else {
-        document.body.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-    }
+function toggleThemeVisual() {
+    const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+    applyTheme(themes[nextIndex]);
+    showToast(`Тема: ${themes[nextIndex]}`, 'info');
 }
-themeToggle.addEventListener('click', toggleTheme);
-initTheme();
+// Добавляем кнопку смены темы
+const themeVisualBtn = document.createElement('button');
+themeVisualBtn.id = 'themeVisualBtn';
+themeVisualBtn.textContent = '🎨 Тема';
+themeVisualBtn.addEventListener('click', toggleThemeVisual);
+document.querySelector('.level-selector').appendChild(themeVisualBtn);
+// Инициализация темы
+applyTheme(currentTheme);
 
 // ========== НУМЕРАЦИЯ СЛОВ ==========
 function generateNumbering() {
@@ -1315,8 +1352,12 @@ function updateClueCompletion() {
         }
         const clueLi = document.querySelector(`.clue-list li[data-word-id='${w.id}']`);
         if (clueLi) {
-            if (isComplete) clueLi.classList.add("completed");
-            else clueLi.classList.remove("completed");
+            if (isComplete) {
+                // Добавляем класс completed, который вызывает анимацию (через CSS transition)
+                clueLi.classList.add("completed");
+            } else {
+                clueLi.classList.remove("completed");
+            }
         }
         if (isComplete) {
             markWordPointsEarned(w.id);
@@ -1788,7 +1829,9 @@ function showTutorial() {
         "🎯 За правильно угаданное слово даётся 10 очков, за полный кроссворд – 50 очков.",
         "💰 Очки можно тратить на разблокировку новых кроссвордов, на подсказки (20 очков за подсказку, лимит можно увеличить в магазине), на скины и в рулетке.",
         "🎁 Каждый день вы получаете 50 бонусных очков за вход.",
-        "🌓 Кнопка темы переключает светлую/тёмную тему. Прогресс сохраняется автоматически.\n\nПриятной игры!"
+        "🌓 Кнопка темы переключает светлую/тёмную тему. Есть дополнительные цветовые темы (кнопка 🎨 Тема).",
+        "🔊 Можно включить/выключить звуки кнопкой рядом.",
+        "Приятной игры!"
     ];
     function updateTutorial() {
         tutorialMessage.innerText = steps[step];
