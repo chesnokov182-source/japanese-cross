@@ -334,6 +334,7 @@ function purchaseSkin(skinId, price) {
         subtractPoints(price);
         purchasedSkins.push(skinId);
         saveSkinsData();
+        showConfetti();
         showToast(`Скин "${availableSkins.find(s => s.id === skinId).name}" куплен!`, "success");
         return true;
     } else {
