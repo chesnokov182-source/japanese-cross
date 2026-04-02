@@ -12,7 +12,104 @@
     --btn-bg-light: #4a6fa5;
     --btn-hover-light: #3a5a8c;
     --shadow-light: rgba(0,0,0,0.1);
-    --success-glow: rgba(76, 175, 80, 0.3);
+
+    --bg-body-dark: #1a1a2e;
+    --bg-container-dark: #23233a;
+    --bg-clues-dark: #1e1e30;
+    --text-dark: #eaeef2;
+    --border-dark: #4a4a6a;
+    --cell-bg-dark: #2d2d44;
+    --cell-blocked-dark: #393956;
+    --highlight-dark: #6b4e2e;
+    --active-word-dark: #3a7ca5;
+    --wrong-dark: #c94f4f;
+    --btn-bg-dark: #6c8fb5;
+    --btn-hover-dark: #5a7a9e;
+    --shadow-dark: rgba(0,0,0,0.5);
+}
+
+/* Тема Сакура (розовая) */
+body.theme-sakura {
+    --bg-body-light: #fff0f5;
+    --bg-container-light: #ffe4ec;
+    --bg-clues-light: #ffd9e6;
+    --text-light: #8b3a62;
+    --border-light: #f0b8d0;
+    --cell-bg-light: #ffeef4;
+    --cell-blocked-light: #f0c0d8;
+    --highlight-light: #ffcce0;
+    --active-word-light: #ffb3c6;
+    --btn-bg-light: #d96c9e;
+    --btn-hover-light: #c2558a;
+}
+
+body.theme-sakura.dark {
+    --bg-body-dark: #2a1a2a;
+    --bg-container-dark: #3a2a3a;
+    --bg-clues-dark: #2d1f2d;
+    --text-dark: #f0c0d8;
+    --border-dark: #8b3a62;
+    --cell-bg-dark: #3a2a3a;
+    --cell-blocked-dark: #4a3a4a;
+    --active-word-dark: #d96c9e;
+    --btn-bg-dark: #c2558a;
+    --btn-hover-dark: #a83e70;
+}
+
+/* Тема Самурай (красно-чёрная) */
+body.theme-samurai {
+    --bg-body-light: #2c2c2c;
+    --bg-container-light: #3a3a3a;
+    --bg-clues-light: #333333;
+    --text-light: #e0e0e0;
+    --border-light: #8b0000;
+    --cell-bg-light: #4a4a4a;
+    --cell-blocked-light: #5a5a5a;
+    --highlight-light: #6b0000;
+    --active-word-light: #8b0000;
+    --btn-bg-light: #8b0000;
+    --btn-hover-light: #a00000;
+}
+
+body.theme-samurai.dark {
+    --bg-body-dark: #1a1a1a;
+    --bg-container-dark: #2a2a2a;
+    --bg-clues-dark: #252525;
+    --text-dark: #f0f0f0;
+    --border-dark: #6b0000;
+    --cell-bg-dark: #3a3a3a;
+    --cell-blocked-dark: #4a4a4a;
+    --active-word-dark: #8b0000;
+    --btn-bg-dark: #6b0000;
+    --btn-hover-dark: #8b0000;
+}
+
+/* Тема Футуризм (неоновая) */
+body.theme-futuristic {
+    --bg-body-light: #0a0a2a;
+    --bg-container-light: #0f0f3a;
+    --bg-clues-light: #0a0a2a;
+    --text-light: #00ffcc;
+    --border-light: #00ffcc;
+    --cell-bg-light: #151545;
+    --cell-blocked-light: #202055;
+    --highlight-light: #00ffaa33;
+    --active-word-light: #00ffcc44;
+    --btn-bg-light: #00ccaa;
+    --btn-hover-light: #00ffcc;
+}
+
+body.theme-futuristic.dark {
+    --bg-body-dark: #050520;
+    --bg-container-dark: #0a0a30;
+    --bg-clues-dark: #050520;
+    --text-dark: #00ffcc;
+    --border-dark: #00ffcc;
+    --cell-bg-dark: #101040;
+    --cell-blocked-dark: #151545;
+    --active-word-dark: #00ffcc44;
+    --btn-bg-dark: #00aa88;
+    --btn-hover-dark: #00ffcc;
 }
 
 * {
@@ -34,134 +131,8 @@ body {
 }
 
 body.dark {
-    --bg-body-dark: #1a1a2e;
-    --bg-container-dark: #23233a;
-    --bg-clues-dark: #1e1e30;
-    --text-dark: #eaeef2;
-    --border-dark: #4a4a6a;
-    --cell-bg-dark: #2d2d44;
-    --cell-blocked-dark: #393956;
-    --highlight-dark: #6b4e2e;
-    --active-word-dark: #3a7ca5;
-    --wrong-dark: #c94f4f;
-    --btn-bg-dark: #6c8fb5;
-    --btn-hover-dark: #5a7a9e;
-    --shadow-dark: rgba(0,0,0,0.5);
-    --success-glow: rgba(129, 199, 132, 0.4);
-}
-
-/* Тема Сакура */
-body.sakura {
-    --bg-body-light: #ffe4ec;
-    --bg-container-light: #fff0f5;
-    --bg-clues-light: #ffeef4;
-    --text-light: #a04060;
-    --border-light: #f0b8c8;
-    --cell-bg-light: #fff8fa;
-    --cell-blocked-light: #f0d0dc;
-    --highlight-light: #ffc0d0;
-    --active-word-light: #ffb0c0;
-    --btn-bg-light: #e080a0;
-    --btn-hover-light: #c06080;
-    --success-glow: rgba(255, 160, 180, 0.4);
-}
-body.sakura.dark {
-    --bg-body-dark: #2a1a22;
-    --bg-container-dark: #3a2530;
-    --bg-clues-dark: #2e1f28;
-    --text-dark: #f0c0d0;
-    --border-dark: #603040;
-    --cell-bg-dark: #4a2a38;
-    --cell-blocked-dark: #3a2230;
-    --highlight-dark: #804060;
-    --active-word-dark: #a05070;
-    --btn-bg-dark: #c07090;
-    --btn-hover-dark: #a05070;
-    --success-glow: rgba(192, 112, 144, 0.5);
-}
-
-/* Тема Самурай */
-body.samurai {
-    --bg-body-light: #e8d8c0;
-    --bg-container-light: #f0e8d8;
-    --bg-clues-light: #f4ece0;
-    --text-light: #4a2a1a;
-    --border-light: #b09070;
-    --cell-bg-light: #fff8f0;
-    --cell-blocked-light: #e0d0c0;
-    --highlight-light: #d4a070;
-    --active-word-light: #c08050;
-    --btn-bg-light: #8b4513;
-    --btn-hover-light: #6b3410;
-    --success-glow: rgba(139, 69, 19, 0.3);
-}
-body.samurai.dark {
-    --bg-body-dark: #1a1008;
-    --bg-container-dark: #2a1c10;
-    --bg-clues-dark: #221810;
-    --text-dark: #e0c8b0;
-    --border-dark: #5a3a20;
-    --cell-bg-dark: #3a2818;
-    --cell-blocked-dark: #2e2014;
-    --highlight-dark: #8a5a30;
-    --active-word-dark: #aa7040;
-    --btn-bg-dark: #b06030;
-    --btn-hover-dark: #904820;
-    --success-glow: rgba(160, 96, 48, 0.5);
-}
-
-/* Тема Футуризм */
-body.futurism {
-    --bg-body-light: #0a0a2a;
-    --bg-container-light: #0f0f3a;
-    --bg-clues-light: #12123f;
-    --text-light: #00e0ff;
-    --border-light: #2a6a8a;
-    --cell-bg-light: #1a1a4a;
-    --cell-blocked-light: #2a2a5a;
-    --highlight-light: #3a3a8a;
-    --active-word-light: #4a4aaa;
-    --btn-bg-light: #0a8aca;
-    --btn-hover-light: #0a6aaa;
-    --success-glow: rgba(0, 224, 255, 0.4);
-}
-body.futurism.dark {
-    --bg-body-dark: #050520;
-    --bg-container-dark: #0a0a30;
-    --bg-clues-dark: #0c0c35;
-    --text-dark: #80ffff;
-    --border-dark: #1a4a6a;
-    --cell-bg-dark: #151540;
-    --cell-blocked-dark: #202050;
-    --highlight-dark: #2a2a70;
-    --active-word-dark: #3a3a90;
-    --btn-bg-dark: #0a7aba;
-    --btn-hover-dark: #0a5a9a;
-    --success-glow: rgba(128, 255, 255, 0.4);
-}
-
-/* Анимация для решённого слова */
-@keyframes wordComplete {
-    0% { background-color: var(--success-glow); transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { background-color: var(--success-glow); transform: scale(1); }
-}
-.clue-list li.completed {
-    animation: wordComplete 0.4s ease;
-    text-decoration: line-through;
-    opacity: 0.8;
-    background-color: var(--success-glow);
-}
-.cell.word-complete-animation {
-    animation: cellComplete 0.3s ease;
-}
-@keyframes cellComplete {
-    0% { background-color: var(--success-glow); transform: scale(1); }
-    50% { transform: scale(1.05); background-color: var(--success-glow); }
-    100% { transform: scale(1); background-color: var(--cell-bg-light); }
-}
-body.dark .cell.word-complete-animation {
-    background-color: var(--success-glow);
+    background: var(--bg-body-dark);
+    color: var(--text-dark);
 }
 
 .crossword-container {
@@ -383,7 +354,7 @@ body.dark .clue-block h3 {
     margin: 6px 0;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background 0.1s, opacity 0.3s, transform 0.2s;
     font-size: 16px;
     display: flex;
     gap: 10px;
@@ -410,6 +381,7 @@ body.dark .clue-list li.active-clue {
     text-decoration: line-through;
     opacity: 0.7;
     background-color: #e0ffe0;
+    transition: all 0.3s ease;
 }
 
 body.dark .clue-list li.completed {
@@ -649,29 +621,29 @@ body.dark .skin-item, body.dark .upgrade-item {
     align-items: center;
     gap: 15px;
     flex: 1;
-    min-width: 0;
 }
 .skin-emoji {
     font-size: 32px;
-    width: 48px;
+    min-width: 50px;
     text-align: center;
-    flex-shrink: 0;
 }
 .skin-details {
     flex: 1;
-    min-width: 0;
 }
-.skin-name {
+.skin-name, .upgrade-name {
     font-weight: bold;
     font-size: 16px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
-.skin-price {
+.skin-price, .upgrade-price {
     font-size: 14px;
     color: #4a6fa5;
-    white-space: nowrap;
+}
+.upgrade-desc {
+    font-size: 12px;
+    color: #666;
+}
+body.dark .upgrade-desc {
+    color: #aaa;
 }
 .skin-btn, .upgrade-btn {
     padding: 6px 16px;
@@ -681,7 +653,6 @@ body.dark .skin-item, body.dark .upgrade-item {
     border: none;
     min-width: 80px;
     text-align: center;
-    flex-shrink: 0;
 }
 .skin-btn.buy, .upgrade-btn.buy {
     background: #4a6fa5;
@@ -695,26 +666,6 @@ body.dark .skin-item, body.dark .upgrade-item {
     background: #999;
     cursor: not-allowed;
     opacity: 0.6;
-}
-.upgrade-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-.upgrade-name {
-    font-weight: bold;
-    font-size: 16px;
-}
-.upgrade-desc {
-    font-size: 12px;
-    color: #666;
-}
-body.dark .upgrade-desc {
-    color: #aaa;
-}
-.upgrade-price {
-    font-size: 14px;
-    color: #4a6fa5;
 }
 .roulette-container {
     text-align: center;
@@ -736,10 +687,8 @@ body.dark .upgrade-desc {
     text-shadow: 0 0 4px rgba(0,0,0,0.3);
 }
 body.dark .roulette-spin-area {
-    color: black;
-}
-.roulette-spin-area span {
-    color: inherit;
+    text-shadow: 0 0 6px rgba(0,0,0,0.5);
+    color: #ffffff !important;
 }
 .roulette-spin-btn {
     background: var(--btn-bg-light);
@@ -768,6 +717,15 @@ body.dark .roulette-info {
     color: #aaa;
 }
 
+/* Кнопка переключения звука */
+.sound-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
 @media (max-width: 800px) {
     .cell { width: 50px; height: 50px; font-size: 24px; }
     .cell input { font-size: 24px; }
@@ -777,5 +735,4 @@ body.dark .roulette-info {
     .modal-btn { font-size: 16px; padding: 10px 24px; }
     .roulette-spin-area { font-size: 32px; min-height: 100px; }
     .skin-btn, .upgrade-btn { min-width: 70px; font-size: 12px; }
-    .skin-emoji { width: 36px; font-size: 24px; }
 }
