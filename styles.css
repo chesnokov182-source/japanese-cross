@@ -52,7 +52,7 @@ body {
     background: var(--bg-body-light);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center;    
     min-height: 100vh;
     margin: 0;
     padding: 20px;
@@ -808,6 +808,22 @@ body.sakura .upgrade-btn.buy {
 
 body.sakura .skin-btn.select {
     background: #2e7d32; /* Зеленый для выбора, чтобы отличался от розового */
+}
+
+.clue-list li.active-clue {
+    background: var(--active-word-light); 
+    color: #004080; 
+    font-weight: bold;
+    border-left: 4px solid #4a6fa5; 
+    box-shadow: 0 2px 5px rgba(74, 111, 165, 0.2); 
+}
+
+body.dark .clue-list li.active-clue {
+    background: var(--active-word-dark); 
+    color: #ffffff; 
+    font-weight: bold;
+    border-left: 4px solid #6c8fb5; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 800px) {
