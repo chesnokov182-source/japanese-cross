@@ -218,5 +218,21 @@ window.crosswordsData.n4 = {
                     { word: "マンタン", row: 3, col: 0, dir: "across", clue: "Полный бак", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 15",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "タイイク", row: 0, col: 0, dir: "down", clue: "Физкультура", number: 1},
+                    { word: "タナバタ", row: 0, col: 0, dir: "across", clue: "Танабата (традиционный японский праздник, обычно отмечается 7 июля)", number: 1.1},
+                    { word: "ナス", row: 0, col: 1, dir: "down", clue: "Баклажан", number: 2},
+                    { word: "イス", row: 1, col: 0, dir: "across", clue: "Стул", number: 3},
+                    { word: "ヘヤ", row: 2, col: 2, dir: "across", clue: "Комната", number: 4},
+                    { word: "ヘビ", row: 2, col: 2, dir: "down", clue: "Змея", number: 4.1},
+                    { word: "タイヤキ", row: 0, col: 3, dir: "down", clue: "Пряник в форме рыбы со сладкой начинкой", number: 5},
+                    { word: "クジビキ", row: 3, col: 0, dir: "across", clue: "Лотерея", number: 6},
+                ]
+            },
         ]
     };
