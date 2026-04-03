@@ -202,5 +202,21 @@ window.crosswordsData.n4 = {
                     { word: "イロイロ", row: 3, col: 0, dir: "across", clue: "Когда много разных видов", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 14",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "オニギリ", row: 0, col: 0, dir: "across", clue: "Онигири, рисовый колобок", number: 1},
+                    { word: "オヒサマ", row: 0, col: 0, dir: "down", clue: "Солнце", number: 1.1},
+                    { word: "ニジ", row: 0, col: 1, dir: "down", clue: "Радуга", number: 2},
+                    { word: "リモコン", row: 0, col: 3, dir: "down", clue: "Пульт", number: 3},
+                    { word: "ハコ", row: 2, col: 2, dir: "across", clue: "Коробка", number: 4},
+                    { word: "ハタ", row: 2, col: 2, dir: "down", clue: "Флаг", number: 4.1},
+                    { word: "ヒジ", row: 1, col: 0, dir: "across", clue: "Локоть", number: 5},
+                    { word: "マンタン", row: 3, col: 0, dir: "across", clue: "Полный бак", number: 6},
+                ]
+            },
         ]
     };
