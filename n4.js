@@ -261,8 +261,8 @@ window.crosswordsData.n4 = {
                     { word: "ニク", row: 0, col: 1, dir: "down", clue: "Мясо", number: 2},
                     { word: "ケン", row: 0, col: 3, dir: "down", clue: "Меч", number: 3},
                     { word: "タクサン", row: 1, col: 0, dir: "across", clue: "Много, достаточно", number: 4},
-                    { word: "メジルシ", row: 2, col: 3, dir: "across", clue: "Ориентир", number: 5},
-                    { word: "サドル", row: 0, col: 2, dir: "down", clue: "Седло (велосипеда, мотороллера и т. п.)", number: 6},
+                    { word: "メジルシ", row: 3, col: 0, dir: "across", clue: "Ориентир", number: 5},
+                    { word: "サドル", row: 1, col: 2, dir: "down", clue: "Седло (велосипеда, мотороллера и т. п.)", number: 6},
                 ]
             },
         ]
