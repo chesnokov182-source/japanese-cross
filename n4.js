@@ -250,5 +250,20 @@ window.crosswordsData.n4 = {
                     { word: "ヘチマ", row: 3, col: 1, dir: "across", clue: "Люфа, люффа (овощ)", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 17",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ワニ", row: 0, col: 0, dir: "across", clue: "Крокодил", number: 1},
+                    { word: "ワタアメ", row: 0, col: 0, dir: "down", clue: "Сахарная вата", number: 1.1},
+                    { word: "ニク", row: 0, col: 1, dir: "down", clue: "Мясо", number: 2},
+                    { word: "ケン", row: 0, col: 3, dir: "down", clue: "Меч", number: 3},
+                    { word: "タクサン", row: 1, col: 0, dir: "across", clue: "Много, достаточно", number: 4},
+                    { word: "メジルシ", row: 2, col: 3, dir: "across", clue: "Ориентир", number: 5},
+                    { word: "サドル", row: 0, col: 2, dir: "down", clue: "Седло (велосипеда, мотороллера и т. п.)", number: 6},
+                ]
+            },
         ]
     };
