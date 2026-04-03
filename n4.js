@@ -234,5 +234,21 @@ window.crosswordsData.n4 = {
                     { word: "クジビキ", row: 3, col: 0, dir: "across", clue: "Лотерея", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 16",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "サシミ", row: 0, col: 0, dir: "down", clue: "Сасими (блюдо из сырой рыбы)", number: 1},
+                    { word: "サカダチ", row: 0, col: 0, dir: "across", clue: "Стойка на руках вниз головой", number: 1.1},
+                    { word: "カメ", row: 0, col: 1, dir: "down", clue: "Черепаха", number: 2},
+                    { word: "シメイ", row: 1, col: 0, dir: "across", clue: "Имя и фамилия", number: 3},
+                    { word: "キタ", row: 2, col: 2, dir: "across", clue: "Проиивоположность югу", number: 4},
+                    { word: "タマ", row: 2, col: 3, dir: "down", clue: "Шар, мяч, сфера", number: 4.1},
+                    { word: "ダイキチ", row: 0, col: 2, dir: "down", clue: "Большая удача, большое счастье", number: 5},
+                    { word: "ヘチマ", row: 3, col: 1, dir: "across", clue: "Люфа, люффа (овощ)", number: 6},
+                ]
+            },
         ]
     };
