@@ -295,5 +295,20 @@ window.crosswordsData.n4 = {
                     { word: "バランス", row: 0, col: 3, dir: "down", clue: "Баланс", number: 5},
                 ]
             },
+            {
+                name: "Кроссворд 20",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "アリ", row: 0, col: 0, dir: "down", clue: "Муравей", number: 1},
+                    { word: "アニマル", row: 0, col: 0, dir: "across", clue: "Животное на английском", number: 1.1},
+                    { word: "リンゴ", row: 1, col: 0, dir: "across", clue: "Яблоко", number: 2},
+                    { word: "ニンジン", row: 0, col: 1, dir: "down", clue: "Морковка", number: 3},
+                    { word: "ハンカチ", row: 3, col: 0, dir: "across", clue: "Платок", number: 4},
+                    { word: "ハチ", row: 2, col: 3, dir: "down", clue: "Пчела", number: 5},
+                    { word: "マゴ", row: 0, col: 2, dir: "down", clue: "Внук, внучка", number: 6},
+                ]
+            },
         ]
     };
