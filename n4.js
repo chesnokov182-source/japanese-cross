@@ -380,7 +380,7 @@ window.crosswordsData.n4 = {
                 price: 60,
                 words: [
                     { word: "マネ", row: 0, col: 0, dir: "down", clue: "Подражание", number: 1},
-                    { word: "マエカケ", row: 0, col: 0, dir: "across", clue: "передник, фартук", number: 1.1},
+                    { word: "マエカケ", row: 0, col: 0, dir: "across", clue: "Передник, фартук", number: 1.1},
                     { word: "ネンド", row: 1, col: 0, dir: "across", clue: "Глина", number: 2},
                     { word: "エンピツ", row: 0, col: 1, dir: "down", clue: "Карандаш", number: 3},
                     { word: "カド", row: 0, col: 2, dir: "down", clue: "Угол", number: 4},
