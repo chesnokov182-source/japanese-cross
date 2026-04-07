@@ -265,5 +265,20 @@ window.crosswordsData.n4 = {
                     { word: "サドル", row: 1, col: 2, dir: "down", clue: "Седло (велосипеда, мотороллера и т. п.)", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 18",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "トンネル", row: 0, col: 0, dir: "across", clue: "Тоннель", number: 1},
+                    { word: "トノカイ", row: 0, col: 0, dir: "down", clue: "Животное, которое тащит сани Санты", number: 1.1},
+                    { word: "イケ", row: 3, col: 0, dir: "across", clue: "Пруд", number: 2},
+                    { word: "マケ", row: 2, col: 1, dir: "down", clue: "Противоположность победы", number: 3},
+                    { word: "カマキリ", row: 2, col: 0, dir: "across", clue: "Богомол", number: 4},
+                    { word: "リス", row: 2, col: 3, dir: "down", clue: "Белка", number: 5},
+                    { word: "ネマキ", row: 0, col: 2, dir: "down", clue: "Пижама", number: 6},
+                ]
+            }
         ]
     };
