@@ -310,5 +310,20 @@ window.crosswordsData.n4 = {
                     { word: "マゴ", row: 0, col: 2, dir: "down", clue: "Внук, внучка", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 21",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "スポンジ", row: 0, col: 0, dir: "across", clue: "С помощью неё моют посуду", number: 1},
+                    { word: "ポスト", row: 0, col: 1, dir: "down", clue: "Почтовый ящик", number: 2},
+                    { word: "オトウト", row: 2, col: 0, dir: "across", clue: "Младший брат", number: 3},
+                    { word: "オス", row: 2, col: 0, dir: "down", clue: "Самец", number: 3.1},
+                    { word: "ウエ", row: 2, col: 2, dir: "down", clue: "Противоположность низу", number: 4},
+                    { word: "トラ", row: 2, col: 3, dir: "down", clue: "Тигр", number: 5},
+                    { word: "エラ", row: 3, col: 2, dir: "across", clue: "С помощью этого дышат рыбы", number: 6},
+                ]
+            },
         ]
     };
