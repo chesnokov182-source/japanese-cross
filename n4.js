@@ -373,5 +373,20 @@ window.crosswordsData.n4 = {
                     { word: "シンパイ", row: 0, col: 3, dir: "down", clue: "Волнение", number: 7},
                 ]
             },
+            {
+                name: "Кроссворд 25",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "マネ", row: 0, col: 0, dir: "down", clue: "Подражание", number: 1},
+                    { word: "マエカケ", row: 0, col: 0, dir: "across", clue: "передник, фартук", number: 1.1},
+                    { word: "ネンド", row: 1, col: 0, dir: "across", clue: "Глина", number: 2},
+                    { word: "エンピツ", row: 0, col: 1, dir: "down", clue: "Карандаш", number: 3},
+                    { word: "カド", row: 0, col: 2, dir: "down", clue: "Угол", number: 4},
+                    { word: "アキ", row: 2, col: 3, dir: "down", clue: "После лета", number: 5},
+                    { word: "ツミキ", row: 3, col: 1, dir: "across", clue: "Деревянные кубики", number: 6},
+                ]
+            },   
         ]
     };
