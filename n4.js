@@ -279,6 +279,21 @@ window.crosswordsData.n4 = {
                     { word: "リス", row: 2, col: 3, dir: "down", clue: "Белка", number: 5},
                     { word: "ネマキ", row: 0, col: 2, dir: "down", clue: "Пижама", number: 6},
                 ]
-            }
+            },
+            {
+                name: "Кроссворд 19",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "クウコウ", row: 0, col: 0, dir: "down", clue: "Там много самолетов", number: 1},
+                    { word: "クリ", row: 0, col: 0, dir: "across", clue: "Каштан", number: 1.1},
+                    { word: "コウエン", row: 2, col: 0, dir: "across", clue: "Качели? Горка? Где поиграем?", number: 2},
+                    { word: "カエル", row: 1, col: 2, dir: "down", clue: "Лягушка", number: 3},
+                    { word: "カラ", row: 1, col: 2, dir: "across", clue: "Есть у улитки, нет у слизняка", number: 3.1},
+                    { word: "ルス", row: 3, col: 2, dir: "across", clue: "Когда никого нет дома", number: 4},
+                    { word: "バランス", row: 0, col: 3, dir: "down", clue: "Баланс", number: 5},
+                ]
+            },
         ]
     };
