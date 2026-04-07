@@ -341,5 +341,21 @@ window.crosswordsData.n4 = {
                     { word: "センスイ", row: 0, col: 1, dir: "down", clue: "Погружение в воду, ныряние", number: 7},
                 ]
             },
+            {
+                name: "Кроссворд 23",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ヒツジ", row: 0, col: 0, dir: "down", clue: "Овца, баран", number: 1},
+                    { word: "ヒナ", row: 0, col: 0, dir: "across", clue: "Птенец, цыплёнок", number: 1.1},
+                    { word: "ナナ", row: 0, col: 1, dir: "down", clue: "Семь", number: 2},
+                    { word: "ツナヒキ", row: 1, col: 0, dir: "across", clue: "Перетягивание каната", number: 3},
+                    { word: "トゲ", row: 2, col: 2, dir: "across", clue: "Шип, игла", number: 4},
+                    { word: "オデン", row: 3, col: 1, dir: "across", clue: "Японское «зимнее» блюдо", number: 5},
+                    { word: "ヒトデ", row: 1, col: 2, dir: "down", clue: "Морское животное в форме звезды", number: 6},
+                    { word: "ゴキゲン", row: 0, col: 3, dir: "down", clue: "Хорошее настроение", number: 7},
+                ]
+            }    
         ]
     };
