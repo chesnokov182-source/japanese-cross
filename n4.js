@@ -326,7 +326,7 @@ window.crosswordsData.n4 = {
                 ]
             },
             {
-                name: "Кроссворд 20",
+                name: "Кроссворд 22",
                 width: 4,
                 height: 4,
                 price: 60,
@@ -334,9 +334,9 @@ window.crosswordsData.n4 = {
                     { word: "アサ", row: 0, col: 0, dir: "down", clue: "Противоположность ночи", number: 1},
                     { word: "アセ", row: 0, col: 0, dir: "across", clue: "Пот", number: 1.1},
                     { word: "サンスウ", row: 1, col: 0, dir: "across", clue: "Арифметика; вычисление, счёт", number: 2},
-                    { word: "スイカ", row: 2, col: 1, dir: "down", clue: "Арбуз", number: 3},
-                    { word: "スイス", row: 1, col: 2, dir: "across", clue: "Швейцария", number: 4},
-                    { word: "カイスイ", row: 3, col: 0, dir: "down", clue: "Морская вода", number: 5},
+                    { word: "スイカ", row: 2, col: 1, dir: "across", clue: "Арбуз", number: 3},
+                    { word: "スイス", row: 1, col: 2, dir: "down", clue: "Швейцария", number: 4},
+                    { word: "カイスイ", row: 3, col: 0, dir: "across", clue: "Морская вода", number: 5},
                     { word: "ヨウカイ", row: 0, col: 3, dir: "down", clue: "Дух, демон, оборотень", number: 6},
                     { word: "センスイ", row: 0, col: 1, dir: "down", clue: "Погружение в воду, ныряние", number: 7},
                 ]
