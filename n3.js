@@ -23,8 +23,9 @@ window.crosswordsData.n3 = {
               height: 5,
               price: 60,
               words: [
-                { word: "レストラン", row: 0, col: 0, dir: "across", clue: "いしそうな料理がたくさん！ 君は何を食べる？", number: 1 },
-                { word: "レイゾウコ", row: 0, col: 0, dir: "down", clue: "なかはひんやり。食べ物を保管するよ", number: 1 },
+                { word: "レストラン", row: 0, col: 0, dir: "across", clue: "おいしそうな料理がたくさん！ 君は何を食べる？", number: 1 },
+                { word: "レイゾウコ", row: 0, col: 0, dir: "down", clue: "なかはひんやり。食べ物を保管するよ", number: 1.1},
+                { word: "トク", row: 0, col: 2, dir: "down", clue: "そんして？？取れ", number: 2},
                 { word: "ライオン", row: 0, col: 3, dir: "down", clue: "動物の王様!? たてがみがかっこいいよね", number: 3 },
                 { word: "クイ", row: 1, col: 2, dir: "across", clue: "出る⑦⑨は打たれる", number: 4 },
                 { word: "ゾウ", row: 2, col: 0, dir: "across", clue: "体が大きく、はなが長いよ。バオーン！", number: 5 },
