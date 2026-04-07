@@ -356,6 +356,22 @@ window.crosswordsData.n4 = {
                     { word: "ヒトデ", row: 1, col: 2, dir: "down", clue: "Морское животное в форме звезды", number: 6},
                     { word: "ゴキゲン", row: 0, col: 3, dir: "down", clue: "Хорошее настроение", number: 7},
                 ]
-            }    
+            },  
+            {
+                name: "Кроссворд 24",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "カラアゲ", row: 0, col: 0, dir: "down", clue: "Карааге", number: 1},
+                    { word: "カケアシ", row: 0, col: 0, dir: "across", clue: "Ускоренный шаг", number: 1.1},
+                    { word: "ライオン", row: 1, col: 0, dir: "across", clue: "Лев", number: 2},
+                    { word: "アト", row: 2, col: 0, dir: "across", clue: "После, затем", number: 3},
+                    { word: "ケイト", row: 0, col: 1, dir: "down", clue: "Шерсть", number: 4},
+                    { word: "アオ", row: 0, col: 2, dir: "down", clue: "Цвет моря", number: 5},
+                    { word: "ニイ", row: 3, col: 2, dir: "across", clue: "Два", number: 6},
+                    { word: "シンパイ", row: 0, col: 3, dir: "down", clue: "Волнение", number: 7},
+                ]
+            },
         ]
     };
