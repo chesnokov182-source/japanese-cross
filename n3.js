@@ -18,7 +18,7 @@ window.crosswordsData.n3 = {
             ]
         },
         {
-              name: "Кроссворд　2",
+              name: "Кроссворд 2",
               width: 5,
               height: 5,
               price: 60,
