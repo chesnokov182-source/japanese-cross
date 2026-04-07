@@ -27,7 +27,7 @@ window.crosswordsData.n3 = {
                 { word: "レイゾウコ", row: 0, col: 0, dir: "down", clue: "なかはひんやり。食べ物を保管するよ", number: 1.1},
                 { word: "トク", row: 0, col: 2, dir: "down", clue: "そんして？？取れ", number: 2},
                 { word: "ライオン", row: 0, col: 3, dir: "down", clue: "動物の王様!? たてがみがかっこいいよね", number: 3 },
-                { word: "クイ", row: 1, col: 2, dir: "across", clue: "出る⑦⑨は打たれる", number: 4 },
+                { word: "クイ", row: 1, col: 2, dir: "across", clue: "出る？？は打たれる", number: 4 },
                 { word: "ゾウ", row: 2, col: 0, dir: "across", clue: "体が大きく、はなが長いよ。バオーン！", number: 5 },
                 { word: "スイロ", row: 2, col: 1, dir: "down", clue: "舟の移動などのためにつくられた、水の通路", number: 6 },
                 { word: "オヤ", row: 2, col: 3, dir: "across", clue: "お父さん、お母さん", number: 7 },
