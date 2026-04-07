@@ -388,5 +388,20 @@ window.crosswordsData.n4 = {
                     { word: "ツミキ", row: 3, col: 1, dir: "across", clue: "Деревянные кубики", number: 6},
                 ]
             },   
+            {
+                name: "Кроссворд 26",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ハミガキ", row: 0, col: 0, dir: "down", clue: "Чистка зубов", number: 1},
+                    { word: "ミカン", row: 1, col: 0, dir: "across", clue: "Мандарин", number: 2},
+                    { word: "キジ", row: 3, col: 0, dir: "across", clue: "Фазан", number: 3},
+                    { word: "コメ", row: 0, col: 2, dir: "across", clue: "Рис", number: 4},
+                    { word: "コンヤ", row: 0, col: 2, dir: "down", clue: "Сегодняшний вечер", number: 4.1},
+                    { word: "ヤギ", row: 2, col: 2, dir: "across", clue: "Козёл, коза", number: 5},
+                    { word: "ギン", row: 2, col: 3, dir: "down", clue: "Медаль за 2-е место", number: 6},
+                ]
+            }, 
         ]
     };
