@@ -92,7 +92,7 @@ window.crosswordsData.n3 = {
                 { word: "イトコ", row: 3, col: 3, dir: "down", clue: "親の兄弟の子", number: 7 },
                 { word: "イネ", row: 4, col: 4, dir: "down", clue: "この植物からお米ができるよ", number: 9 },
                 { word: "オテ", row: 0, col: 0, dir: "across", clue: "犬が前あしで、人間の手にタッチ", number: 1 },
-                { word: "コテ", row: 0, col: 3, dir: "across", clue: "剣道で、うでをこうげき", number: 3 },
+                { word: "コテ", row: 0, col: 3, dir: "across", clue: "剣道で、うでをこうげき", number: 3.1 },
                 { word: "ニンジヤ", row: 1, col: 0, dir: "across", clue: "忍法、分身の術！ 手裏剣も得意だぞ！", number: 4 },
                 { word: "カシツ", row: 2, col: 0, dir: "across", clue: "テレビや写真などの、画像の質", number: 6 },
                 { word: "セイト", row: 3, col: 2, dir: "across", clue: "学校で「教える人」は先生。では、「教わる人」は？", number: 8 },
