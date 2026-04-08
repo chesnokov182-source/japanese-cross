@@ -168,16 +168,17 @@ window.crosswordsData.n3 = {
               price: 60,
               words: [
                 { word: "ナラ", row: 0, col: 0, dir: "down", clue: "有名なお寺や仏像が、たくさんある県だよ", number: 1 },
-                { word: "カクオキ", row: 1, col: 0, dir: "down", clue: "一年おき", number: 2 },
-                { word: "ワラジ", row: 2, col: 0, dir: "down", clue: "わらでつくった、はきもの", number: 3 },
-                { word: "カーシェア", row: 3, col: 0, dir: "down", clue: "自動車を貸し出すサービス", number: 4 },
-                { word: "コムギ", row: 4, col: 0, dir: "down", clue: "パン、ビスケット、うどんなどは、これからできているよ", number: 8 },
-                { word: "キリ", row: 4, col: 3, dir: "down", clue: "小さなあなをあける道具", number: 9 },
-                { word: "トラブル", row: 0, col: 0, dir: "across", clue: "どうした！たいへんだ！なかま同士が、けんかしちゃったぞ", number: 1 },
-                { word: "ラク", row: 0, col: 2, dir: "across", clue: "人生は楽しいこともあれば、苦しいこともある。「楽あれば苦あり」だね", number: 5 },
-                { word: "ラン", row: 0, col: 3, dir: "across", clue: "「走る」の英語。「走る人」は、ランナー", number: 6 },
-                { word: "ネコ", row: 2, col: 0, dir: "across", clue: "ぼくは、熱い食べ物が苦手なんだ", number: 7 },
-                { word: "ギョウム", row: 3, col: 1, dir: "across", clue: "会社でお仕事", number: 9 }
+                { word: "カクネン", row: 0, col: 1, dir: "down", clue: "一年おき", number: 2 },
+                { word: "ワラジ", row: 0, col: 3, dir: "down", clue: "わらでつくった、はきもの", number: 3 },
+                { word: "レンタカー", row: 0, col: 4, dir: "down", clue: "自動車を貸し出すサービス", number: 4 },
+                { word: "コムギ", row: 2, col: 2, dir: "down", clue: "パン、ビスケット、うどんなどは、これからできているよ", number: 8 },
+                { word: "キリ", row: 3, col: 0, dir: "down", clue: "小さなあなをあける道具", number: 9 },
+                { word: "ナカマワレ", row: 0, col: 0, dir: "across", clue: "たいへんだ！なかま同士が、けんかしちゃったぞ", number: 1.1 },
+                { word: "ラク", row: 1, col: 0, dir: "across", clue: "人生は楽しいこともあれば、苦しいこともある。「楽あれば苦あり」だね", number: 5 },
+                { word: "ラン", row: 1, col: 3, dir: "across", clue: "「走る」の英語。「走る人」は、？？ナー", number: 6 },
+                { word: "ネコジタ", row: 2, col: 1, dir: "across", clue: "ぼくは、熱い食べ物が苦手なんだ", number: 7 },
+                { word: "キンム", row: 3, col: 0, dir: "across", clue: "会社でお仕事", number: 9.1 }
+                { word: "ギター", row:4, col: 2, dir: "across", clue: "楽器", number: 10 }
         ]
     },
     ]
