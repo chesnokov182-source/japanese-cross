@@ -78,6 +78,6 @@ window.crosswordsData.n3 = {
                 { word: "シヨウネン", row: 0, col: 2, dir: "down", clue: "男の子", number: 2 },
                 { word: "ランドセル", row: 0, col: 4, dir: "down", clue: "背中にしまって、学校へゴー！", number: 3 },
           ]
-    },
+    }
     ]
 };
