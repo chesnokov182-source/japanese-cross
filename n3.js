@@ -150,7 +150,7 @@ window.crosswordsData.n3 = {
                 { word: "クシ", row: 0, col: 1, dir: "down", clue: "かみをきれいにとかしましょう", number: 2 },
                 { word: "サカミチ", row: 0, col: 3, dir: "down", clue: "くだりは楽だけど、のぼりはつかれる", number: 3 },
                 { word: "メン", row: 0, col: 4, dir: "down", clue: "うどん、そば、スパゲッティ……", number: 4 },
-                { word: "ヨウモウ", row: 2, col: 2, dir: "down", clue: "ヒツジの毛", number: 6 },
+                { word: "ヨウモウ", row: 1, col: 2, dir: "down", clue: "ヒツジの毛", number: 6 },
                 { word: "オト", row: 3, col: 1, dir: "down", clue: "ノックは「トントン」、電子レンジは「チン」、電車は「ガタゴトン」", number: 8 },
                 { word: "ヤギ", row: 3, col: 4, dir: "down", clue: "紙をムシャムシャ。メェーメェーメェー", number: 9 },
                 { word: "フク", row: 0, col: 0, dir: "across", clue: "残り物にはこれがある？", number: 1.1 },
@@ -160,6 +160,25 @@ window.crosswordsData.n3 = {
                 { word: "オモチヤ", row: 3, col: 1, dir: "across", clue: "積み木、ラジコン、ボードゲーム、けん玉……", number: 8 },
                 { word: "サトウ", row: 4, col: 0, dir: "across", clue: "「あまい調味料」といえば何が思いつく？", number: 10 }
           ]
+    },
+    {
+              name: "Кроссворд 9",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "ナラ", row: 0, col: 0, dir: "down", clue: "有名なお寺や仏像が、たくさんある県だよ", number: 1 },
+                { word: "カクオキ", row: 1, col: 0, dir: "down", clue: "一年おき", number: 2 },
+                { word: "ワラジ", row: 2, col: 0, dir: "down", clue: "わらでつくった、はきもの", number: 3 },
+                { word: "カーシェア", row: 3, col: 0, dir: "down", clue: "自動車を貸し出すサービス", number: 4 },
+                { word: "コムギ", row: 4, col: 0, dir: "down", clue: "パン、ビスケット、うどんなどは、これからできているよ", number: 8 },
+                { word: "キリ", row: 4, col: 3, dir: "down", clue: "小さなあなをあける道具", number: 9 },
+                { word: "トラブル", row: 0, col: 0, dir: "across", clue: "どうした！たいへんだ！なかま同士が、けんかしちゃったぞ", number: 1 },
+                { word: "ラク", row: 0, col: 2, dir: "across", clue: "人生は楽しいこともあれば、苦しいこともある。「楽あれば苦あり」だね", number: 5 },
+                { word: "ラン", row: 0, col: 3, dir: "across", clue: "「走る」の英語。「走る人」は、ランナー", number: 6 },
+                { word: "ネコ", row: 2, col: 0, dir: "across", clue: "ぼくは、熱い食べ物が苦手なんだ", number: 7 },
+                { word: "ギョウム", row: 3, col: 1, dir: "across", clue: "会社でお仕事", number: 9 }
+        ]
     },
     ]
 };
