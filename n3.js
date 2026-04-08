@@ -114,7 +114,7 @@ window.crosswordsData.n3 = {
                 { word: "サクラ", row: 0, col: 2, dir: "across", clue: "この木の下で、お花見をしたいね", number: 2.2 },
                 { word: "スマイル", row: 1, col: 0, dir: "across", clue: "ニコニコ", number: 4 },
                 { word: "ワケ", row: 2, col: 0, dir: "across", clue: "理由", number: 6 },
-                { word: "トビ", row: 2, col: 4, dir: "across", clue: "輪をえがくように、空を飛ぶ鳥。ピーヒョロロ♪", number: 7 },
+                { word: "トビ", row: 2, col: 3, dir: "across", clue: "輪をえがくように、空を飛ぶ鳥。ピーヒョロロ♪", number: 7 },
                 { word: "ガンコ", row: 3, col: 2, dir: "across", clue: "ワシは間違っとらんぞ！ ワシは考えを変えないぞ！", number: 9 },
                 { word: "ドラム", row: 4, col: 0, dir: "across", clue: "たいこ", number: 10 }
           ]
