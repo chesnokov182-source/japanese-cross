@@ -131,6 +131,7 @@ window.crosswordsData.n3 = {
                 { word: "コマ", row: 0, col: 4, dir: "down", clue: "くるくる回して遊ぶよ", number: 4 },
                 { word: "インク", row: 2, col: 2, dir: "down", clue: "ボールペンで文字が書けるのは、ペンの中にこれが入っているから", number: 8 },
                 { word: "プロ", row: 3, col: 0, dir: "down", clue: "それを職業としている人。例）野球選手、ゴルファー", number: 9 },
+                { word: "スミ", row: 3, col: 4, dir: "down", clue: "区切られた場所の角.目立たないところ", number: 10 },
                 { word: "ハミガキコ", row: 0, col: 0, dir: "across", clue: "これをつけて歯をみがこう！", number: 1.1 },
                 { word: "エマ", row: 1, col: 0, dir: "across", clue: "馬の絵がかかれた板。お願いごとを書いて、神社や寺におさめるよ", number: 5 },
                 { word: "ヤマ", row: 1, col: 3, dir: "across", clue: "世界一の高さはエベレスト", number: 6 },
