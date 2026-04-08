@@ -187,7 +187,7 @@ window.crosswordsData.n3 = {
               height: 5,
               price: 60,
               words: [
-                { word: "アクリョク", row: 0, col: 0, dir: "down", clue: "ものを強くにぎる力", number: 1.1 },
+                { word: "アクリヨク", row: 0, col: 0, dir: "down", clue: "ものを強くにぎる力", number: 1.1 },
                 { word: "リク", row: 0, col: 1, dir: "down", clue: "地球の約7割は海。では、残りの3割は？", number: 2 },
                 { word: "トキン", row: 0, col: 3, dir: "down", clue: "しょうぎで、「歩」が成ると？", number: 3 },
                 { word: "ウシロアシ", row: 0, col: 4, dir: "down", clue: "しっぽに近いほうのあし", number: 4 },
@@ -198,6 +198,29 @@ window.crosswordsData.n3 = {
                 { word: "センロ", row: 2, col: 2, dir: "across", clue: "ガッタン、ガッタン。列車の走る道", number: 7.1 },
                 { word: "ヨカン", row: 3, col: 0, dir: "across", clue: "これから何かが起こりそう……", number: 8 },
                 { word: "シルシ", row: 4, col: 2, dir: "across", clue: "マーク", number: 9 }
+          ]
+    },
+    {
+              name: "Кроссворд 11",
+              width: 6,
+              height: 6,
+              price: 60,
+              words: [
+                { word: "キヨウリユウ", row: 0, col: 0, dir: "down", clue: "ティラノサウルス、ステゴサウルス、トリケラトプス……", number: 1 },
+                { word: "ナカユビ", row: 0, col: 2, dir: "down", clue: "お兄さん指", number: 2 },
+                { word: "イクジ", row: 0, col: 4, dir: "down", clue: "子育て", number: 3 },
+                { word: "ロマンチスト", row: 0, col: 5, dir: "down", clue: "現実離れした、夢みたいなことが好きな人", number: 4 },
+                { word: "ツチ", row: 1, col: 1, dir: "down", clue: "花の種を花だんの？？にうめる", number: 6 },
+                { word: "ウンセイ", row: 2, col: 3, dir: "down", clue: "やった！ 今日はハッピーな一日だってさ", number: 9 },
+                { word: "カン", row: 4, col: 1, dir: "down", clue: "自動販売機で、？？コーヒーを買う", number: 12 },
+                { word: "ナナイロ", row: 0, col: 2, dir: "across", clue: "にじって何色？", number: 2.1 },
+                { word: "ヨツカ", row: 1, col: 0, dir: "across", clue: "「みどりの日」は、5月何日？", number: 5 },
+                { word: "クマ", row: 1, col: 4, dir: "across", clue: "金太郎とすもうをとった、大きな動物といえば？", number: 7 },
+                { word: "ウチユウジン", row: 2, col: 0, dir: "across", clue: "地球以外の星に生存する知的生命体。君はいると思う？", number: 8 },
+                { word: "ビン", row: 3, col: 2, dir: "across", clue: "？？に入ったビールを、コップにつぐお父さん", number: 10 },
+                { word: "ユカ", row: 4, col: 0, dir: "across", clue: "「天井」の反対の言葉", number: 11 },
+                { word: "センス", row: 4, col: 3, dir: "across", clue: "バタバタあおいで風を起こす道具。「おうぎ」ともいうね", number: 13 },
+                { word: "ウンメイ", row: 5, col: 0, dir: "across", clue: "ベートーベンがつくった有名な曲。ジャジャジャジャーン♪", number: 14 }
           ]
     },
     ]
