@@ -42,5 +42,27 @@ window.crosswordsData.n3 = {
                 { word: "アシカ", row: 4, col: 0, dir: "across", clue: "水族館で、よくショーをやっている動物。オットセイやアザラシに似ているね", number: 10 }
         ]
     },
+        {
+              name: "Кроссворд 3",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "カカク", row: 0, col: 0, dir: "across", clue: "「ねだん」と同じ意味", number: 1.1 },
+                { word: "オンガエシ", row: 1, col: 0, dir: "across", clue: "親切にしてくれた人には、これをしたいよね", number: 5 },
+                { word: "ガツキ", row: 2, col: 1, dir: "across", clue: "ピアノ、バイオリン、たいこ、ラッパ……", number: 7 },
+                { word: "エル", row: 3, col: 0, dir: "across", clue: "小さいサイズは「S」、大きいサイズは？", number: 8 },
+                { word: "タナ", row: 3, col: 3, dir: "across", clue: "物をのせておくのに便利", number: 9 },
+                { word: "サーフイン", row: 4, col: 0, dir: "across", clue: "板を使って、波に乗っちゃうぞ", number: 11 },
+                { word: "カオ", row: 0, col: 0, dir: "down", clue: "朝起きたら、あらおうね", number: 1 },
+                { word: "カンガルー", row: 0, col: 1, dir: "down", clue: "ビョンビョンビョン、おなかのふくろから子どもがひょっこり", number: 2 },
+                { word: "クガツ", row: 0, col: 2, dir: "down", clue: "7月→8月→ ？→10月", number: 3 },
+                { word: "ニシ", row: 0, col: 4, dir: "down", clue: "「東」の反対の方角", number: 4 },
+                { word: "エキタイ", row: 1, col: 3, dir: "down", clue: "水は「固体」。では、水は？", number: 6 },
+                { word: "エサ", row: 3, col: 0, dir: "down", clue: "ペットにこれは、わすれちゃダメだね", number: 8 },
+                { word: "ナン", row: 3, col: 4, dir: "down", clue: "カレーといっしょに食べたいパン。平べったいよ", number: 10 }
+      ]
+    },
+        
     ]
 };
