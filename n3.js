@@ -73,7 +73,7 @@ window.crosswordsData.n3 = {
                 { word: "ヨニン", row: 1, col: 2, dir: "across", clue: "公園に10人いましたが、6人帰りました。残りは何人？", number: 4 },
                 { word: "ウモウ", row: 2, col: 0, dir: "across", clue: "鳥のはね。ふわふわしたものが、ふとんに使われることもあるね", number: 5 },
                 { word: "ネグセ", row: 3, col: 2, dir: "across", clue: "朝起きたら、かみの毛がピョン", number: 6 },
-                { word: "ウテン", row: 4, col: 0, dir: "down", clue: "雨のふる天気。「？？？中止」", number: 7 },
+                { word: "ウテン", row: 4, col: 0, dir: "across", clue: "雨のふる天気。「？？？中止」", number: 7 },
                 { word: "リユウコウ", row: 0, col: 0, dir: "down", clue: "今、話題や人気になっていること", number: 1.1 },
                 { word: "シヨウネン", row: 0, col: 2, dir: "down", clue: "男の子", number: 2 },
                 { word: "ランドセル", row: 0, col: 4, dir: "down", clue: "背中にしまって、学校へゴー！", number: 3 }
