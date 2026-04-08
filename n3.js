@@ -4,21 +4,7 @@ window.crosswordsData.n3 = {
     name: "JLPT N3",
     puzzles: [
         {
-            name: "Кроссворд 1",
-            width: 9,
-            height: 9,
-            price: 0,
-            words: [
-                { word: "ケイザイ", row: 0, col: 2, dir: "across", clue: "Экономика" },
-                { word: "セイジ", row: 2, col: 1, dir: "across", clue: "Политика" },
-                { word: "ブンカ", row: 4, col: 0, dir: "across", clue: "Культура" },
-                { word: "レキシ", row: 6, col: 3, dir: "across", clue: "История" },
-                { word: "ガクシュウ", row: 1, col: 5, dir: "down", clue: "Обучение" },
-                { word: "ケンキュウ", row: 3, col: 7, dir: "down", clue: "Исследование" }
-            ]
-        },
-        {
-              name: "Кроссворд 2",
+              name: "Кроссворд 1",
               width: 5,
               height: 5,
               price: 60,
@@ -37,5 +23,24 @@ window.crosswordsData.n3 = {
                 { word: "コガラ", row: 4, col: 0, dir: "across", clue: "「大がら」の反対の意味の言葉は？", number: 11 }
               ]
         },
+        {
+              name: "Кроссворд 2",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "ジユウ", row: 0, col: 0, dir: "down", clue: "自分の好きなようにやれること", number: 1 },
+                { word: "ザンネン", row: 1, col: 0, dir: "down", clue: "残念。もう一回、やってみよう！", number: 2 },
+                { word: "オウチ", row: 2, col: 0, dir: "down", clue: "おうち", number: 3 },
+                { word: "モーニング", row: 3, col: 0, dir: "down", clue: "「朝」の英語", number: 4 },
+                { word: "ギンカ", row: 4, col: 0, dir: "down", clue: "銀でつくられたお金", number: 8 },
+                { word: "ジャガイモ", row: 0, col: 0, dir: "across", clue: "「ポテト」って、どんな野菜？", number: 1 },
+                { word: "ユリ", row: 0, col: 3, dir: "across", clue: "漢字で書くと「百合」。きれいなお花だよ", number: 5 },
+                { word: "エー", row: 0, col: 4, dir: "across", clue: "アルファベットの最初の文字", number: 6 },
+                { word: "ウナギ", row: 1, col: 1, dir: "across", clue: "ぬるぬるしていて、つかみにくいぞ", number: 7 },
+                { word: "オフロ", row: 2, col: 2, dir: "across", clue: "あたたまるし、健康にもいいらしいよ", number: 9 },
+                { word: "オットセイ", row: 3, col: 1, dir: "across", clue: "水族館で、よくショーをやっている動物。オットセイやアザラシに似ているね", number: 10 }
+        ]
+    },
     ]
 };
