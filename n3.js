@@ -140,5 +140,26 @@ window.crosswordsData.n3 = {
                 { word: "クルミ", row: 4, col: 2, dir: "across", clue: "リスの好物。からがかたい木の実だよ", number: 11 }
           ]
     },
+    {
+              name: "Кроссворд 8",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "フトン", row: 0, col: 0, dir: "down", clue: "さむい日の朝は、なかなか出られないよね", number: 1 },
+                { word: "クシ", row: 0, col: 1, dir: "down", clue: "かみをきれいにとかしましょう", number: 2 },
+                { word: "サカミチ", row: 0, col: 3, dir: "down", clue: "くだりは楽だけど、のぼりはつかれる", number: 3 },
+                { word: "メン", row: 0, col: 4, dir: "down", clue: "うどん、そば、スパゲッティ……", number: 4 },
+                { word: "ヨウモウ", row: 2, col: 2, dir: "down", clue: "ヒツジの毛", number: 6 },
+                { word: "オト", row: 3, col: 1, dir: "down", clue: "ノックは「トントン」、電子レンジは「チン」、電車は「ガタゴトン」", number: 8 },
+                { word: "ヤギ", row: 3, col: 4, dir: "down", clue: "紙をムシャムシャ。メェーメェーメェー", number: 9 },
+                { word: "フク", row: 0, col: 0, dir: "across", clue: "残り物にはこれがある？", number: 1.1 },
+                { word: "サメ", row: 0, col: 3, dir: "across", clue: "ジョーズ", number: 3.1 },
+                { word: "トシヨカン", row: 1, col: 0, dir: "across", clue: "本がいっぱい。利用するときは静かにね", number: 5 },
+                { word: "ウミ", row: 2, col: 2, dir: "across", clue: "広いな、大きいな～♪", number: 7 },
+                { word: "オモチヤ", row: 3, col: 1, dir: "across", clue: "積み木、ラジコン、ボードゲーム、けん玉……", number: 8 },
+                { word: "サトウ", row: 4, col: 0, dir: "across", clue: "「あまい調味料」といえば何が思いつく？", number: 10 }
+          ]
+    },
     ]
 };
