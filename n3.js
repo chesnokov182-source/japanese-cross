@@ -181,5 +181,24 @@ window.crosswordsData.n3 = {
                 { word: "ギター", row:4, col: 2, dir: "across", clue: "楽器", number: 10 }
         ]
     },
+    {
+              name: "Кроссворд 10",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "アクリョク", row: 0, col: 0, dir: "down", clue: "ものを強くにぎる力", number: 1.1 },
+                { word: "リク", row: 0, col: 1, dir: "down", clue: "地球の約7割は海。では、残りの3割は？", number: 2 },
+                { word: "トキン", row: 0, col: 3, dir: "down", clue: "しょうぎで、「歩」が成ると？", number: 3 },
+                { word: "ウシロアシ", row: 0, col: 4, dir: "down", clue: "しっぽに近いほうのあし", number: 4 },
+                { word: "センシ", row: 2, col: 2, dir: "down", clue: "戦う人。ファイター", number: 7 },
+                { word: "アリガトウ", row: 0, col: 0, dir: "across", clue: "お礼の言葉。言っても言われても、すてきな気持ちになるよね", number: 1 },
+                { word: "クク", row: 1, col: 0, dir: "across", clue: "1ケタ同士のかけ算", number: 5 },
+                { word: "キシ", row: 1, col: 3, dir: "across", clue: "しょうぎのプロ", number: 6 },
+                { word: "センロ", row: 2, col: 2, dir: "across", clue: "ガッタン、ガッタン。列車の走る道", number: 7.1 },
+                { word: "ヨカン", row: 3, col: 0, dir: "across", clue: "これから何かが起こりそう……", number: 8 },
+                { word: "シルシ", row: 4, col: 2, dir: "across", clue: "マーク", number: 9 }
+          ]
+    },
     ]
 };
