@@ -126,17 +126,17 @@ window.crosswordsData.n3 = {
               price: 60,
               words: [
                 { word: "ハエ", row: 0, col: 0, dir: "down", clue: "ブーン、ブーン。とまっては、あしをスリスリ", number: 1 },
-                { word: "ケンサ", row: 1, col: 0, dir: "down", clue: "何か問題がないか、あちこち見て回ること", number: 2 },
-                { word: "キヤンセル", row: 2, col: 0, dir: "down", clue: "すみません。今日の予定、取り消します", number: 3 },
-                { word: "コマ", row: 3, col: 0, dir: "down", clue: "くるくる回して遊ぶよ", number: 4 },
-                { word: "インキ", row: 4, col: 0, dir: "down", clue: "ボールペンで文字が書けるのは、ペンの中にこれが入っているから", number: 8 },
-                { word: "プロ", row: 4, col: 3, dir: "down", clue: "それを職業としている人。例）野球選手、ゴルファー", number: 9 },
-                { word: "ハイキ", row: 0, col: 0, dir: "across", clue: "これをつけて歯をみがこう！", number: 1 },
-                { word: "エマ", row: 0, col: 1, dir: "across", clue: "馬の絵がかかれた板。お願いごとを書いて、神社や寺におさめるよ", number: 5 },
-                { word: "ヤマ", row: 0, col: 2, dir: "across", clue: "世界一の高さはエベレスト", number: 6 },
-                { word: "ワイン", row: 0, col: 3, dir: "across", clue: "ブドウでつくったお酒", number: 7 },
-                { word: "ヒメ", row: 2, col: 0, dir: "across", clue: "おひめさま", number: 9 },
-                { word: "クリ", row: 4, col: 0, dir: "across", clue: "リスの好物。からがかたい木の実だよ", number: 11 }
+                { word: "ミマワリ", row: 0, col: 1, dir: "down", clue: "何か問題がないか、あちこち見て回ること", number: 2 },
+                { word: "キヤンセル", row: 0, col: 3, dir: "down", clue: "すみません。今日の予定、取り消します", number: 3 },
+                { word: "コマ", row: 0, col: 4, dir: "down", clue: "くるくる回して遊ぶよ", number: 4 },
+                { word: "インク", row: 2, col: 2, dir: "down", clue: "ボールペンで文字が書けるのは、ペンの中にこれが入っているから", number: 8 },
+                { word: "プロ", row: 3, col: 0, dir: "down", clue: "それを職業としている人。例）野球選手、ゴルファー", number: 9 },
+                { word: "ハミガキコ", row: 0, col: 0, dir: "across", clue: "これをつけて歯をみがこう！", number: 1.1 },
+                { word: "エマ", row: 1, col: 0, dir: "across", clue: "馬の絵がかかれた板。お願いごとを書いて、神社や寺におさめるよ", number: 5 },
+                { word: "ヤマ", row: 1, col: 3, dir: "across", clue: "世界一の高さはエベレスト", number: 6 },
+                { word: "ワイン", row: 2, col: 1, dir: "across", clue: "ブドウでつくったお酒", number: 7 },
+                { word: "プリンセス", row: 3, col: 0, dir: "across", clue: "おひめさま", number: 9.1 },
+                { word: "クルミ", row: 4, col: 2, dir: "across", clue: "リスの好物。からがかたい木の実だよ", number: 11 }
           ]
     },
     ]
