@@ -30,16 +30,16 @@ window.crosswordsData.n3 = {
               price: 60,
               words: [
                 { word: "ジユウ", row: 0, col: 0, dir: "down", clue: "自分の好きなようにやれること", number: 1 },
-                { word: "ザンネン", row: 1, col: 0, dir: "down", clue: "残念。もう一回、やってみよう！", number: 2 },
-                { word: "オウチ", row: 2, col: 0, dir: "down", clue: "おうち", number: 3 },
-                { word: "モーニング", row: 3, col: 0, dir: "down", clue: "「朝」の英語", number: 4 },
-                { word: "ギンカ", row: 4, col: 0, dir: "down", clue: "銀でつくられたお金", number: 8 },
                 { word: "ジヤガイモ", row: 0, col: 0, dir: "across", clue: "「ポテト」って、どんな野菜？", number: 1.1 },
-                { word: "ユリ", row: 0, col: 3, dir: "across", clue: "漢字で書くと「百合」。きれいなお花だよ", number: 5 },
-                { word: "エー", row: 0, col: 4, dir: "across", clue: "アルファベットの最初の文字", number: 6 },
-                { word: "ウナギ", row: 1, col: 1, dir: "across", clue: "ぬるぬるしていて、つかみにくいぞ", number: 7 },
-                { word: "オフロ", row: 2, col: 2, dir: "across", clue: "あたたまるし、健康にもいいらしいよ", number: 9 },
-                { word: "オットセイ", row: 3, col: 1, dir: "across", clue: "水族館で、よくショーをやっている動物。オットセイやアザラシに似ているね", number: 10 }
+                { word: "ヤリナオシ", row: 0, col: 1, dir: "down", clue: "残念。もう一回、やってみよう！", number: 2 },
+                { word: "イエ", row: 0, col: 3, dir: "down", clue: "おうち", number: 3 },
+                { word: "モーニング", row: 0, col: 4, dir: "down", clue: "「朝」の英語", number: 4 },
+                { word: "ギンカ", row: 2, col: 2, dir: "down", clue: "銀でつくられたお金", number: 8 },
+                { word: "ユリ", row: 1, col: 0, dir: "across", clue: "漢字で書くと「百合」。きれいなお花だよ", number: 5 },
+                { word: "エー", row: 1, col: 3, dir: "across", clue: "アルファベットの最初の文字", number: 6 },
+                { word: "ウナギ", row: 2, col: 0, dir: "across", clue: "ぬるぬるしていて、つかみにくいぞ", number: 7 },
+                { word: "オンセン", row: 3, col: 1, dir: "across", clue: "あたたまるし、健康にもいいらしいよ", number: 9 },
+                { word: "アシカ", row: 4, col: 0, dir: "across", clue: "水族館で、よくショーをやっている動物。オットセイやアザラシに似ているね", number: 10 }
         ]
     },
     ]
