@@ -322,5 +322,26 @@ window.crosswordsData.n3 = {
                 { word: "ジンギスカン", row: 5, col: 0, dir: "across", clue: "ヒツジの肉を焼いた、北海道の郷土料理", number: 13 }
         ]
     },
+    {
+              name: "Кроссворд 16",
+              width: 5,
+              height: 5,
+              price: 60,
+              words: [
+                { word: "コテシラベ", row: 0, col: 0, dir: "down", clue: "本格的にやる前に、ちょっと試してみること。「今のはほんのヨミだ」", number: 1 },
+                { word: "パパイア", row: 1, col: 0, dir: "down", clue: "代表的なトロピカルフルーツ（熱帯産の果実）のひとつ。黄色くなったら食べごろだよ", number: 2 },
+                { word: "スシ", row: 2, col: 0, dir: "down", clue: "マグロ、イクラ、たまご……、みんなは何が好き？", number: 3 },
+                { word: "ターミナル", row: 3, col: 0, dir: "down", clue: "大きな駅", number: 4 },
+                { word: "レア", row: 4, col: 0, dir: "down", clue: "めずらしいこと", number: 6 },
+                { word: "テツ", row: 4, col: 4, dir: "down", clue: "「金」＋「失」＝", number: 9 },
+            
+                { word: "パスタ", row: 0, col: 0, dir: "across", clue: "スパゲッティ、ラザニア、マカロニ、ペンネ……", number: 2.1 },
+                { word: "テレパシー", row: 0, col: 1, dir: "across", clue: "言葉や身ぶりなしで、相手の気持ちがわかっちゃう超能力！", number: 5 },
+                { word: "シアイ", row: 2, col: 0, dir: "across", clue: "サッカーの？？？で、勝利する", number: 7 },
+                { word: "アテナ", row: 3, col: 0, dir: "across", clue: "これを書かないと、手紙はとどかないぞ", number: 8 },
+                { word: "ベル", row: 4, col: 0, dir: "across", clue: "リンリンリン", number: 10 },
+                { word: "ツル", row: 0, col: 4, dir: "across", clue: "「？？は千年、カメは万年」は、長生きを祝う言葉", number: 11 }
+  ]
+}
     ]
 };
