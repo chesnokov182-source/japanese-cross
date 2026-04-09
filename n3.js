@@ -273,6 +273,30 @@ window.crosswordsData.n3 = {
                 { word: "チカラダメシ", row: 5, col: 0, dir: "across", clue: "力がどのていどのものか確かめるため、実際にやってみること", number: 17 }
           ]
     },
-        
+    {
+              name: "Кроссворд 14",
+              width: 6,
+              height: 6,
+              price: 60,
+              words: [
+                { word: "ホニユウルイ", row: 0, col: 0, dir: "down", clue: "人間もパンダもクジラも、同じなかまだよ", number: 1 },
+                { word: "クツ", row: 0, col: 1, dir: "down", clue: "きちんとそろえて、おうちに入ろう", number: 2 },
+                { word: "ホキユウ", row: 0, col: 2, dir: "down", clue: "暑い日は、「水分？？？？」をわすれずに", number: 3 },
+                { word: "セキジユン", row: 0, col: 4, dir: "down", clue: "席替えをすると変わるよね", number: 4 },
+                { word: "イジン", row: 0, col: 5, dir: "down", clue: "すごいことをなしとげた、すごい人", number: 5 },
+                { word: "ルビー", row: 3, col: 1, dir: "down", clue: "7月の誕生石", number: 10 },
+                { word: "エト", row: 4, col: 3, dir: "down", clue: "ウシの前はネズミ、ウシの後ろはトラ", number: 12 },
+                { word: "ママ", row: 4, col: 5, dir: "down", clue: "お母さん", number: 13 },
+            
+                { word: "ホクホクセイ", row: 0, col: 0, dir: "across", clue: "北と北西との間の方角", number: 1.1 },
+                { word: "ニツキ", row: 1, col: 0, dir: "across", clue: "今日あったことを書いておこう", number: 6 },
+                { word: "キジ", row: 1, col: 4, dir: "across", clue: "桃太郎「イヌとサル、えーと、なかまはあとだれだっけ？」", number: 7 }, 
+                { word: "ユウジン", row: 2, col: 2, dir: "across", clue: "お友だち", number: 8 },
+                { word: "ウルウ", row: 3, col: 0, dir: "across", clue: "「？？？年」は４年に１回", number: 9 },
+                { word: "ルビ", row: 4, col: 0, dir: "across", clue: "むずかしい漢字には、これがほしいよね", number: 11 },
+                { word: "エンマ", row: 4, col: 3, dir: "across", clue: "うそをつくと、舌をぬかれちゃう!?", number: 12.1 },
+                { word: "イースト", row: 5, col: 0, dir: "across", clue: "「東」を英語で言うと？", number: 14 }
+          ]
+    },   
     ]
 };
