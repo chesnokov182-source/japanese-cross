@@ -969,6 +969,17 @@ function applyHighlight(){
     }
 }
 
+// Прокрутка к активному вопросу в списке подсказок
+function scrollToActiveClue() {
+    const activeClue = document.querySelector('.clue-list li.active-clue');
+    if (activeClue) {
+        activeClue.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+}
+
 function clearHighlight(){
     activeWordId = null;
     applyHighlight();
