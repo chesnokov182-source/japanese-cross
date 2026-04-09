@@ -245,6 +245,6 @@ window.crosswordsData.n3 = {
                 { word: "カイロ", row: 4, col: 3, dir: "across", clue: "あったかいけど、やけどに注意してね", number: 11 },
                 { word: "アリゲーター", row: 5, col: 0, dir: "across", clue: "ワニ。クロコダイルにくらべて、口の先の幅が広いよ", number: 13 }
           ]
-    }?
+    },
     ]
 };
