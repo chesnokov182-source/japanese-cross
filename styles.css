@@ -909,3 +909,8 @@ body.sakura .clue-list li.active-clue {
     transform: scale(1.01);
     transition: transform 0.1s ease;
 }
+
+.clue-block {
+    max-height: 400px; 
+    overflow-y: auto;
+}
