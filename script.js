@@ -972,20 +972,18 @@ function applyHighlight(){
 
 function scrollToActiveClue() {
     const activeClue = document.querySelector('.clue-list li.active-clue');
-    if (activeClue) {
-        const container = activeClue.closest('.clue-block');
-        if (container) {
-            const containerRect = container.getBoundingClientRect();
-            const clueRect = activeClue.getBoundingClientRect();
-            const offset = clueRect.top - containerRect.top - 20; 
-            container.scrollBy({
-                top: offset,
-                behavior: 'smooth'
-            });
-        } else {
-            activeClue.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }
+    if (!activeClue) return;
+
+    const clueBlock = activeClue.closest('.clue-block');
+    if (!clueBlock) return;
+
+    // Позиция элемента относительно блока
+    const scrollTop = activeClue.offsetTop - clueBlock.offsetTop - 10; // -10 для отступа
+
+    clueBlock.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+    });
 }
 
 function clearHighlight(){
