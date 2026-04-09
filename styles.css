@@ -911,7 +911,7 @@ body.sakura .clue-list li.active-clue {
 }
 
 .clue-block {
-    max-height: 400px;        
+    max-height: 60vh;
     overflow-y: auto;
-    scroll-behavior: smooth;  
+    scroll-behavior: smooth;
 }
