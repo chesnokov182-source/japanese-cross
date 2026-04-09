@@ -246,5 +246,33 @@ window.crosswordsData.n3 = {
                 { word: "アリゲーター", row: 5, col: 0, dir: "across", clue: "ワニ。クロコダイルにくらべて、口の先の幅が広いよ", number: 13 }
           ]
     },
+    {
+              name: "Кроссворд 13",
+              width: 6,
+              height: 6,
+              price: 60,
+              words: [
+                { word: "カイサツグチ", row: 0, col: 0, dir: "down", clue: "駅のホームの出入り口", number: 1 },
+                { word: "スキー", row: 0, col: 1, dir: "down", clue: "雪山をスイスイすべるよ", number: 2 },
+                { word: "ネコ", row: 0, col: 3, dir: "down", clue: "ニャーニャー", number: 3 },
+                { word: "ツウカ", row: 0, col: 4, dir: "down", clue: "通りすぎること。「電車が???します。ご注意ください」", number: 4 },
+                { word: "トウモロコシ", row: 0, col: 5, dir: "down", clue: "黄色いつぶがたくさんある野菜", number: 5 },
+                { word: "ブタ", row: 2, col: 2, dir: "down", clue: "ブーブー", number: 9 },
+                { word: "カラダ", row: 3, col: 3, dir: "down", clue: "頭のてっぺんから、つま先まで全部", number: 12 },
+                { word: "チカ", row: 4, col: 1, dir: "down", clue: "地面の下", number: 14 },
+                { word: "ツメ", row: 4, col: 4, dir: "down", clue: "のびたら切ろうね", number: 16 },
+            
+                { word: "カスタネツト", row: 0, col: 0, dir: "across", clue: "２まいの板を打ち合わせて音を出す楽器。タンタンタン♪", number: 1.1 },
+                { word: "イキ", row: 1, col: 0, dir: "across", clue: "口から「ハー」、鼻からも「フー」", number: 6 },
+                { word: "コウウ", row: 1, col: 3, dir: "across", clue: "雨がふること", number: 7 },
+                { word: "サーブ", row: 2, col: 0, dir: "across", clue: "テニスやバレーボールでは、最初にまずこれ", number: 8 },
+                { word: "カモ", row: 2, col: 4, dir: "across", clue: "「？？がネギをしょってくる」は、都合のよいことが重なるたとえ", number: 10 },
+                { word: "タカ", row: 3, col: 2, dir: "across", clue: "正月の夢に見ると、縁起がいいとされる鳥", number: 11 },
+                { word: "グチ", row: 4, col: 0, dir: "across", clue: "不満を口に出して、悲しむこと。あまりこぼさないようにね", number: 13 },
+                { word: "ラツコ", row: 4, col: 3, dir: "across", clue: "石を使って貝をわる姿が、かわいらしいよね", number: 15 },
+                { word: "チカラダメシ", row: 5, col: 0, dir: "across", clue: "力がどのていどのものか確かめるため、実際にやってみること", number: 17 }
+          ]
+    },
+        
     ]
 };
