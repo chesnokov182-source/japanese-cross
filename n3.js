@@ -313,7 +313,7 @@ window.crosswordsData.n3 = {
                 { word: "アカ", row: 4, col: 4, dir: "down", clue: "「進め」は青、「とまれ」は？", number: 12 },
             
                 { word: "トシコシソバ", row: 0, col: 0, dir: "across", clue: "大みそかに食べるよ", number: 1.1 },
-                { word: "キンシヨ", row: 1, col: 0, dir: "across", clue: "近くのところ", number: 6 },
+                { word: "キンジヨ", row: 1, col: 0, dir: "across", clue: "近くのところ", number: 6 },
                 { word: "メカ", row: 2, col: 0, dir: "across", clue: "機械の装置", number: 7 },
                 { word: "カガミ", row: 2, col: 3, dir: "across", clue: "これがあれば、自分の顔が見られるね", number: 8 },
                 { word: "キンセイ", row: 3, col: 0, dir: "across", clue: "水星と地球の間にある惑星", number: 9 },
