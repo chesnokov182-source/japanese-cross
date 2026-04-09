@@ -910,8 +910,3 @@ body.sakura .clue-list li.active-clue {
     transition: transform 0.1s ease;
 }
 
-.clue-block {
-    max-height: 60vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-}
