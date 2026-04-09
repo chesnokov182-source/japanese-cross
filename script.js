@@ -938,6 +938,7 @@ function onCellBlur(row, col) {
 function setActiveWord(wordId){
     activeWordId = wordId;
     applyHighlight();
+    scrollToActiveClue();
     const word = wordsList.find(w => w.id === activeWordId);
     if (word && word.cells.length) {
         const firstEmpty = word.cells.find(cell => gridData[cell.row][cell.col] === "");
