@@ -938,7 +938,6 @@ function onCellBlur(row, col) {
 function setActiveWord(wordId){
     activeWordId = wordId;
     applyHighlight();
-    scrollToActiveClue();
     const word = wordsList.find(w => w.id === activeWordId);
     if (word && word.cells.length) {
         const firstEmpty = word.cells.find(cell => gridData[cell.row][cell.col] === "");
@@ -967,13 +966,6 @@ function applyHighlight(){
     if(activeWordId !== null){
         let target = document.querySelector(`.clue-list li[data-word-id='${activeWordId}']`);
         if(target) target.classList.add("active-clue");
-    }
-}
-
-function scrollToActiveClue() {
-    const activeClue = document.querySelector('.clue-list li.active-clue');
-    if (activeClue) {
-        activeClue.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
