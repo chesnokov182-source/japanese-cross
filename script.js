@@ -970,14 +970,21 @@ function applyHighlight(){
     }
 }
 
-// Прокрутка к активному вопросу в списке подсказок
 function scrollToActiveClue() {
     const activeClue = document.querySelector('.clue-list li.active-clue');
     if (activeClue) {
-        activeClue.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-        });
+        const container = activeClue.closest('.clue-block');
+        if (container) {
+            const containerRect = container.getBoundingClientRect();
+            const clueRect = activeClue.getBoundingClientRect();
+            const offset = clueRect.top - containerRect.top - 20; 
+            container.scrollBy({
+                top: offset,
+                behavior: 'smooth'
+            });
+        } else {
+            activeClue.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 }
 
