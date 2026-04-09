@@ -223,5 +223,28 @@ window.crosswordsData.n3 = {
                 { word: "ウンメイ", row: 5, col: 0, dir: "across", clue: "ベートーベンがつくった有名な曲。ジャジャジャジャーン♪", number: 14 }
           ]
     },
+    {
+              name: "Кроссворд 12",
+              width: 6,
+              height: 6,
+              price: 60,
+              words: [
+                { word: "ツリイト", row: 0, col: 0, dir: "down", clue: "水中にたらして、魚がくるのを待とう", number: 1 },
+                { word: "クサカンムリ", row: 0, col: 1, dir: "down", clue: "「花」「茶」「薬」、共通するのは？", number: 2 },
+                { word: "エイ", row: 0, col: 2, dir: "down", clue: "平べったくて、尾が長い魚", number: 3 },
+                { word: "ニルイ", row: 0, col: 4, dir: "down", clue: "セカンド", number: 4 },
+                { word: "クラツカー", row: 1, col: 3, dir: "down", clue: "おたんじょう日、おめでとう～。バーン！", number: 6 },
+                { word: "ストロー", row: 2, col: 5, dir: "down", clue: "ジュースを飲もう。チュルルルル～", number: 9 },
+                { word: "イタ", row: 4, col: 4, dir: "down", clue: "どっちの味方をしていいかわからない……。？？ばさみの状態だ～", number: 12 },
+                { word: "ツクエ", row: 0, col: 0, dir: "across", clue: "勉強するときは、ここの上にノートや教科書を広げるよね", number: 1.1 },
+                { word: "ニシ", row: 0, col: 4, dir: "across", clue: "太陽がしずむ方角", number: 4.1 },
+                { word: "リサイクル", row: 1, col: 0, dir: "across", clue: "使い終わったものを回収して、再利用すること", number: 5 },
+                { word: "イカ", row: 2, col: 0, dir: "across", clue: "スミが、スパゲッティの材料に使われることも。海にすむ動物だよ", number: 7 },
+                { word: "ライス", row: 2, col: 3, dir: "across", clue: "お米", number: 8 },
+                { word: "トンカツ", row: 3, col: 0, dir: "across", clue: "代表的なブタ肉料理。ソースをかけると、おいしさアップ！", number: 10 },
+                { word: "カイロ", row: 4, col: 3, dir: "across", clue: "あったかいけど、やけどに注意してね", number: 11 },
+                { word: "アリゲーター", row: 5, col: 0, dir: "across", clue: "ワニ。クロコダイルにくらべて、口の先の幅が広いよ", number: 13 }
+          ]
+    }?
     ]
 };
