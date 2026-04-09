@@ -297,6 +297,30 @@ window.crosswordsData.n3 = {
                 { word: "エンマ", row: 4, col: 3, dir: "across", clue: "うそをつくと、舌をぬかれちゃう!?", number: 12.1 },
                 { word: "イースト", row: 5, col: 0, dir: "across", clue: "「東」を英語で言うと？", number: 14 }
           ]
-    },   
+    }, 
+    {
+              name: "Кроссворд 15",
+              width: 6,
+              height: 6,
+              price: 60,
+              words: [
+                { word: "トキメキ", row: 0, col: 0, dir: "down", clue: "期待やはずかしさで、胸がどきどきすること", number: 1 },
+                { word: "シンカンセン", row: 0, col: 1, dir: "down", clue: "のぞみ、ひかり、こだま、はやぶさ……", number: 2 },
+                { word: "コジ", row: 0, col: 2, dir: "down", clue: "昔から伝わる、ことがらや言葉", number: 3 },
+                { word: "シヨカイ", row: 0, col: 3, dir: "down", clue: "第一回", number: 4 },
+                { word: "バドミントン", row: 0, col: 5, dir: "down", clue: "シャトル（羽根）を打ち合うスポーツ", number: 5 },
+                { word: "セイギ", row: 3, col: 2, dir: "down", clue: "アンパンマンも仮面ライダーも、「？？？のヒーロー」だね", number: 10 },
+                { word: "アカ", row: 4, col: 4, dir: "down", clue: "「進め」は青、「とまれ」は？", number: 12 },
+            
+                { word: "トシコシソバ", row: 0, col: 0, dir: "across", clue: "大みそかに食べるよ", number: 1.1 },
+                { word: "キンシヨ", row: 1, col: 0, dir: "across", clue: "近くのところ", number: 6 },
+                { word: "メカ", row: 2, col: 0, dir: "across", clue: "機械の装置", number: 7 },
+                { word: "カガミ", row: 2, col: 3, dir: "across", clue: "これがあれば、自分の顔が見られるね", number: 8 },
+                { word: "キンセイ", row: 3, col: 0, dir: "across", clue: "水星と地球の間にある惑星", number: 9 },
+                { word: "セイ", row: 4, col: 1, dir: "across", clue: "どんぐりの？？くらべ", number: 11 },
+                { word: "アト", row: 4, col: 4, dir: "across", clue: "うしろ。「犯人の？？をつける」", number: 12.1 },
+                { word: "ジンギスカン", row: 5, col: 0, dir: "across", clue: "ヒツジの肉を焼いた、北海道の郷土料理", number: 13 }
+        ]
+    },
     ]
 };
