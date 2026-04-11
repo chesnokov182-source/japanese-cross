@@ -448,5 +448,19 @@ window.crosswordsData.n4 = {
                     { word: "クシ", row: 2, col: 3, dir: "down", clue: "Расческа", number: 5},
                 ]
             },
+            {
+                name: "Кроссворд 30",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "テブクロ", row: 0, col: 0, dir: "down", clue: "Перчатки", number: 1},
+                    { word: "ヨル", row: 0, col: 2, dir: "across", clue: "Ночь, вечер", number: 2},
+                    { word: "ヨウカ", row: 0, col: 2, dir: "down", clue: "8-й день месяца", number: 2.1},
+                    { word: "ブドウ", row: 1, col: 0, dir: "across", clue: "Виноград", number: 3},
+                    { word: "カキ", row: 2, col: 2, dir: "across", clue: "Хурма", number: 4},
+                    { word: "キジ", row: 2, col: 3, dir: "down", clue: "Фазан", number: 5},
+                ]
+            },
         ]
     };
