@@ -403,5 +403,20 @@ window.crosswordsData.n4 = {
                     { word: "ギン", row: 2, col: 3, dir: "down", clue: "Медаль за 2-е место", number: 6},
                 ]
             }, 
+            {
+                name: "Кроссворд 27",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "オオカミ", row: 0, col: 0, dir: "across", clue: "Животное из Красной шапочки", number: 1},
+                    { word: "オウド", row: 0, col: 1, dir: "down", clue: "Охра (цвет)", number: 2},
+                    { word: "ミギ", row: 0, col: 3, dir: "down", clue: "Противоположность лево", number: 3},
+                    { word: "コドモ", row: 2, col: 0, dir: "across", clue: "Между младенцем и взрослым", number: 4},
+                    { word: "コエ", row: 2, col: 0, dir: "down", clue: "Голос", number: 4.1},
+                    { word: "モモ", row: 2, col: 2, dir: "down", clue: "Персик", number: 5},
+                    { word: "モチ", row: 3, col: 2, dir: "across", clue: "Моти", number: 6},
+                ]
+            },   
         ]
     };
