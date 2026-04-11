@@ -478,5 +478,20 @@ window.crosswordsData.n4 = {
                     { word: "シンゴウ", row: 3, col: 0, dir: "across", clue: "Светофор", number: 7},
                 ]
             },
+            {
+                name: "Кроссворд 32",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "カサ", row: 0, col: 0, dir: "across", clue: "Зонтик", number: 1},
+                    { word: "カマボコ", row: 0, col: 0, dir: "down", clue: "Блюдо из рыбного фарша в форме полуцилиндрического батона", number: 1.1},
+                    { word: "ボウシ", row: 2, col: 0, dir: "across", clue: "Шляпа", number: 2},
+                    { word: "アシタ", row: 1, col: 2, dir: "down", clue: "После сегодня будет", number: 3},
+                    { word: "アメ", row: 1, col: 2, dir: "across", clue: "Дождь", number: 3.1},
+                    { word: "ツメ", row: 0, col: 3, dir: "down", clue: "Ноготь", number: 5},
+                    { word: "タネ", row: 3, col: 2, dir: "across", clue: "Семена, зёрна", number: 6},
+                ]
+            },
         ]
     };
