@@ -493,5 +493,20 @@ window.crosswordsData.n4 = {
                     { word: "タネ", row: 3, col: 2, dir: "across", clue: "Семена, зёрна", number: 6},
                 ]
             },
+            {
+                name: "Кроссворд 33",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "オヤスミ", row: 0, col: 0, dir: "across", clue: "Говорят перед сном", number: 1},
+                    { word: "オトナ", row: 0, col: 0, dir: "down", clue: "Взрослый", number: 1.1},
+                    { word: "スズ", row: 0, col: 2, dir: "down", clue: "Колокольчик", number: 2},
+                    { word: "ナシ", row: 2, col: 0, dir: "across", clue: "Груша", number: 3},
+                    { word: "シタ", row: 2, col: 1, dir: "down", clue: "Язык", number: 3.1},
+                    { word: "ヨコ", row: 2, col: 3, dir: "down", clue: "Противоположность вертикали", number: 5},
+                    { word: "タイコ", row: 3, col: 1, dir: "across", clue: "Японский барабан", number: 6},
+                ]
+            },
         ]
     };
