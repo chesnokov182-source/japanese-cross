@@ -418,5 +418,21 @@ window.crosswordsData.n4 = {
                     { word: "モチ", row: 3, col: 2, dir: "across", clue: "Моти", number: 6},
                 ]
             },   
+            {
+                name: "Кроссворд 28",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "ウタ", row: 0, col: 0, dir: "across", clue: "Песня", number: 1},
+                    { word: "ウスギ", row: 0, col: 0, dir: "down", clue: "Лёгкая одежда", number: 1.1},
+                    { word: "タイ", row: 0, col: 1, dir: "down", clue: "Эту рыбу часто едят на праздновании чего-либо", number: 2},
+                    { word: "スイトウ", row: 1, col: 0, dir: "across", clue: "Термос, фляга", number: 3},
+                    { word: "オウエン", row: 0, col: 3, dir: "down", clue: "Поддержка", number: 4},
+                    { word: "トマト", row: 1, col: 2, dir: "down", clue: "Красный овощ", number: 5},
+                    { word: "マエ", row: 2, col: 2, dir: "across", clue: "Противоположность зада", number: 6},
+                    { word: "フトン", row: 3, col: 1, dir: "across", clue: "Футон", number: 7},
+                ]
+            }, 
         ]
     };
