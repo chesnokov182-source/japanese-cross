@@ -434,5 +434,19 @@ window.crosswordsData.n4 = {
                     { word: "フトン", row: 3, col: 1, dir: "across", clue: "Футон", number: 7},
                 ]
             }, 
+            {
+                name: "Кроссворд 29",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "フウセン", row: 0, col: 0, dir: "across", clue: "Воздушный шарик", number: 1},
+                    { word: "フクロウ", row: 0, col: 0, dir: "down", clue: "Сова", number: 1.1},
+                    { word: "ロウソク", row: 2, col: 0, dir: "down", clue: "Свеча", number: 2},
+                    { word: "セイソウ", row: 0, col: 2, dir: "across", clue: "Уборка", number: 3},
+                    { word: "ウシ", row: 3, col: 2, dir: "down", clue: "Корова, бык", number: 4},
+                    { word: "クシ", row: 2, col: 3, dir: "down", clue: "Расческа", number: 5},
+                ]
+            },
         ]
     };
