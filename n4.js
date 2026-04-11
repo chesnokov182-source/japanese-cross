@@ -462,5 +462,21 @@ window.crosswordsData.n4 = {
                     { word: "キジ", row: 2, col: 3, dir: "down", clue: "Фазан", number: 5},
                 ]
             },
+            {
+                name: "Кроссворд 31",
+                width: 4,
+                height: 4,
+                price: 60,
+                words: [
+                    { word: "カド", row: 0, col: 0, dir: "across", clue: "Угол", number: 1},
+                    { word: "カオ", row: 0, col: 0, dir: "down", clue: "Лицо", number: 1.1},
+                    { word: "ドウテン", row: 0, col: 1, dir: "down", clue: "Ничья", number: 2},
+                    { word: "オウダン", row: 1, col: 0, dir: "across", clue: "Переход, пересечение", number: 3},
+                    { word: "ホントウ", row: 0, col: 3, dir: "down", clue: "Противоположность лжи", number: 4},
+                    { word: "ダンゴ", row: 1, col: 2, dir: "down", clue: "Японские клёцки из клейких сортов риса", number: 5},
+                    { word: "テント", row: 2, col: 1, dir: "across", clue: "Тент, палатка", number: 6},
+                    { word: "シンゴウ", row: 3, col: 0, dir: "across", clue: "Светофор", number: 7},
+                ]
+            },
         ]
     };
