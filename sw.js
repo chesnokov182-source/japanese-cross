@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jlpt-crosswords-v15';
+const CACHE_NAME = 'jlpt-crosswords-v16'; // Увеличил версию, чтобы очистить старый кэш
 
 const urlsToCache = [
     '/',
@@ -21,7 +21,7 @@ self.addEventListener('install', event => {
                 console.log('Opened cache');
                 return cache.addAll(urlsToCache);
             })
-            .then(() => self.skipWaiting()) // Активируем новый SW сразу после установки
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -36,21 +36,19 @@ self.addEventListener('activate', event => {
                         return caches.delete(key);
                     })
             );
-        }).then(() => self.clients.claim()) // Захватываем контроль над всеми страницами сразу
+        }).then(() => self.clients.claim())
     );
 });
 
-// 3. Перехват запросов: Стратегия "Network First" для HTML, "Cache First" для остального
+// 3. Перехват запросов: разные стратегии для разных типов файлов
 self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
 
-    // Для HTML (index.html и корень) используем стратегию "Network First"
-    // Это гарантирует, что мы всегда получим свежую версию страницы
+    // Для HTML (навигация) – Network First (свежая страница, кэш при офлайне)
     if (event.request.mode === 'navigate' || requestUrl.pathname.endsWith('.html')) {
         event.respondWith(
             fetch(event.request)
                 .then(networkResponse => {
-                    // Если сеть ответила успешно, обновляем кэш
                     if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'error') {
                         return networkResponse;
                     }
@@ -60,16 +58,31 @@ self.addEventListener('fetch', event => {
                     });
                     return networkResponse;
                 })
-                .catch(() => {
-                    // Если сети нет, отдаем из кэша
-                    return caches.match(event.request);
-                })
+                .catch(() => caches.match(event.request))
         );
         return;
     }
 
-    // Для CSS, JS, картинок и данных используем "Cache First" (быстрая загрузка)
-    // Но с фоллбэком на сеть, если файла нет в кэше
+    // Для JS и CSS – Network First (всегда свежие скрипты и стили, кэш при офлайне)
+    if (requestUrl.pathname.match(/\.(js|css)$/)) {
+        event.respondWith(
+            fetch(event.request)
+                .then(networkResponse => {
+                    if (!networkResponse || networkResponse.status !== 200) {
+                        return networkResponse;
+                    }
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, responseClone);
+                    });
+                    return networkResponse;
+                })
+                .catch(() => caches.match(event.request))
+        );
+        return;
+    }
+
+    // Для всего остального (изображения, шрифты, данные) – Cache First (быстрая загрузка)
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
@@ -77,7 +90,6 @@ self.addEventListener('fetch', event => {
                     return cachedResponse;
                 }
                 return fetch(event.request).then(networkResponse => {
-                    // Опционально: можно кэшировать и новые JS/CSS файлы, если они изменились
                     if (!networkResponse || networkResponse.status !== 200) {
                         return networkResponse;
                     }
