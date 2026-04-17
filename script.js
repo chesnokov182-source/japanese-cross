@@ -870,7 +870,6 @@ function renderGrid() {
             
             if(!isBlocked && !isLocked){
                 input.addEventListener("focus", () => onCellFocus(i,j));
-                input.addEventListener("blur", () => onCellBlur(i,j));
                 
                 if (isMobile) {
                     // Мобильные: используем beforeinput для перехвата символов
@@ -1924,6 +1923,13 @@ if (!localStorage.getItem("tutorialShown")) {
 }
 
 helpBtn.addEventListener("click", showTutorial);
+
+// Если мобильное устройство, подгружаем mobile-input.js
+if (isMobile) {
+    var mobileScript = document.createElement('script');
+    mobileScript.src = 'mobile-input.js';
+    document.body.appendChild(mobileScript);
+}
 
 // Инициализация
 loadGameStats();
