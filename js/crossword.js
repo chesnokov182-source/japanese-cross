@@ -1,9 +1,8 @@
 import { romajiToKatakana } from './constants.js';
 import { saveCurrentProgress, clearProgressForPuzzle, isPuzzleUnlocked, markAsCompleted, isCrosswordCompleted, getEarnedPointsForPuzzle, saveEarnedPointsForPuzzle, clearEarnedPointsForPuzzle, getCompletedCrosswords, loadGameStats, saveGameStats, setLastPlayed } from './storage.js';
 import { playCorrectInput, playErrorInput, playPop } from './sounds.js';
-import { renderGrid, updateCellUI, applyHighlight, clearHighlight, renderClues, updateClueCompletion, showToast, showConfetti, updateScoreUI, setStatusMessage, getCellElements, getGridData, setGridData, setWordsList, setGridDimensions, setActiveWordId, getActiveWordId, updateWrongHighlights, setWrongHighlight } from './ui.js';
+import { renderGrid, updateCellUI, applyHighlight, clearHighlight, renderClues, updateClueCompletion, showToast, showConfetti, updateScoreUI, setStatusMessage, getCellElements, getGridData, setGridData, setWordsList, setGridDimensions, setActiveWordId, getActiveWordId, updateWrongHighlights, setWrongHighlight, setRomajiBuffers } from './ui.js';
 import { updateAllBlockedSkins } from './shop.js';
-import { setRomajiBuffers } from './ui.js';
 
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
@@ -16,7 +15,7 @@ let gridWidth = 0, gridHeight = 0;
 let hintUsed = false;
 let hintCount = 0;
 let correctCharMap = new Map();
-let romajiBuffers = new Map(); // буфер для ввода ромадзи
+let romajiBuffers = new Map();
 
 let gameStats = loadGameStats();
 
@@ -146,7 +145,6 @@ function applyWrongHighlights() {
     }
 }
 
-// ---- Вспомогательные функции для ввода (старая логика) ----
 function getDisplayValue(row, col) {
     const key = `${row},${col}`;
     const buffer = romajiBuffers.get(key) || "";
@@ -495,14 +493,12 @@ function onCellBlur(row, col) {
 }
 
 function onCellInput(row, col) {
-    // для совместимости с мобильными – очищаем буфер, если пользователь ввел что-то напрямую
     const key = `${row},${col}`;
     if(romajiBuffers.has(key)) {
         romajiBuffers.delete(key);
         updateCellUI(row, col);
     }
 }
-// ---- конец старой логики ввода ----
 
 export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const levelData = window.crosswordsData[levelId];
@@ -570,6 +566,10 @@ export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     buildCorrectCharMap();
     
     const isLocked = !isPuzzleUnlocked(levelId, puzzleIdx);
+    
+    // Передаём буфер ромадзи в UI
+    setRomajiBuffers(romajiBuffers);
+    
     renderGrid(isLocked, onCellFocus, onCellInput, onCellBlur, handleKeydown);
     renderClues(cluesAcross, cluesDown, (wordId) => setActiveWord(wordId));
     clearHighlight();
@@ -578,6 +578,11 @@ export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updateClueCompletionForAll();
     applyWrongHighlights();
     updateAllBlockedSkins();
+    
+    // Устанавливаем активное слово по умолчанию (первое)
+    if(wordsList.length > 0 && !activeWordId) {
+        setActiveWord(wordsList[0].id);
+    }
     
     if(isLocked) {
         const price = puzzle.price !== undefined ? puzzle.price : 0;
