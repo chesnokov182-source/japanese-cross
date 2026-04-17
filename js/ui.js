@@ -1,5 +1,6 @@
 import { playClick } from './sounds.js';
 import { getSelectedSkinEmoji, updateAllBlockedSkins } from './shop.js';
+let onCellKeydownCallback;
 
 let cellElements = [];
 let gridWidth, gridHeight, gridData, wordsList, activeWordId;
