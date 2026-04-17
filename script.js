@@ -31,6 +31,8 @@ const romajiToKatakana = {
     "-": ["ー"]
 };
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
 // Генерация удвоенных согласных
 (function generateDoubledConsonants() {
     const consonants = ['k','s','t','p','c','j','d','b','g','z','r','m','h','f','w'];
