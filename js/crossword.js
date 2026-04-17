@@ -1,4 +1,4 @@
-import { romajiToKatakanaString } from './romaji.js';
+import { romajiToKatakana } from './constants.js';
 import { saveCurrentProgress, clearProgressForPuzzle, isPuzzleUnlocked, markAsCompleted, isCrosswordCompleted, getEarnedPointsForPuzzle, saveEarnedPointsForPuzzle, clearEarnedPointsForPuzzle, getCompletedCrosswords, loadGameStats, saveGameStats, setLastPlayed } from './storage.js';
 import { playCorrectInput, playErrorInput, playPop } from './sounds.js';
 import { renderGrid, updateCellUI, applyHighlight, clearHighlight, renderClues, updateClueCompletion, showToast, showConfetti, updateScoreUI, setStatusMessage, getCellElements, getGridData, setGridData, setWordsList, setGridDimensions, setActiveWordId, getActiveWordId, updateWrongHighlights, setWrongHighlight } from './ui.js';
@@ -15,10 +15,10 @@ let gridWidth = 0, gridHeight = 0;
 let hintUsed = false;
 let hintCount = 0;
 let correctCharMap = new Map();
+let romajiBuffers = new Map(); // буфер для ввода ромадзи
 
 let gameStats = loadGameStats();
 
-// Ссылки на внешние функции
 let addPointsCallback, subtractPointsCallback, incrementWordsCompletedCallback, updateButtonStatesCallback;
 
 export function initCrosswordModule(addPointsFn, subtractPointsFn, incWordsFn, updateButtonsFn) {
@@ -102,13 +102,12 @@ function checkCompletion() {
     } else if(unlocked) {
         setStatusMessage("Заполняйте ячейки. Вводите английскими буквами (a-z). Буквы отображаются в процессе набора.");
         if(isCrosswordCompleted(currentLevel, currentPuzzleIndex)) {
-            // снимаем отметку о завершении, если вдруг она есть (пользователь стёр)
             const completed = getCompletedCrosswords();
             const key = `${currentLevel}_${currentPuzzleIndex}`;
             const idx = completed.indexOf(key);
             if(idx !== -1) {
                 completed.splice(idx, 1);
-                localStorage.setItem(STORAGE_COMPLETED_KEY, JSON.stringify(completed));
+                localStorage.setItem("completedCrosswords", JSON.stringify(completed));
                 if(updateButtonStatesCallback) updateButtonStatesCallback();
             }
         }
@@ -123,7 +122,6 @@ function updateClueCompletionForAll() {
         }
         updateClueCompletion(w.id, isComplete);
         if(isComplete) {
-            // Начисляем очки за слово, если ещё не начисляли
             const earned = getEarnedPointsForPuzzle(currentLevel, currentPuzzleIndex);
             if(!earned.words[w.id]) {
                 earned.words[w.id] = true;
@@ -147,42 +145,19 @@ function applyWrongHighlights() {
     }
 }
 
-function onCellFocus(row, col) {
-    if(!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) return;
-    let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
-    if(containingWords.length === 0) return;
-    if(activeWordId !== null) {
-        let activeWord = wordsList.find(w => w.id === activeWordId);
-        if(activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) return;
-    }
-    let newWord = null;
-    if(activeWordId !== null) {
-        let activeWord = wordsList.find(w => w.id === activeWordId);
-        if(activeWord) newWord = containingWords.find(w => w.dir === activeWord.dir);
-    }
-    if(!newWord) newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
-    setActiveWord(newWord.id);
+// ---- Вспомогательные функции для ввода (старая логика) ----
+function getDisplayValue(row, col) {
+    const key = `${row},${col}`;
+    const buffer = romajiBuffers.get(key) || "";
+    if(buffer !== "") return buffer;
+    return gridData[row][col] !== null ? gridData[row][col] : "";
 }
 
-function onCellBlur(row, col) {
-    // Ничего не делаем, ввод уже обработан
-}
-
-function onCellInput(row, col) {
-    if(!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) return;
-    const input = getCellElements()[row]?.[col];
-    if(!input) return;
-    let rawValue = input.value;
-    // Преобразуем ромадзи в катакану
-    const katakana = romajiToKatakanaString(rawValue);
-    if(katakana) {
-        // Вводим только первый символ? Нет, мы должны заменить всё содержимое ячейки на катакану,
-        // но если katakana длиннее 1 символа, это значит, что пользователь ввёл комбинацию типа "shu" -> シュ (2 символа).
-        // В классическом кроссворде одна ячейка = одна катакана. Поэтому мы должны взять только первый символ катаканы,
-        // а остальные символы попытаться поместить в следующие ячейки.
-        const firstChar = katakana[0];
-        const remaining = katakana.slice(1);
-        gridData[row][col] = firstChar;
+function insertKatakanaArray(row, col, katakanaArray, startIndex) {
+    if(startIndex >= katakanaArray.length) return;
+    const char = katakanaArray[startIndex];
+    if(startIndex === 0) {
+        gridData[row][col] = char;
         updateCellUI(row, col);
         syncWordFromGrid();
         checkCompletion();
@@ -191,9 +166,8 @@ function onCellInput(row, col) {
         saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
         
         const correctChar = correctCharMap.get(`${row},${col}`);
-        if(firstChar === correctChar) {
+        if(char === correctChar) {
             playCorrectInput();
-            // анимация
             const cellDiv = getCellElements()[row]?.[col]?.parentElement;
             if(cellDiv) {
                 cellDiv.classList.add('correct-animation');
@@ -202,66 +176,168 @@ function onCellInput(row, col) {
         } else {
             playErrorInput();
         }
-        
-        // Если есть остаток, вставляем его в следующие ячейки текущего слова
-        if(remaining.length > 0 && activeWordId !== null) {
-            const activeWord = wordsList.find(w => w.id === activeWordId);
-            if(activeWord) {
-                let currentIdx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                if(currentIdx !== -1) {
-                    for(let i = 0; i < remaining.length; i++) {
-                        const nextIdx = currentIdx + 1 + i;
-                        if(nextIdx < activeWord.cells.length) {
-                            const nextCell = activeWord.cells[nextIdx];
-                            gridData[nextCell.row][nextCell.col] = remaining[i];
-                            updateCellUI(nextCell.row, nextCell.col);
-                        } else {
-                            break;
-                        }
-                    }
-                    syncWordFromGrid();
-                    checkCompletion();
-                    updateClueCompletionForAll();
-                    applyWrongHighlights();
-                    saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
-                    // фокус на следующую пустую ячейку
-                    const nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if(nextEmpty) {
-                        getCellElements()[nextEmpty.row][nextEmpty.col]?.focus();
-                    } else {
-                        focusNextWord(activeWord.number);
+
+        if(katakanaArray.length > 1) {
+            if(activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if(activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if(idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
+                        return;
                     }
                 }
             }
         } else {
-            // Переход к следующей пустой ячейке в слове
             if(activeWordId !== null) {
                 const activeWord = wordsList.find(w => w.id === activeWordId);
                 if(activeWord) {
-                    const nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if(nextEmpty) getCellElements()[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
+                }
+            }
+        }
+    } else {
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        updateClueCompletionForAll();
+        applyWrongHighlights();
+        saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
+        
+        const correctChar = correctCharMap.get(`${row},${col}`);
+        if(char === correctChar) {
+            playCorrectInput();
+            const cellDiv = getCellElements()[row]?.[col]?.parentElement;
+            if(cellDiv) {
+                cellDiv.classList.add('correct-animation');
+                setTimeout(() => cellDiv.classList.remove('correct-animation'), 300);
+            }
+        } else {
+            playErrorInput();
+        }
+
+        if(startIndex + 1 < katakanaArray.length) {
+            if(activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if(activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if(idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
+                        return;
+                    }
+                }
+            }
+        } else {
+            if(activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if(activeWord) {
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if(nextEmpty) getCellElements()[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
+                }
+            }
+        }
+    }
+}
+
+function processBuffer(row, col, buffer) {
+    if(buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
+        insertKatakanaArray(row, col, ["ン"], 0);
+        if(activeWordId !== null) {
+            const activeWord = wordsList.find(w => w.id === activeWordId);
+            if(activeWord) {
+                let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                if(idx !== -1 && idx + 1 < activeWord.cells.length) {
+                    let nextCell = activeWord.cells[idx + 1];
+                    const nextKey = `${nextCell.row},${nextCell.col}`;
+                    romajiBuffers.set(nextKey, buffer[1]);
+                    updateCellUI(nextCell.row, nextCell.col);
+                    getCellElements()[nextCell.row][nextCell.col]?.focus();
+                } else {
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
                     if(nextEmpty) {
+                        const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
+                        romajiBuffers.set(nextKey, buffer[1]);
+                        updateCellUI(nextEmpty.row, nextEmpty.col);
                         getCellElements()[nextEmpty.row][nextEmpty.col]?.focus();
                     } else {
                         focusNextWord(activeWord.number);
+                        setTimeout(() => {
+                            if(activeWordId !== null) {
+                                const newWord = wordsList.find(w => w.id === activeWordId);
+                                if(newWord && newWord.cells.length) {
+                                    let firstCell = newWord.cells[0];
+                                    const firstKey = `${firstCell.row},${firstCell.col}`;
+                                    romajiBuffers.set(firstKey, buffer[1]);
+                                    updateCellUI(firstCell.row, firstCell.col);
+                                    getCellElements()[firstCell.row][firstCell.col]?.focus();
+                                }
+                            }
+                        }, 10);
                     }
                 }
             }
         }
-        // Очищаем поле ввода от лишнего текста (он уже преобразован)
-        input.value = gridData[row][col];
-    } else {
-        // Если не удалось преобразовать, очищаем ячейку
-        if(gridData[row][col] !== "") {
-            gridData[row][col] = "";
-            updateCellUI(row, col);
-            syncWordFromGrid();
-            checkCompletion();
-            updateClueCompletionForAll();
-            applyWrongHighlights();
-            saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
-        }
-        input.value = "";
+        return true;
     }
+
+    if(romajiToKatakana.hasOwnProperty(buffer)) {
+        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+        return true;
+    }
+
+    for(let i = buffer.length - 1; i >= 1; i--) {
+        let prefix = buffer.slice(0, i);
+        if(romajiToKatakana.hasOwnProperty(prefix)) {
+            const katakanaArray = romajiToKatakana[prefix];
+            const remaining = buffer.slice(i);
+            insertKatakanaArray(row, col, katakanaArray, 0);
+            if(remaining.length > 0) {
+                if(activeWordId !== null) {
+                    const activeWord = wordsList.find(w => w.id === activeWordId);
+                    if(activeWord) {
+                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                        if(idx !== -1 && idx + 1 < activeWord.cells.length) {
+                            let nextCell = activeWord.cells[idx + 1];
+                            const nextKey = `${nextCell.row},${nextCell.col}`;
+                            romajiBuffers.set(nextKey, remaining);
+                            updateCellUI(nextCell.row, nextCell.col);
+                            getCellElements()[nextCell.row][nextCell.col]?.focus();
+                        } else {
+                            let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                            if(nextEmpty) {
+                                const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
+                                romajiBuffers.set(nextKey, remaining);
+                                updateCellUI(nextEmpty.row, nextEmpty.col);
+                                getCellElements()[nextEmpty.row][nextEmpty.col]?.focus();
+                            } else {
+                                focusNextWord(activeWord.number);
+                                setTimeout(() => {
+                                    if(activeWordId !== null) {
+                                        const newWord = wordsList.find(w => w.id === activeWordId);
+                                        if(newWord && newWord.cells.length) {
+                                            let firstCell = newWord.cells[0];
+                                            const firstKey = `${firstCell.row},${firstCell.col}`;
+                                            romajiBuffers.set(firstKey, remaining);
+                                            updateCellUI(firstCell.row, firstCell.col);
+                                            getCellElements()[firstCell.row][firstCell.col]?.focus();
+                                        }
+                                    }
+                                }, 10);
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
 function getNextEmptyCellInWord(word, currentRow, currentCol) {
@@ -309,6 +385,123 @@ function setActiveWord(wordId) {
         else getCellElements()[word.cells[0].row][word.cells[0].col]?.focus();
     }
 }
+
+function handleKeydown(e, row, col) {
+    if(gridData[row][col] === null) return;
+    const allowedChars = /^[a-zA-Z-]$/;
+    if(e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
+        e.preventDefault();
+        return;
+    }
+    if(e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) e.preventDefault();
+
+    if(e.key === "Backspace") {
+        const key = `${row},${col}`;
+        let buffer = romajiBuffers.get(key) || "";
+        if(buffer.length > 0) {
+            buffer = buffer.slice(0, -1);
+            romajiBuffers.set(key, buffer);
+            updateCellUI(row, col);
+        } else {
+            if(gridData[row][col] !== "") {
+                gridData[row][col] = "";
+                updateCellUI(row, col);
+                syncWordFromGrid();
+                checkCompletion();
+                updateClueCompletionForAll();
+                applyWrongHighlights();
+                saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
+            } else {
+                if(activeWordId !== null) {
+                    const activeWord = wordsList.find(w => w.id === activeWordId);
+                    if(activeWord) {
+                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                        if(idx > 0) {
+                            let prev = activeWord.cells[idx - 1];
+                            getCellElements()[prev.row][prev.col]?.focus();
+                        }
+                    }
+                }
+            }
+        }
+        return;
+    }
+
+    if(e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+        let newRow = row, newCol = col;
+        if(e.key === "ArrowLeft") newCol--;
+        if(e.key === "ArrowRight") newCol++;
+        if(e.key === "ArrowUp") newRow--;
+        if(e.key === "ArrowDown") newRow++;
+        if(newRow >= 0 && newRow < gridHeight && newCol >= 0 && newCol < gridWidth && gridData[newRow][newCol] !== null) {
+            getCellElements()[newRow][newCol]?.focus();
+        }
+        return;
+    }
+
+    if(e.key.length === 1 && allowedChars.test(e.key)) {
+        const key = `${row},${col}`;
+        let buffer = (romajiBuffers.get(key) || "") + e.key.toLowerCase();
+        romajiBuffers.set(key, buffer);
+        updateCellUI(row, col);
+
+        if(buffer.length === 1 && gridData[row][col] !== "") {
+            gridData[row][col] = "";
+            updateCellUI(row, col);
+            syncWordFromGrid();
+            checkCompletion();
+            updateClueCompletionForAll();
+            applyWrongHighlights();
+            saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
+        }
+
+        const processed = processBuffer(row, col, buffer);
+        if(processed) {
+            romajiBuffers.set(key, "");
+            updateCellUI(row, col);
+        }
+    }
+}
+
+function onCellFocus(row, col) {
+    if(!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) return;
+    let containingWords = wordsList.filter(w => w.cells.some(c => c.row === row && c.col === col));
+    if(containingWords.length === 0) return;
+    if(activeWordId !== null) {
+        let activeWord = wordsList.find(w => w.id === activeWordId);
+        if(activeWord && activeWord.cells.some(c => c.row === row && c.col === col)) return;
+    }
+    let newWord = null;
+    if(activeWordId !== null) {
+        let activeWord = wordsList.find(w => w.id === activeWordId);
+        if(activeWord) newWord = containingWords.find(w => w.dir === activeWord.dir);
+    }
+    if(!newWord) newWord = containingWords.find(w => w.dir === "across") || containingWords[0];
+    setActiveWord(newWord.id);
+}
+
+function onCellBlur(row, col) {
+    const key = `${row},${col}`;
+    const buffer = romajiBuffers.get(key);
+    if(buffer === "n") {
+        insertKatakanaArray(row, col, ["ン"], 0);
+        romajiBuffers.delete(key);
+        updateCellUI(row, col);
+    } else if(buffer) {
+        romajiBuffers.delete(key);
+        updateCellUI(row, col);
+    }
+}
+
+function onCellInput(row, col) {
+    // для совместимости с мобильными – очищаем буфер, если пользователь ввел что-то напрямую
+    const key = `${row},${col}`;
+    if(romajiBuffers.has(key)) {
+        romajiBuffers.delete(key);
+        updateCellUI(row, col);
+    }
+}
+// ---- конец старой логики ввода ----
 
 export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     const levelData = window.crosswordsData[levelId];
@@ -365,6 +558,7 @@ export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
         gridData = freshGrid;
         hintUsed = false;
         hintCount = 0;
+        romajiBuffers.clear();
     }
     
     setGridDimensions(gridWidth, gridHeight);
@@ -375,7 +569,7 @@ export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     buildCorrectCharMap();
     
     const isLocked = !isPuzzleUnlocked(levelId, puzzleIdx);
-    renderGrid(isLocked, onCellFocus, onCellInput, onCellBlur);
+    renderGrid(isLocked, onCellFocus, onCellInput, onCellBlur, handleKeydown);
     renderClues(cluesAcross, cluesDown, (wordId) => setActiveWord(wordId));
     clearHighlight();
     activeWordId = null;
@@ -392,9 +586,9 @@ export function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
 }
 
 export function resetCurrentCrossword() {
-    // очищаем прогресс и перезагружаем
     clearProgressForPuzzle(currentLevel, currentPuzzleIndex);
     clearEarnedPointsForPuzzle(currentLevel, currentPuzzleIndex);
+    romajiBuffers.clear();
     loadCrossword(currentLevel, currentPuzzleIndex, false);
     showToast("Кроссворд сброшен", "success");
 }
@@ -412,7 +606,6 @@ export function giveHint(subtractPointsFn) {
         showToast(`Вы использовали все ${gameStats.maxHints} подсказки`, "error");
         return false;
     }
-    // найти пустую ячейку в неполном слове
     let emptyCells = [];
     for(let i=0;i<gridHeight;i++) {
         for(let j=0;j<gridWidth;j++) {
@@ -451,7 +644,7 @@ export function giveHint(subtractPointsFn) {
     hintCount++;
     saveCurrentProgress(currentLevel, currentPuzzleIndex, gridData, hintUsed, hintCount);
     if(updateButtonStatesCallback) updateButtonStatesCallback();
-    showToast(`Подсказка: в ячейке ${row+1},${col+1} → ${correctChar}`, "info");
+    showToast(`Подсказка: ${correctChar}`, "info");
     return true;
 }
 
