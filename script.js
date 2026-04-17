@@ -832,27 +832,28 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updatePuzzleSelect();
 }
 
-// ========== ОТРИСОВКА СЕТКИ (НОВАЯ ВЕРСИЯ ДЛЯ МОБИЛЬНЫХ) ==========
 function renderGrid() {
     const container = document.getElementById("gridContainer");
     container.innerHTML = "";
     container.style.gridTemplateColumns = `repeat(${gridWidth}, minmax(70px, 1fr))`;
     cellElements = [];
     const isLocked = !isPuzzleUnlocked(currentLevel, currentPuzzleIndex);
-    for(let i=0;i<gridHeight;i++){
-        cellElements[i]=[];
-        for(let j=0;j<gridWidth;j++){
+    for (let i = 0; i < gridHeight; i++) {
+        cellElements[i] = [];
+        for (let j = 0; j < gridWidth; j++) {
             const isBlocked = (gridData[i][j] === null);
             const cellDiv = document.createElement("div");
             cellDiv.className = "cell";
-            if(isBlocked) cellDiv.classList.add("blocked");
-            const wordNumber = getWordNumberAt(i,j);
-            if(wordNumber && !isBlocked){
+            if (isBlocked) cellDiv.classList.add("blocked");
+            
+            const wordNumber = getWordNumberAt(i, j);
+            if (wordNumber && !isBlocked) {
                 const spanNum = document.createElement("span");
                 spanNum.className = "cell-number";
                 spanNum.innerText = Math.floor(wordNumber);
                 cellDiv.appendChild(spanNum);
             }
+            
             const skinSpan = document.createElement("span");
             skinSpan.className = "cell-skin";
             skinSpan.style.display = "none";
@@ -860,40 +861,25 @@ function renderGrid() {
             
             const input = document.createElement("input");
             input.type = "text";
-            // Убираем maxlength! Это важно для мобильных.
+            // Убираем maxlength – мобильный модуль сам управляет длиной
             input.value = getDisplayValue(i, j);
             input.disabled = isBlocked || isLocked;
             input.classList.add("cell-input");
             input.dataset.row = i;
             input.dataset.col = j;
-            input.inputMode = "text"; // подсказка клавиатуре
+            // Для мобильных – не нужно inputmode, mobile-input.js использует скрытый input
             
-            if(!isBlocked && !isLocked){
-                input.addEventListener("focus", () => onCellFocus(i,j));
-                
-                if (isMobile) {
-                    // Мобильные: используем beforeinput для перехвата символов
-                    input.addEventListener("beforeinput", (e) => {
-                        if (e.inputType === "insertText" && e.data) {
-                            e.preventDefault();
-                            handleMobileChar(i, j, e.data.toLowerCase());
-                        }
-                    });
-                    // Также обрабатываем Backspace и стрелки через keydown
-                    input.addEventListener("keydown", (e) => {
-                        if (e.key === "Backspace" || e.key === "Delete") {
-                            e.preventDefault();
-                            handleMobileBackspace(i, j);
-                        } else if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
-                            e.preventDefault();
-                            handleControlKeyMobile(e, i, j);
-                        }
-                    });
-                } else {
-                    // Десктоп: полная обработка через keydown
+            if (!isBlocked && !isLocked) {
+                // Единый обработчик фокуса (для подсветки и активации мобильного режима)
+                input.addEventListener("focus", () => onCellFocus(i, j));
+                // Для десктопа – полная обработка через keydown
+                if (!isMobile) {
                     input.addEventListener("keydown", (e) => handleKeydownDesktop(e, i, j));
                 }
+                // Для мобильных – НИКАКИХ дополнительных обработчиков (input, beforeinput и т.д.)
+                // Всю работу берёт на себя mobile-input.js
             }
+            
             cellDiv.appendChild(input);
             container.appendChild(cellDiv);
             cellElements[i][j] = input;
