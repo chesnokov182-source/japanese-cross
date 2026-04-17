@@ -1,29 +1,29 @@
-// mobile-input.js — только для мобильных устройств
+// mobile-input.js – полностью заменяет ввод на мобильных устройствах
 (function() {
     if (!window.isMobile) return;
 
     let activeRow = null, activeCol = null;
     let isActive = false;
-    let inputElement = null;
+    let hiddenInput = null;
     let buffer = '';
 
     function init() {
-        inputElement = document.createElement('input');
-        inputElement.type = 'text';
-        inputElement.style.position = 'fixed';
-        inputElement.style.top = '-100px';
-        inputElement.style.left = '-100px';
-        inputElement.style.opacity = '0';
-        inputElement.style.pointerEvents = 'none';
-        inputElement.style.zIndex = '-1';
-        inputElement.setAttribute('autocapitalize', 'none');
-        inputElement.setAttribute('autocomplete', 'off');
-        inputElement.setAttribute('spellcheck', 'false');
-        document.body.appendChild(inputElement);
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'text';
+        hiddenInput.style.position = 'fixed';
+        hiddenInput.style.top = '-100px';
+        hiddenInput.style.left = '-100px';
+        hiddenInput.style.opacity = '0';
+        hiddenInput.style.pointerEvents = 'none';
+        hiddenInput.style.zIndex = '-1';
+        hiddenInput.setAttribute('autocapitalize', 'none');
+        hiddenInput.setAttribute('autocomplete', 'off');
+        hiddenInput.setAttribute('spellcheck', 'false');
+        document.body.appendChild(hiddenInput);
 
-        inputElement.addEventListener('input', onInput);
-        inputElement.addEventListener('blur', () => {
-            if (isActive) setTimeout(() => inputElement.focus(), 10);
+        hiddenInput.addEventListener('input', onInput);
+        hiddenInput.addEventListener('blur', () => {
+            if (isActive) setTimeout(() => hiddenInput.focus(), 10);
         });
 
         document.addEventListener('click', onCellClick);
@@ -56,8 +56,8 @@
         activeCol = col;
         isActive = true;
         buffer = '';
-        inputElement.value = '';
-        inputElement.focus();
+        hiddenInput.value = '';
+        hiddenInput.focus();
         highlightCell(row, col);
         if (window.setActiveWordFromCell) window.setActiveWordFromCell(row, col);
     }
@@ -67,7 +67,7 @@
         activeRow = null;
         activeCol = null;
         buffer = '';
-        inputElement.value = '';
+        hiddenInput.value = '';
         removeHighlight();
     }
 
@@ -83,7 +83,7 @@
 
     function onInput(e) {
         if (!isActive) return;
-        let value = inputElement.value;
+        let value = hiddenInput.value;
         if (value.length < buffer.length) {
             buffer = value;
             if (buffer === '') {
@@ -109,14 +109,14 @@
         if (b.length === 2 && b[0] === 'n' && !'aiueo'.includes(b[1]) && b[1] !== 'n') {
             insertKatakana(row, col, ["ン"]);
             buffer = '';
-            inputElement.value = '';
+            hiddenInput.value = '';
             moveToNextCell();
             return true;
         }
         if (window.romajiToKatakana && window.romajiToKatakana[b]) {
             insertKatakana(row, col, window.romajiToKatakana[b]);
             buffer = '';
-            inputElement.value = '';
+            hiddenInput.value = '';
             moveToNextCell();
             return true;
         }
@@ -127,7 +127,7 @@
                 const remaining = b.slice(i);
                 insertKatakana(row, col, katakanaArray);
                 buffer = remaining;
-                inputElement.value = remaining;
+                hiddenInput.value = remaining;
                 if (remaining.length === 0) moveToNextCell();
                 return true;
             }
