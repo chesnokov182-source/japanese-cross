@@ -37,6 +37,13 @@
             </div>
         </div>
         <div id="gridContainer" class="crossword-grid"></div>
+        <!-- Мобильные кнопки навигации -->
+        <div id="mobileNav" class="mobile-nav" style="display: none;">
+            <button class="nav-btn" data-dir="up">▲</button>
+            <button class="nav-btn" data-dir="left">◀</button>
+            <button class="nav-btn" data-dir="down">▼</button>
+            <button class="nav-btn" data-dir="right">▶</button>
+        </div>
         <div class="status" id="statusMsg"></div>
     </div>
     <div class="clues-section">
@@ -53,7 +60,7 @@
 </div>
 <div id="toast" class="toast"></div>
 
-<!-- Модальное окно подтверждения -->
+<!-- Модальные окна -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">
         <p id="confirmMessage" class="modal-message"></p>
@@ -64,7 +71,6 @@
     </div>
 </div>
 
-<!-- Модальное окно покупки -->
 <div id="buyModal" class="modal">
     <div class="modal-content">
         <p id="buyModalMessage" class="modal-message"></p>
@@ -75,7 +81,6 @@
     </div>
 </div>
 
-<!-- Модальное окно магазина скинов -->
 <div id="shopModal" class="modal">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="margin-top:0;">Магазин скинов</h3>
@@ -86,7 +91,6 @@
     </div>
 </div>
 
-<!-- Модальное окно туториала -->
 <div id="tutorialModal" class="modal">
     <div class="modal-content" style="max-width: 500px;">
         <p class="modal-message" id="tutorialMessage"></p>
@@ -97,20 +101,14 @@
     </div>
 </div>
 
-<!-- Подключаем данные кроссвордов по уровням -->
+<!-- Данные кроссвордов (глобальные переменные) -->
 <script src="n5.js"></script>
 <script src="n4.js"></script>
 <script src="n3.js"></script>
 <script src="n2.js"></script>
 <script src="n1.js"></script>
-<!-- Основной скрипт приложения -->
-<script src="script.js"></script>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('SW registered', reg))
-            .catch(err => console.log('SW registration failed', err));
-    }
-</script>
+
+<!-- Главный модуль (точка входа) -->
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
