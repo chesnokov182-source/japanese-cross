@@ -72,6 +72,10 @@ const helpBtn = document.getElementById("helpBtn");
 const buyPuzzleBtn = document.getElementById("buyPuzzleBtn");
 const shopBtn = document.getElementById("shopBtn");
 
+// ========== ОПРЕДЕЛЕНИЕ МОБИЛЬНОГО УСТРОЙСТВА ==========
+const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+let isComposing = false; // флаг IME (для мобильных)
+
 // ========== ЗВУКИ ==========
 let audioContext = null;
 function initAudio() {
@@ -645,9 +649,8 @@ function isCrosswordCompleted(level, puzzleIdx) {
 
 // ========== ТЕМА ==========
 function initTheme() {
- const savedTheme = localStorage.getItem('theme') || 'light'; 
+    const savedTheme = localStorage.getItem('theme') || 'light'; 
     document.body.classList.remove('dark', 'sakura'); 
-    
     if (savedTheme === 'dark') {
         document.body.classList.add('dark');
     } else if (savedTheme === 'sakura') {
@@ -655,16 +658,13 @@ function initTheme() {
     }
 }
 function toggleTheme() {
-  let currentTheme = 'light';
+    let currentTheme = 'light';
     if (document.body.classList.contains('dark')) {
         currentTheme = 'dark';
     } else if (document.body.classList.contains('sakura')) {
         currentTheme = 'sakura';
     }
-
-    // Цикл переключения: Light -> Dark -> Sakura -> Light
     let nextTheme = '';
-    
     if (currentTheme === 'light') {
         nextTheme = 'dark';
     } else if (currentTheme === 'dark') {
@@ -672,15 +672,12 @@ function toggleTheme() {
     } else {
         nextTheme = 'light';
     }
-
-    // Применяем новую тему
     document.body.classList.remove('dark', 'sakura');
     if (nextTheme === 'dark') {
         document.body.classList.add('dark');
     } else if (nextTheme === 'sakura') {
         document.body.classList.add('sakura');
     }
-    
     localStorage.setItem('theme', nextTheme);
 }
 themeToggle.addEventListener('click', toggleTheme);
@@ -836,7 +833,7 @@ function loadCrossword(levelId, puzzleIdx, preserveSaved = true) {
     updatePuzzleSelect();
 }
 
-// ========== ОТРИСОВКА СЕТКИ ==========
+// ========== ОТРИСОВКА СЕТКИ (с поддержкой мобильного ввода) ==========
 function renderGrid() {
     const container = document.getElementById("gridContainer");
     container.innerHTML = "";
@@ -867,11 +864,45 @@ function renderGrid() {
             input.maxLength = 1;
             input.value = getDisplayValue(i, j);
             input.disabled = isBlocked || isLocked;
+            input.classList.add("cell-input");
+            input.dataset.row = i;
+            input.dataset.col = j;
+            
             if(!isBlocked && !isLocked){
-                input.addEventListener("keydown", (e) => handleKeydown(e, i, j));
+                // Общие обработчики для всех устройств (фокус, блюр)
                 input.addEventListener("focus", () => onCellFocus(i,j));
                 input.addEventListener("blur", () => onCellBlur(i,j));
-                input.addEventListener("input", () => onCellInput(i,j));
+                
+                // Для десктопа и мобильных по-разному
+                if (isMobileDevice) {
+                    // Мобильные: используем beforeinput + composition
+                    input.addEventListener('compositionstart', () => {
+                        isComposing = true;
+                    });
+                    input.addEventListener('compositionend', (e) => {
+                        isComposing = false;
+                        if (e.data) {
+                            handleCharInput(i, j, e.data.toLowerCase());
+                        }
+                    });
+                    input.addEventListener('beforeinput', (e) => {
+                        if (e.inputType === 'insertText' && e.data && !isComposing) {
+                            e.preventDefault();
+                            handleCharInput(i, j, e.data.toLowerCase());
+                        }
+                    });
+                    // Также обрабатываем управляющие клавиши (Backspace, стрелки) через keydown
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
+                            e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Enter') {
+                            e.preventDefault();
+                            handleControlKey(e, i, j);
+                        }
+                    });
+                } else {
+                    // Десктоп: полная обработка через keydown (как было)
+                    input.addEventListener("keydown", (e) => handleKeydownDesktop(e, i, j));
+                }
             }
             cellDiv.appendChild(input);
             container.appendChild(cellDiv);
@@ -925,13 +956,12 @@ function onCellFocus(row, col){
 function onCellBlur(row, col) {
     const key = `${row},${col}`;
     const buffer = romajiBuffers.get(key);
-    if (buffer === "n") {
-        insertKatakanaArray(row, col, ["ン"], 0);
-        romajiBuffers.delete(key);
-        updateCellUI(row, col);
-    } else if (buffer) {
-        romajiBuffers.delete(key);
-        updateCellUI(row, col);
+    if (buffer) {
+        // Попытаться обработать буфер при потере фокуса
+        if (!processBuffer(row, col, buffer)) {
+            romajiBuffers.delete(key);
+            updateCellUI(row, col);
+        }
     }
 }
 
@@ -984,240 +1014,71 @@ function getNextEmptyCellInWord(word, currentRow, currentCol) {
     return null;
 }
 
-// ========== ВСТАВКА СИМВОЛОВ (с проверкой правильности и звуками) ==========
-function insertKatakanaArray(row, col, katakanaArray, startIndex) {
-    if (startIndex >= katakanaArray.length) return;
-    const char = katakanaArray[startIndex];
-    if (startIndex === 0) {
-        gridData[row][col] = char;
+// ========== НОВЫЕ ФУНКЦИИ ДЛЯ МОБИЛЬНОГО ВВОДА ==========
+function handleCharInput(row, col, char) {
+    if (gridData[row][col] === null) return;
+    const key = `${row},${col}`;
+    let buffer = (romajiBuffers.get(key) || "") + char;
+    romajiBuffers.set(key, buffer);
+    updateCellUI(row, col);
+    
+    if (processBuffer(row, col, buffer)) {
+        romajiBuffers.delete(key);
         updateCellUI(row, col);
-        syncWordFromGrid();
-        checkCompletion();
-        updateClueCompletion();
-        updateWrongHighlights();
-        saveCurrentProgress();
-        
-        const correctChar = correctCharMap.get(`${row},${col}`);
-        if (char === correctChar) {
-            playCorrectInput();
-            // Добавляем анимацию
-            const cellDiv = cellElements[row]?.[col]?.parentElement;
-            if (cellDiv) {
-                cellDiv.classList.add('correct-animation');
-                setTimeout(() => {
-                    cellDiv.classList.remove('correct-animation');
-                }, 300); // Удаляем класс после завершения анимации
-            }
-        } else {
-            playErrorInput();
-        }
-
-        if (katakanaArray.length > 1) {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
-                        return;
-                    }
-                }
-            }
-        } else {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    else focusNextWord(activeWord.number);
-                }
-            }
-        }
-    } else {
-        gridData[row][col] = char;
-        updateCellUI(row, col);
-        syncWordFromGrid();
-        checkCompletion();
-        updateClueCompletion();
-        updateWrongHighlights();
-        saveCurrentProgress();
-        
-        const correctChar = correctCharMap.get(`${row},${col}`);
-        if (char === correctChar) {
-            playCorrectInput();
-            // Добавляем анимацию
-            const cellDiv = cellElements[row]?.[col]?.parentElement;
-            if (cellDiv) {
-                cellDiv.classList.add('correct-animation');
-                setTimeout(() => {
-                    cellDiv.classList.remove('correct-animation');
-                }, 300); // Удаляем класс после завершения анимации
-            }
-        } else {
-            playErrorInput();
-        }
-
-        if (startIndex + 1 < katakanaArray.length) {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                        let nextCell = activeWord.cells[idx + 1];
-                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
-                        return;
-                    }
-                }
-            }
-        } else {
-            if (activeWordId !== null) {
-                const activeWord = wordsList.find(w => w.id === activeWordId);
-                if (activeWord) {
-                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    else focusNextWord(activeWord.number);
-                }
-            }
-        }
     }
 }
 
-function focusNextWord(currentNumber) {
-    let allWords = [...cluesAcross, ...cluesDown];
-    allWords.sort((a,b) => a.num - b.num);
-    
-    for (let w of allWords) {
-        if (w.num > currentNumber) {
-            const wordObj = wordsList.find(word => word.id === w.wordId);
-            if (!wordObj) continue;
-            let isComplete = true;
-            for (let i = 0; i < wordObj.word.length; i++) {
-                if (wordObj.current[i] !== wordObj.wordOrig[i]) {
-                    isComplete = false;
-                    break;
+function handleControlKey(e, row, col) {
+    if (e.key === 'Backspace') {
+        const key = `${row},${col}`;
+        let buffer = romajiBuffers.get(key) || "";
+        if (buffer.length > 0) {
+            buffer = buffer.slice(0, -1);
+            romajiBuffers.set(key, buffer);
+            updateCellUI(row, col);
+        } else {
+            if (gridData[row][col] !== "") {
+                gridData[row][col] = "";
+                updateCellUI(row, col);
+                syncWordFromGrid();
+                checkCompletion();
+                updateClueCompletion();
+                updateWrongHighlights();
+                saveCurrentProgress();
+            } else if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx > 0) {
+                        let prev = activeWord.cells[idx - 1];
+                        cellElements[prev.row][prev.col]?.focus();
+                    }
                 }
             }
-            if (!isComplete) {
-                setActiveWord(wordObj.id);
-                return;
-            }
         }
+        return;
     }
-    
-    for (let w of allWords) {
-        const wordObj = wordsList.find(word => word.id === w.wordId);
-        if (!wordObj) continue;
-        let isComplete = true;
-        for (let i = 0; i < wordObj.word.length; i++) {
-            if (wordObj.current[i] !== wordObj.wordOrig[i]) {
-                isComplete = false;
-                break;
-            }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        let newRow = row, newCol = col;
+        if (e.key === 'ArrowLeft') newCol--;
+        if (e.key === 'ArrowRight') newCol++;
+        if (e.key === 'ArrowUp') newRow--;
+        if (e.key === 'ArrowDown') newRow++;
+        if (newRow >= 0 && newRow < gridHeight && newCol >= 0 && newCol < gridWidth && gridData[newRow][newCol] !== null) {
+            cellElements[newRow][newCol]?.focus();
         }
-        if (!isComplete) {
-            setActiveWord(wordObj.id);
-            return;
-        }
+        return;
     }
-}
-
-function processBuffer(row, col, buffer) {
-    if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
-        insertKatakanaArray(row, col, ["ン"], 0);
+    if (e.key === 'Enter') {
         if (activeWordId !== null) {
-            const activeWord = wordsList.find(w => w.id === activeWordId);
-            if (activeWord) {
-                let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                    let nextCell = activeWord.cells[idx + 1];
-                    const nextKey = `${nextCell.row},${nextCell.col}`;
-                    romajiBuffers.set(nextKey, buffer[1]);
-                    updateCellUI(nextCell.row, nextCell.col);
-                    cellElements[nextCell.row][nextCell.col]?.focus();
-                } else {
-                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                    if (nextEmpty) {
-                        const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
-                        romajiBuffers.set(nextKey, buffer[1]);
-                        updateCellUI(nextEmpty.row, nextEmpty.col);
-                        cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                    } else {
-                        focusNextWord(activeWord.number);
-                        setTimeout(() => {
-                            if (activeWordId !== null) {
-                                const newWord = wordsList.find(w => w.id === activeWordId);
-                                if (newWord && newWord.cells.length) {
-                                    let firstCell = newWord.cells[0];
-                                    const firstKey = `${firstCell.row},${firstCell.col}`;
-                                    romajiBuffers.set(firstKey, buffer[1]);
-                                    updateCellUI(firstCell.row, firstCell.col);
-                                    cellElements[firstCell.row][firstCell.col]?.focus();
-                                }
-                            }
-                        }, 10);
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    if (romajiToKatakana.hasOwnProperty(buffer)) {
-        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
-        return true;
-    }
-
-    for (let i = buffer.length - 1; i >= 1; i--) {
-        let prefix = buffer.slice(0, i);
-        if (romajiToKatakana.hasOwnProperty(prefix)) {
-            const katakanaArray = romajiToKatakana[prefix];
-            const remaining = buffer.slice(i);
-            insertKatakanaArray(row, col, katakanaArray, 0);
-            if (remaining.length > 0) {
-                if (activeWordId !== null) {
-                    const activeWord = wordsList.find(w => w.id === activeWordId);
-                    if (activeWord) {
-                        let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
-                        if (idx !== -1 && idx + 1 < activeWord.cells.length) {
-                            let nextCell = activeWord.cells[idx + 1];
-                            const nextKey = `${nextCell.row},${nextCell.col}`;
-                            romajiBuffers.set(nextKey, remaining);
-                            updateCellUI(nextCell.row, nextCell.col);
-                            cellElements[nextCell.row][nextCell.col]?.focus();
-                        } else {
-                            let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
-                            if (nextEmpty) {
-                                const nextKey = `${nextEmpty.row},${nextEmpty.col}`;
-                                romajiBuffers.set(nextKey, remaining);
-                                updateCellUI(nextEmpty.row, nextEmpty.col);
-                                cellElements[nextEmpty.row][nextEmpty.col]?.focus();
-                            } else {
-                                focusNextWord(activeWord.number);
-                                setTimeout(() => {
-                                    if (activeWordId !== null) {
-                                        const newWord = wordsList.find(w => w.id === activeWordId);
-                                        if (newWord && newWord.cells.length) {
-                                            let firstCell = newWord.cells[0];
-                                            const firstKey = `${firstCell.row},${firstCell.col}`;
-                                            romajiBuffers.set(firstKey, remaining);
-                                            updateCellUI(firstCell.row, firstCell.col);
-                                            cellElements[firstCell.row][firstCell.col]?.focus();
-                                        }
-                                    }
-                                }, 10);
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
+            const word = wordsList.find(w => w.id === activeWordId);
+            if (word) focusNextWord(word.number);
         }
     }
-    return false;
 }
 
-function handleKeydown(e, row, col) {
+// Оригинальная функция keydown для десктопа (без изменений)
+function handleKeydownDesktop(e, row, col) {
     if (gridData[row][col] === null) return;
     const allowedChars = /^[a-zA-Z-]$/;
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !allowedChars.test(e.key)) {
@@ -1294,11 +1155,183 @@ function handleKeydown(e, row, col) {
     }
 }
 
-function onCellInput(row, col) {
-    const key = `${row},${col}`;
-    if (romajiBuffers.has(key)) {
-        romajiBuffers.delete(key);
+// Универсальная вставка катаканы (без рекурсивного перехода, только в текущую ячейку)
+function insertKatakanaArray(row, col, katakanaArray, startIndex) {
+    if (startIndex >= katakanaArray.length) return;
+    const char = katakanaArray[startIndex];
+    if (startIndex === 0) {
+        gridData[row][col] = char;
         updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        updateClueCompletion();
+        updateWrongHighlights();
+        saveCurrentProgress();
+        
+        const correctChar = correctCharMap.get(`${row},${col}`);
+        if (char === correctChar) {
+            playCorrectInput();
+            const cellDiv = cellElements[row]?.[col]?.parentElement;
+            if (cellDiv) {
+                cellDiv.classList.add('correct-animation');
+                setTimeout(() => cellDiv.classList.remove('correct-animation'), 300);
+            }
+        } else {
+            playErrorInput();
+        }
+
+        if (katakanaArray.length > 1) {
+            // Если в слове есть продолжение (составной символ), обрабатываем следующую часть в текущей ячейке? 
+            // Для составных типа シ+ユ мы уже вставили シ, а ユ нужно в следующую ячейку.
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, 1);
+                        return;
+                    }
+                }
+            }
+        } else {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
+                }
+            }
+        }
+    } else {
+        gridData[row][col] = char;
+        updateCellUI(row, col);
+        syncWordFromGrid();
+        checkCompletion();
+        updateClueCompletion();
+        updateWrongHighlights();
+        saveCurrentProgress();
+        
+        const correctChar = correctCharMap.get(`${row},${col}`);
+        if (char === correctChar) {
+            playCorrectInput();
+            const cellDiv = cellElements[row]?.[col]?.parentElement;
+            if (cellDiv) {
+                cellDiv.classList.add('correct-animation');
+                setTimeout(() => cellDiv.classList.remove('correct-animation'), 300);
+            }
+        } else {
+            playErrorInput();
+        }
+
+        if (startIndex + 1 < katakanaArray.length) {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+                    if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                        let nextCell = activeWord.cells[idx + 1];
+                        insertKatakanaArray(nextCell.row, nextCell.col, katakanaArray, startIndex + 1);
+                        return;
+                    }
+                }
+            }
+        } else {
+            if (activeWordId !== null) {
+                const activeWord = wordsList.find(w => w.id === activeWordId);
+                if (activeWord) {
+                    let nextEmpty = getNextEmptyCellInWord(activeWord, row, col);
+                    if (nextEmpty) cellElements[nextEmpty.row][nextEmpty.col]?.focus();
+                    else focusNextWord(activeWord.number);
+                }
+            }
+        }
+    }
+}
+
+function processBuffer(row, col, buffer) {
+    // Специальный случай: "n" + согласная (кроме n, a,i,u,e,o)
+    if (buffer.length === 2 && buffer[0] === 'n' && !'aiueo'.includes(buffer[1]) && buffer[1] !== 'n') {
+        insertKatakanaArray(row, col, ["ン"], 0);
+        // Остаток? Нет, так как n уже использована
+        return true;
+    }
+    if (romajiToKatakana.hasOwnProperty(buffer)) {
+        insertKatakanaArray(row, col, romajiToKatakana[buffer], 0);
+        return true;
+    }
+    for (let i = buffer.length - 1; i >= 1; i--) {
+        let prefix = buffer.slice(0, i);
+        if (romajiToKatakana.hasOwnProperty(prefix)) {
+            const katakanaArray = romajiToKatakana[prefix];
+            const remaining = buffer.slice(i);
+            insertKatakanaArray(row, col, katakanaArray, 0);
+            if (remaining.length > 0) {
+                moveRemainingToNextCell(row, col, remaining);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+function moveRemainingToNextCell(row, col, remaining) {
+    if (activeWordId !== null) {
+        const activeWord = wordsList.find(w => w.id === activeWordId);
+        if (activeWord) {
+            let idx = activeWord.cells.findIndex(c => c.row === row && c.col === col);
+            if (idx !== -1 && idx + 1 < activeWord.cells.length) {
+                let nextCell = activeWord.cells[idx + 1];
+                const nextKey = `${nextCell.row},${nextCell.col}`;
+                romajiBuffers.set(nextKey, remaining);
+                updateCellUI(nextCell.row, nextCell.col);
+                cellElements[nextCell.row][nextCell.col]?.focus();
+                if (processBuffer(nextCell.row, nextCell.col, remaining)) {
+                    romajiBuffers.delete(nextKey);
+                    updateCellUI(nextCell.row, nextCell.col);
+                }
+            }
+        }
+    }
+}
+
+function focusNextWord(currentNumber) {
+    let allWords = [...cluesAcross, ...cluesDown];
+    allWords.sort((a,b) => a.num - b.num);
+    
+    for (let w of allWords) {
+        if (w.num > currentNumber) {
+            const wordObj = wordsList.find(word => word.id === w.wordId);
+            if (!wordObj) continue;
+            let isComplete = true;
+            for (let i = 0; i < wordObj.word.length; i++) {
+                if (wordObj.current[i] !== wordObj.wordOrig[i]) {
+                    isComplete = false;
+                    break;
+                }
+            }
+            if (!isComplete) {
+                setActiveWord(wordObj.id);
+                return;
+            }
+        }
+    }
+    
+    for (let w of allWords) {
+        const wordObj = wordsList.find(word => word.id === w.wordId);
+        if (!wordObj) continue;
+        let isComplete = true;
+        for (let i = 0; i < wordObj.word.length; i++) {
+            if (wordObj.current[i] !== wordObj.wordOrig[i]) {
+                isComplete = false;
+                break;
+            }
+        }
+        if (!isComplete) {
+            setActiveWord(wordObj.id);
+            return;
+        }
     }
 }
 
@@ -1347,7 +1380,6 @@ function checkCompletion() {
             }
         }
     }
-    // Если кроссворд заблокирован, сообщение уже установлено в loadCrossword
 }
 
 function updateClueCompletion() {
@@ -1419,7 +1451,7 @@ function renderClues() {
     updateClueCompletion();
 }
 
-// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА (с подтверждением) ==========
+// ========== СБРОС ТЕКУЩЕГО КРОССВОРДА ==========
 async function resetCrossword() {
     if (!isPuzzleUnlocked(currentLevel, currentPuzzleIndex)) {
         showToast("Кроссворд заблокирован. Сброс невозможен.", "error");
@@ -1609,7 +1641,6 @@ helpBtn.addEventListener('click', () => {
     showTutorial();
 });
 
-// Для селекторов уровней тоже можно добавить, но там onChange, а не click
 levelSelect.addEventListener('change', () => playClick());
 puzzleSelect.addEventListener('change', () => playClick());
 
@@ -1650,7 +1681,6 @@ function openShopModal() {
         modalContent.appendChild(rouletteSection);
     }
     
-    // Заполняем скины с новой структурой
     skinsSection.innerHTML = '';
     for (let skin of availableSkins) {
         const purchased = isSkinPurchased(skin.id);
@@ -1674,7 +1704,6 @@ function openShopModal() {
         skinsSection.appendChild(skinDiv);
     }
     
-    // Заполняем улучшения
     upgradesSection.innerHTML = `
         <div class="upgrade-item">
             <div class="upgrade-info">
@@ -1698,7 +1727,6 @@ function openShopModal() {
         </div>
     `;
     
-    // Заполняем рулетку
     rouletteSection.innerHTML = `
         <div class="roulette-container">
             <div class="roulette-spin-area">
@@ -1720,7 +1748,6 @@ function openShopModal() {
     const spinBtn = document.getElementById('rouletteSpinBtn');
     if (spinBtn) spinBtn.addEventListener('click', spinRoulette);
     
-    // Обработчики для скинов
     skinsSection.querySelectorAll('.skin-btn.buy').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
@@ -1738,7 +1765,6 @@ function openShopModal() {
         });
     });
     
-    // Обработчики для улучшений
     upgradesSection.querySelectorAll('.upgrade-btn.buy').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const newLimit = parseInt(btn.dataset.upgrade);
@@ -1750,7 +1776,6 @@ function openShopModal() {
         });
     });
     
-    // Переключение табов с сохранением
     const tabs = tabsContainer.querySelectorAll('.shop-tab');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -1912,11 +1937,9 @@ checkDailyBonus();
 loadSkinsData();
 updatePuzzleSelect();
 
-// Проверка последнего уровня
 let startLevel = localStorage.getItem('lastPlayedLevel') || "n5";
 let startPuzzle = parseInt(localStorage.getItem('lastPlayedPuzzle')) || 0;
 
-// Проверка, разблокирован ли этот пазл (если нет, сбрасываем на первый разблокированный)
 if (!isPuzzleUnlocked(startLevel, startPuzzle)) {
     const puzzles = window.crosswordsData[startLevel].puzzles;
     for (let i = 0; i < puzzles.length; i++) {
@@ -1925,14 +1948,12 @@ if (!isPuzzleUnlocked(startLevel, startPuzzle)) {
             break;
         }
     }
-    // Если в этом уровне ничего не разблокировано, пробуем N5
     if (!isPuzzleUnlocked(startLevel, startPuzzle) && startLevel !== "n5") {
         startLevel = "n5";
         startPuzzle = 0;
     }
 }
 
-// Установка значений в селекторы перед загрузкой
 levelSelect.value = startLevel;
 currentLevel = startLevel;
 currentPuzzleIndex = startPuzzle;
