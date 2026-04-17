@@ -910,3 +910,15 @@ body.sakura .clue-list li.active-clue {
     transition: transform 0.1s ease;
 }
 
+.cell.mobile-active {
+    background: var(--active-word-light);
+    box-shadow: 0 0 0 2px #4a6fa5;
+}
+body.dark .cell.mobile-active {
+    background: var(--active-word-dark);
+    box-shadow: 0 0 0 2px #6c8fb5;
+}
+body.sakura .cell.mobile-active {
+    background: var(--active-word-sakura);
+    box-shadow: 0 0 0 2px var(--btn-bg-sakura);
+}
