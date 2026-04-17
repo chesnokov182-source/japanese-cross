@@ -1,10 +1,15 @@
 import { playClick } from './sounds.js';
 import { getSelectedSkinEmoji, updateAllBlockedSkins } from './shop.js';
-let onCellKeydownCallback;
 
 let cellElements = [];
 let gridWidth, gridHeight, gridData, wordsList, activeWordId;
-let onCellFocusCallback, onCellInputCallback, onCellBlurCallback;
+let onCellFocusCallback, onCellInputCallback, onCellBlurCallback, onCellKeydownCallback;
+// Глобальная ссылка на буфер ромадзи (устанавливается из crossword.js)
+let romajiBuffersGlobal = null;
+
+export function setRomajiBuffers(buffers) {
+    romajiBuffersGlobal = buffers;
+}
 
 export function setGridDimensions(width, height) {
     gridWidth = width;
@@ -33,6 +38,77 @@ export function getCellElements() {
 
 export function getGridData() {
     return gridData;
+}
+
+function getWordNumberAt(row, col) {
+    if (!wordsList) return null;
+    for (let w of wordsList) {
+        if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
+            return w.number;
+        }
+    }
+    return null;
+}
+
+function getDisplayValue(row, col) {
+    if (!romajiBuffersGlobal) return (gridData[row]?.[col] !== null ? gridData[row][col] : "");
+    const key = `${row},${col}`;
+    const buffer = romajiBuffersGlobal.get(key) || "";
+    if (buffer !== "") return buffer;
+    return gridData[row]?.[col] !== null ? gridData[row][col] : "";
+}
+
+export function updateCellUI(row, col) {
+    if (cellElements[row] && cellElements[row][col]) {
+        cellElements[row][col].value = getDisplayValue(row, col);
+    }
+}
+
+export function applyHighlight() {
+    for(let i = 0; i < gridHeight; i++) {
+        for(let j = 0; j < gridWidth; j++) {
+            const cellDiv = cellElements[i]?.[j]?.parentElement;
+            if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
+        }
+    }
+    if(activeWordId !== null && wordsList) {
+        const activeWord = wordsList.find(w => w.id === activeWordId);
+        if(activeWord) {
+            for(let cell of activeWord.cells) {
+                const cellDiv = cellElements[cell.row]?.[cell.col]?.parentElement;
+                if(cellDiv) cellDiv.classList.add("active-word");
+            }
+        }
+    }
+    document.querySelectorAll(".clue-list li").forEach(li => li.classList.remove("active-clue"));
+    if(activeWordId !== null) {
+        const target = document.querySelector(`.clue-list li[data-word-id='${activeWordId}']`);
+        if(target) target.classList.add("active-clue");
+    }
+}
+
+export function updateWrongHighlights() {
+    // Эта функция вызывается, но реальная подсветка ошибок делается через setWrongHighlight
+    // Оставляем пустой или можно перебрать все ячейки
+    for(let i = 0; i < gridHeight; i++) {
+        for(let j = 0; j < gridWidth; j++) {
+            const cellDiv = cellElements[i]?.[j]?.parentElement;
+            if(cellDiv) cellDiv.classList.remove("wrong");
+        }
+    }
+}
+
+export function setWrongHighlight(row, col, isWrong) {
+    const cellDiv = cellElements[row]?.[col]?.parentElement;
+    if(cellDiv) {
+        if(isWrong) cellDiv.classList.add("wrong");
+        else cellDiv.classList.remove("wrong");
+    }
+}
+
+export function clearHighlight() {
+    activeWordId = null;
+    applyHighlight();
 }
 
 export function renderGrid(isLocked, onFocus, onInput, onBlur, onKeydown) {
@@ -69,7 +145,7 @@ export function renderGrid(isLocked, onFocus, onInput, onBlur, onKeydown) {
             
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;   // <-- вернули 1
+            input.maxLength = 1;
             input.value = getDisplayValue(i, j);
             input.disabled = isBlocked || isLocked;
             if(!isBlocked && !isLocked) {
@@ -77,7 +153,6 @@ export function renderGrid(isLocked, onFocus, onInput, onBlur, onKeydown) {
                 input.addEventListener("blur", () => onCellBlurCallback(i, j));
                 input.addEventListener("input", () => onCellInputCallback(i, j));
                 input.addEventListener("keydown", (e) => onCellKeydownCallback(e, i, j));
-                // для мобильных – подсказка для клавиатуры
                 input.setAttribute("inputmode", "latin");
                 input.setAttribute("autocomplete", "off");
                 input.setAttribute("autocapitalize", "none");
@@ -89,71 +164,7 @@ export function renderGrid(isLocked, onFocus, onInput, onBlur, onKeydown) {
     }
     applyHighlight();
     updateWrongHighlights();
-    updateAllBlockedSkins();
-}
-
-function getWordNumberAt(row, col) {
-    for (let w of wordsList) {
-        if (w.cells.length > 0 && w.cells[0].row === row && w.cells[0].col === col) {
-            return w.number;
-        }
-    }
-    return null;
-}
-
-export function updateCellUI(row, col) {
-    if (cellElements[row] && cellElements[row][col]) {
-        cellElements[row][col].value = gridData[row][col] !== null ? gridData[row][col] : "";
-    }
-}
-
-export function applyHighlight() {
-    for(let i = 0; i < gridHeight; i++) {
-        for(let j = 0; j < gridWidth; j++) {
-            const cellDiv = cellElements[i]?.[j]?.parentElement;
-            if(cellDiv) cellDiv.classList.remove("highlight", "active-word");
-        }
-    }
-    if(activeWordId !== null) {
-        const activeWord = wordsList.find(w => w.id === activeWordId);
-        if(activeWord) {
-            for(let cell of activeWord.cells) {
-                const cellDiv = cellElements[cell.row]?.[cell.col]?.parentElement;
-                if(cellDiv) cellDiv.classList.add("active-word");
-            }
-        }
-    }
-    document.querySelectorAll(".clue-list li").forEach(li => li.classList.remove("active-clue"));
-    if(activeWordId !== null) {
-        const target = document.querySelector(`.clue-list li[data-word-id='${activeWordId}']`);
-        if(target) target.classList.add("active-clue");
-    }
-}
-
-export function updateWrongHighlights() {
-    for(let i = 0; i < gridHeight; i++) {
-        for(let j = 0; j < gridWidth; j++) {
-            const cellDiv = cellElements[i]?.[j]?.parentElement;
-            if(!cellDiv) continue;
-            const value = gridData[i][j];
-            // правильный символ будем передавать извне
-            // Пока просто убираем wrong, потом вызовем отдельно
-            cellDiv.classList.remove("wrong");
-        }
-    }
-}
-
-export function setWrongHighlight(row, col, isWrong) {
-    const cellDiv = cellElements[row]?.[col]?.parentElement;
-    if(cellDiv) {
-        if(isWrong) cellDiv.classList.add("wrong");
-        else cellDiv.classList.remove("wrong");
-    }
-}
-
-export function clearHighlight() {
-    activeWordId = null;
-    applyHighlight();
+    if (typeof updateAllBlockedSkins === 'function') updateAllBlockedSkins();
 }
 
 export function renderClues(cluesAcross, cluesDown, onClueClick) {
