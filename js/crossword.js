@@ -3,6 +3,7 @@ import { saveCurrentProgress, clearProgressForPuzzle, isPuzzleUnlocked, markAsCo
 import { playCorrectInput, playErrorInput, playPop } from './sounds.js';
 import { renderGrid, updateCellUI, applyHighlight, clearHighlight, renderClues, updateClueCompletion, showToast, showConfetti, updateScoreUI, setStatusMessage, getCellElements, getGridData, setGridData, setWordsList, setGridDimensions, setActiveWordId, getActiveWordId, updateWrongHighlights, setWrongHighlight } from './ui.js';
 import { updateAllBlockedSkins } from './shop.js';
+import { setRomajiBuffers } from './ui.js';
 
 let currentLevel = "n5";
 let currentPuzzleIndex = 0;
