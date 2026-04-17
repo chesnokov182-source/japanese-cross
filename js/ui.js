@@ -34,10 +34,11 @@ export function getGridData() {
     return gridData;
 }
 
-export function renderGrid(isLocked, onFocus, onInput, onBlur) {
+export function renderGrid(isLocked, onFocus, onInput, onBlur, onKeydown) {
     onCellFocusCallback = onFocus;
     onCellInputCallback = onInput;
     onCellBlurCallback = onBlur;
+    onCellKeydownCallback = onKeydown;
     
     const container = document.getElementById("gridContainer");
     container.innerHTML = "";
@@ -67,14 +68,15 @@ export function renderGrid(isLocked, onFocus, onInput, onBlur) {
             
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 20; // позволим вводить больше символов для преобразования
-            input.value = gridData[i][j] !== null ? gridData[i][j] : "";
+            input.maxLength = 1;   // <-- вернули 1
+            input.value = getDisplayValue(i, j);
             input.disabled = isBlocked || isLocked;
             if(!isBlocked && !isLocked) {
                 input.addEventListener("focus", () => onCellFocusCallback(i, j));
                 input.addEventListener("blur", () => onCellBlurCallback(i, j));
                 input.addEventListener("input", () => onCellInputCallback(i, j));
-                // Для мобильных: обрабатываем ввод сразу (без дополнительной магии)
+                input.addEventListener("keydown", (e) => onCellKeydownCallback(e, i, j));
+                // для мобильных – подсказка для клавиатуры
                 input.setAttribute("inputmode", "latin");
                 input.setAttribute("autocomplete", "off");
                 input.setAttribute("autocapitalize", "none");
@@ -86,7 +88,7 @@ export function renderGrid(isLocked, onFocus, onInput, onBlur) {
     }
     applyHighlight();
     updateWrongHighlights();
-    updateAllBlockedSkins(); // из shop.js
+    updateAllBlockedSkins();
 }
 
 function getWordNumberAt(row, col) {
