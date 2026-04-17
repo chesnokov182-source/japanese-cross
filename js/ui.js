@@ -4,7 +4,6 @@ import { getSelectedSkinEmoji, updateAllBlockedSkins } from './shop.js';
 let cellElements = [];
 let gridWidth, gridHeight, gridData, wordsList, activeWordId;
 let onCellFocusCallback, onCellInputCallback, onCellBlurCallback, onCellKeydownCallback;
-// Глобальная ссылка на буфер ромадзи (устанавливается из crossword.js)
 let romajiBuffersGlobal = null;
 
 export function setRomajiBuffers(buffers) {
@@ -88,8 +87,6 @@ export function applyHighlight() {
 }
 
 export function updateWrongHighlights() {
-    // Эта функция вызывается, но реальная подсветка ошибок делается через setWrongHighlight
-    // Оставляем пустой или можно перебрать все ячейки
     for(let i = 0; i < gridHeight; i++) {
         for(let j = 0; j < gridWidth; j++) {
             const cellDiv = cellElements[i]?.[j]?.parentElement;
