@@ -47,7 +47,7 @@ window.crosswordsData.n4 = {
                     { word: "サイコロ", row: 1, col: 0, dir: "across", clue: "Игральная кость", number: 4},
                     { word: "コイシ", row: 1, col: 2, dir: "down", clue: "Маленький камень", number: 5},
                     { word: "シロ", row: 0, col: 3, dir: "down", clue: "Белый цвет", number: 6},
-                    { word: "ケシキ", row: 3, col: 1, dir: "across", clue: "Пейзаж, вид", number: 7},
+                    { word: "ケシキ", row: 3, col: 1, dir: "across", clue: "Пейзаж", number: 7},
                 ]
             },
             {
