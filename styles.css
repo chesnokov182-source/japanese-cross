@@ -27,7 +27,7 @@
     --btn-hover-dark: #5a7a9e;
     --shadow-dark: rgba(0,0,0,0.5);
 
-    --bg-body-sakura: #fff0f5;
+    --bg-body-sakura: #fff0f5; 
     --bg-container-sakura: #ffffff;
     --bg-clues-sakura: #fff5f8;
     --text-sakura: #5d4037;
@@ -35,11 +35,11 @@
     --cell-bg-sakura: #fff;
     --cell-blocked-sakura: #f8bbd0;
     --highlight-sakura: #ffecf2;
-    --active-word-sakura: #ffc1e3;
+    --active-word-sakura: #ffc1e3; 
     --wrong-sakura: #ef9a9a;
-    --btn-bg-sakura: #ec407a;
+    --btn-bg-sakura: #ec407a; 
     --btn-hover-sakura: #d81b60;
-    --shadow-sakura: rgba(183, 28, 68, 0.15);
+    --shadow-sakura: rgba(183, 28, 68, 0.15); 
 }
 
 * {
@@ -86,13 +86,13 @@ body.dark .crossword-container {
 
 .grid-section {
     flex: 2;
-    min-width: 280px;
+    min-width: 500px;
     overflow-x: auto;
 }
 
 .clues-section {
     flex: 1;
-    min-width: 280px;
+    min-width: 320px;
     background: var(--bg-clues-light);
     border-radius: 16px;
     padding: 20px;
@@ -155,17 +155,16 @@ button:disabled {
     border: 2px solid #333;
     width: fit-content;
     margin: 0 auto;
-    overflow-x: auto;
 }
 
 .cell {
-    width: min(70px, 13vw);
-    height: min(70px, 13vw);
+    width: 70px;
+    height: 70px;
     background: var(--cell-bg-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: min(32px, 6vw);
+    font-size: 32px;
     font-weight: bold;
     position: relative;
     caret-color: #4a6fa5;
@@ -185,7 +184,7 @@ body.dark .cell input {
     width: 100%;
     height: 100%;
     text-align: center;
-    font-size: min(32px, 6vw);
+    font-size: 32px;
     font-weight: bold;
     border: none;
     background: transparent;
@@ -234,7 +233,7 @@ body.dark .cell.wrong {
     position: absolute;
     top: 3px;
     left: 5px;
-    font-size: min(14px, 3vw);
+    font-size: 14px;
     font-weight: normal;
     color: #666;
     pointer-events: none;
@@ -254,7 +253,7 @@ body.dark .cell-number {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: min(48px, 10vw);
+    font-size: 48px;
     pointer-events: none;
     z-index: 1;
     background: transparent;
@@ -281,7 +280,7 @@ body.dark .clue-block h3 {
 }
 
 .clue-list li {
-    padding: 12px 12px;
+    padding: 10px 12px;
     margin: 6px 0;
     border-radius: 10px;
     cursor: pointer;
@@ -289,7 +288,6 @@ body.dark .clue-block h3 {
     font-size: 16px;
     display: flex;
     gap: 10px;
-    min-height: 44px; /* увеличенная область касания */
 }
 
 .clue-list li:hover {
@@ -499,35 +497,178 @@ body.dark .modal-no {
     color: #e0e0e0;
 }
 
-/* Мобильные кнопки навигации */
-.mobile-nav {
+.shop-tabs {
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
 }
-
-.mobile-nav .nav-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 40px;
+.shop-tab {
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-light);
+    border-radius: 20px 20px 0 0;
+    transition: all 0.2s;
+}
+.shop-tab.active {
     background: var(--btn-bg-light);
     color: white;
-    font-size: 28px;
+}
+body.dark .shop-tab.active {
+    background: var(--btn-bg-dark);
+}
+.shop-tab:hover:not(.active) {
+    background: rgba(0,0,0,0.05);
+}
+.shop-section {
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.shop-section.active {
+    display: block;
+}
+.skin-item, .upgrade-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--bg-container-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    gap: 15px;
+}
+body.dark .skin-item, body.dark .upgrade-item {
+    background: var(--bg-container-dark);
+}
+.skin-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 0;
+}
+.skin-emoji {
+    font-size: 32px;
+    width: 48px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.skin-details {
+    flex: 1;
+    min-width: 0;
+}
+.skin-name {
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.skin-price {
+    font-size: 14px;
+    color: #4a6fa5;
+    white-space: nowrap;
+}
+.skin-btn, .upgrade-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    min-width: 80px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.skin-btn.buy, .upgrade-btn.buy {
+    background: #4a6fa5;
+    color: white;
+}
+.skin-btn.select {
+    background: #2c6e2c;
+    color: white;
+}
+.skin-btn.selected, .upgrade-btn.disabled {
+    background: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.upgrade-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.upgrade-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+.upgrade-desc {
+    font-size: 12px;
+    color: #666;
+}
+body.dark .upgrade-desc {
+    color: #aaa;
+}
+.upgrade-price {
+    font-size: 14px;
+    color: #4a6fa5;
+}
+.roulette-container {
+    text-align: center;
+    padding: 20px;
+}
+.roulette-spin-area {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-container-light);
+    border-radius: 16px;
+    border: 2px solid var(--border-light);
+    min-height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--text-light);
+    text-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+body.dark .roulette-spin-area {
+    color: black;
+}
+.roulette-spin-area span {
+    color: inherit;
+}
+.roulette-spin-btn {
+    background: var(--btn-bg-light);
+    color: white;
     border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 18px;
     cursor: pointer;
-    touch-action: manipulation;
+    transition: transform 0.1s;
+}
+.roulette-spin-btn:active {
+    transform: scale(0.95);
+}
+.roulette-result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.roulette-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
+body.dark .roulette-info {
+    color: #aaa;
 }
 
-body.dark .mobile-nav .nav-btn {
-    background: var(--btn-bg-dark);
-}
-
-/* Тема сакуры */
 body.sakura {
     background: var(--bg-body-sakura);
     color: var(--text-sakura);
@@ -640,13 +781,55 @@ body.sakura .modal-no {
     color: #880e4f;
 }
 
-body.sakura .mobile-nav .nav-btn {
+body.sakura .shop-tabs {
+    border-bottom-color: var(--border-sakura);
+}
+
+body.sakura .shop-tab.active {
     background: var(--btn-bg-sakura);
 }
 
+body.sakura .skin-item, 
+body.sakura .upgrade-item {
+    background: var(--bg-container-sakura);
+    border-color: var(--border-sakura);
+}
+
+body.sakura .roulette-spin-area {
+    background: var(--bg-container-sakura);
+    border-color: var(--border-sakura);
+    color: var(--text-sakura);
+}
+
+body.sakura .skin-btn.buy, 
+body.sakura .upgrade-btn.buy {
+    background: var(--btn-bg-sakura);
+}
+
+body.sakura .skin-btn.select {
+    background: #2e7d32; /* Зеленый для выбора, чтобы отличался от розового */
+}
+
+.clue-list li.active-clue {
+    background: var(--active-word-light); 
+    color: #004080; 
+    font-weight: bold;
+    border-left: 4px solid #4a6fa5; 
+    box-shadow: 0 2px 5px rgba(74, 111, 165, 0.2); 
+}
+
+body.dark .clue-list li.active-clue {
+    background: var(--active-word-dark); 
+    color: #ffffff; 
+    font-weight: bold;
+    border-left: 4px solid #6c8fb5; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Анимация успешного ввода */
 @keyframes successPop {
     0% { transform: scale(1); }
-    50% { transform: scale(1.2); background-color: #a5d6a7; }
+    50% { transform: scale(1.2); background-color: #a5d6a7; } 
     100% { transform: scale(1); }
 }
 
@@ -665,27 +848,65 @@ body.dark .cell.correct-animation {
 }
 
 @media (max-width: 800px) {
-    .level-selector {
-        gap: 8px;
-    }
-    select, button {
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-    .clue-list li {
-        padding: 10px 8px;
-        font-size: 14px;
-    }
-    .modal-message {
-        font-size: 18px;
-    }
-    .modal-btn {
-        font-size: 16px;
-        padding: 10px 24px;
-    }
-    .mobile-nav .nav-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-    }
+    .cell { width: 50px; height: 50px; font-size: 24px; }
+    .cell input { font-size: 24px; }
+    .cell-number { font-size: 11px; }
+    .clue-list li { font-size: 14px; }
+    .modal-message { font-size: 18px; }
+    .modal-btn { font-size: 16px; padding: 10px 24px; }
+    .roulette-spin-area { font-size: 32px; min-height: 100px; }
+    .skin-btn, .upgrade-btn { min-width: 70px; font-size: 12px; }
+    .skin-emoji { width: 36px; font-size: 24px; }
 }
+
+/* Общие стили для активного вопроса */
+.clue-list li.active-clue {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 8px 12px;
+    transition: all 0.25s ease;
+    border-left: 4px solid;
+    margin-left: -4px;
+    border-radius: 0 8px 8px 0;
+    backdrop-filter: blur(2px);
+}
+
+/* Анимация пульсации (лёгкая) */
+@keyframes subtlePulse {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.02); }
+    100% { filter: brightness(1); }
+}
+.clue-list li.active-clue {
+    animation: subtlePulse 0.8s ease 2;
+}
+
+/* ===== СВЕТЛАЯ ТЕМА (по умолчанию) ===== */
+body:not(.dark):not(.sakura) .clue-list li.active-clue {
+    background: linear-gradient(90deg, #f0f7ff 0%, #ffffff 100%);
+    border-left-color: #5a9eff;
+    color: #004e92;
+    box-shadow: 0 2px 6px rgba(0,78,146,0.1);
+}
+
+/* ===== ТЁМНАЯ ТЕМА ===== */
+body.dark .clue-list li.active-clue {
+    background: linear-gradient(90deg, #2a2e3a 0%, #1e2129 100%);
+    border-left-color: #ffb347;
+    color: #f5f0e6;
+    box-shadow: 0 2px 6px rgba(255,179,71,0.15);
+}
+
+/* ===== ТЕМА САКУРЫ ===== */
+body.sakura .clue-list li.active-clue {
+    background: linear-gradient(90deg, #fff5f8 0%, #ffffff 100%);
+    border-left-color: #ff8a9f;
+    color: #9b2c4c;
+    box-shadow: 0 2px 6px rgba(155,44,76,0.1);
+}
+
+.clue-list li.active-clue:hover {
+    transform: scale(1.01);
+    transition: transform 0.1s ease;
+}
+
